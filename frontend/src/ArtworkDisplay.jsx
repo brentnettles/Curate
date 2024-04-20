@@ -1,31 +1,33 @@
 import React, { useEffect, useState } from 'react';
+import './ArtworkList.css'; // Import CSS file
+import ArtworkList from './ArtworkList'; // Import ArtworkList component
 
 function ArtworkDisplay({ galleryNumber }) {
   const [artworks, setArtworks] = useState([]);
   const [error, setError] = useState(null);
+  const [isVisible, setIsVisible] = useState(false); // State to track visibility of ArtworkList
 
   useEffect(() => {
     async function fetchArtworks() {
-      const url = `http://127.0.0.1:5555/api/artworks/${galleryNumber}`;  // Construct the URL with the gallery number
-
+      const url = `http://127.0.0.1:5555/api/artworks/${galleryNumber}`;
       try {
-        // Include credentials with the fetch request
-        const response = await fetch(url, { 
-          credentials: 'include'  // Needed for cookies to be sent with CORS requests
-        });
+        const response = await fetch(url);
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);  // Check if the response was successful
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const data = await response.json();  // Parse JSON response
-        console.log("Fetched Artworks Data:", data); // Log the fetched artworks data
-        setArtworks(data);  // Set the artworks state
+        const data = await response.json();
+        console.log("Fetched Artworks Data:", data);  // Log the fetched data
+        setArtworks(data);
+        setIsVisible(true); // Set isVisible to true after fetching artworks
       } catch (error) {
         console.error('Error fetching artworks:', error);
-        setError(error.message);  // Set the error state
+        setError(error.message);
       }
     }
 
-    fetchArtworks();  // Call the fetch function
+    if (galleryNumber) {  // Ensure galleryNumber is not undefined or null
+      fetchArtworks();
+    }
   }, [galleryNumber]); // Dependency array ensures fetch is called when galleryNumber updates
 
   if (error) {
@@ -33,14 +35,14 @@ function ArtworkDisplay({ galleryNumber }) {
   }
 
   return (
-    <div>
-      <h2>Artworks for Gallery {galleryNumber}</h2>
-      {artworks.map(artwork => (
-        <div key={artwork.objectID}>
-          <p>{artwork.title}</p>
-          <img src={artwork.primaryImage} alt={artwork.title} />
+    <div className="artwork-display-container">
+        <div className="navigation-arrows">
+            {/* Navigation arrows can be added here */}
         </div>
-      ))}
+        <div className="artwork-list">
+            {/* <h2>Artworks for Gallery {galleryNumber}</h2> */}
+            <ArtworkList artworks={artworks} isVisible={isVisible} /> {/* Pass isVisible prop */}
+        </div>
     </div>
   );
 }

@@ -1,0 +1,43 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    z-index: 1000; /* Ensure overlay is on top */
+  }
+  
+  .artwork-list-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    position: fixed;
+    bottom: -200px; /* Initially position the container off-screen */
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    transition: bottom 0.5s ease-in-out; /* Add transition for smooth sliding */
+  }
+  
+  .artwork-item {
+    margin-right: 20px;
+  }
+  
+  .artwork-item:last-child {
+    margin-right: 0;
+  }
+  
+  .artwork-image {
+    width: 100px;
+    height: auto;
+  }
+  
+  .slide-in {
+    bottom: 0; /* Slide the container into position */
+  }
