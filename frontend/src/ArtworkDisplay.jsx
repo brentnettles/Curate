@@ -17,8 +17,9 @@ function ArtworkDisplay({ galleryNumber }) {
         }
         const data = await response.json();
         console.log("Fetched Artworks Data:", data);  // Log the fetched data
-        setArtworks(data);
-        setIsVisible(true); // Set isVisible to true after fetching artworks
+        const validArtworks = data.filter(artwork => artwork.primaryImageSmall !== ""); // Filter out artworks without primaryImageSmall
+        setArtworks(validArtworks);
+        setIsVisible(validArtworks.length > 0); // Set isVisible to true if there are valid artworks
       } catch (error) {
         console.error('Error fetching artworks:', error);
         setError(error.message);

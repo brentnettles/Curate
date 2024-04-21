@@ -1,8 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './ArtworkList.css'; // Import CSS file
 
-function ArtworkList({ artworks, isVisible }) {
+function ArtworkList({ artworks, isVisible, onClose }) {
   const [showOverlay, setShowOverlay] = useState(true);
+  const artworkListRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (artworkListRef.current && !artworkListRef.current.contains(event.target)) {
+        onClose(); // Call the onClose handler if click is outside the artwork list
+      }
+    };
+
+    // Add when the component is mounted
+    document.addEventListener('mousedown', handleOutsideClick);
+
+    // Cleanup event listener
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [onClose]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -17,11 +34,11 @@ function ArtworkList({ artworks, isVisible }) {
   }
 
   return (
-    <div className={`artwork-list-container ${isVisible ? 'slide-in' : ''}`}>
+    <div ref={artworkListRef} className={`artwork-list-container ${isVisible ? 'slide-in' : ''}`}>
       {showOverlay && <div className="overlay"></div>}
       {artworks.map(artwork => (
         <div key={artwork.objectID} className="artwork-item">
-          <h3 className="artwork-title">{artwork.title}</h3>
+          {/* <h3 className="artwork-title">{artwork.title}</h3> */}
           <img src={artwork.primaryImageSmall} alt={artwork.title} className="artwork-image" />
           <p className="artwork-artist">Artist: {artwork.artistDisplayName}</p>
         </div>
