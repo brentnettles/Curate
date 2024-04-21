@@ -20,39 +20,29 @@ function Floorplan() {
 
     const enhanceSVG = (svgElement) => {
         const svg = d3.select(svgElement);
-
-        // Get the dimensions of the SVG
-        const svgWidth = parseFloat(svg.attr('width'));
-        const svgHeight = parseFloat(svg.attr('height'));
-        setSvgDimensions({ width: svgWidth, height: svgHeight });
-
-        // Set the viewBox to match the dimensions of the SVG
-        svg.attr('viewBox', `0 0 ${svgWidth} ${svgHeight}`)
-            .attr('preserveAspectRatio', 'xMidYMid meet')
-            .attr('class', 'floorplan-svg') // Add className to the SVG element
-            .attr('width', '100%') // Set width to 100%
-            .attr('height', '100%'); // Set height to 100%
-
-        // Configure zoom behavior
+        const background = svg.select('#Layer_background');
+    
+        // Calculate the bounding box of the background layer
+        const bbox = background.node().getBBox();
+        const viewBox = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
+    
+        svg.attr('viewBox', viewBox)
+       .attr('preserveAspectRatio', 'xMidYMid meet')
+       .attr('class', 'floorplan-svg') // Add className to the SVG element
+       .attr('width', '100%') // Set width to 100%
+       .attr('height', '100%'); // Set height to 100%
+    
+        // Define the zoom behavior
         const zoom = d3.zoom()
-            .scaleExtent([0.2, 8]) // Set scale extent from 20% to 800%
+            .scaleExtent([1, 8])  // Here, 1 is the minimum scale. Adjust this value based on your needs.
             .on('zoom', (event) => {
-                svg.select('#Layer_background').attr('transform', event.transform);
-                svg.select('#Layer_rooms').attr('transform', event.transform); // Apply the same transform to layer_rooms
+                svg.selectAll('#Layer_background, #Layer_rooms').attr('transform', event.transform);
             });
-
+    
         svg.call(zoom);
-
-        // Initialize zoom at 20% scale
-        const initialTransform = d3.zoomIdentity.scale(1.6);
+        const initialTransform = d3.zoomIdentity.scale(1);  // Start at the minimum scale
         svg.call(zoom.transform, initialTransform);
-
-        // Stretch layer_background to fill svg-container
-        svg.select('#Layer_background')
-            .attr('width', '100%')
-            .attr('height', '100%');
-
-        // Handle room group creation and interaction
+    
         const roomsLayer = svg.select('#Layer_rooms');
         roomsLayer.selectAll('rect')
             .each(function () {
@@ -62,8 +52,7 @@ function Floorplan() {
                 const width = parseFloat(rect.attr('width'));
                 const height = parseFloat(rect.attr('height'));
                 const galleryNumber = rect.attr('data-gallery-number');
-
-                // Create a group for each room
+    
                 const group = rect.node().parentNode.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
                 d3.select(group).attr('class', 'room-group')
                     .style('cursor', 'pointer')
@@ -71,14 +60,11 @@ function Floorplan() {
                         console.log(`Gallery ${galleryNumber} clicked!`);
                         setSelectedGallery(galleryNumber);
                     });
-
-                // Move rectangle into the group
+    
                 group.appendChild(rect.node());
-
-                // Add text label to the group
                 d3.select(group).append('text')
-                    .attr('x', x + width / 2) // Adjust the x position
-                    .attr('y', y + height / 2) // Adjust the y position
+                    .attr('x', x + width / 2)
+                    .attr('y', y + height / 2)
                     .attr('dominant-baseline', 'middle')
                     .attr('text-anchor', 'middle')
                     .text(galleryNumber)
@@ -86,6 +72,7 @@ function Floorplan() {
                     .style('fill', 'black');
             });
     };
+    
 
     return (
         <div className="floorplan-container">

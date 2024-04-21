@@ -14,7 +14,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 Migrate(app, db)
 
-CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5173"]}})
+# CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5173"]}})
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": ["http://localhost:5173"]}})
+
 
 @app.route('/api/artworks/<gallery_number>', methods=['GET'])
 def get_artworks_by_gallery(gallery_number):
