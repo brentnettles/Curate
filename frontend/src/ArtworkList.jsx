@@ -1,46 +1,40 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './ArtworkList.css'; // Import CSS file
 
 function ArtworkList({ artworks, isVisible, onClose }) {
-  const [showOverlay, setShowOverlay] = useState(true);
   const artworkListRef = useRef(null);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (artworkListRef.current && !artworkListRef.current.contains(event.target)) {
-        onClose(); // Call the onClose handler if click is outside the artwork list
+        onClose();
       }
     };
 
-    // Add when the component is mounted
     document.addEventListener('mousedown', handleOutsideClick);
 
-    // Cleanup event listener
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [onClose]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowOverlay(false);
-    }, 1000); // Show overlay for 1 second
-    return () => clearTimeout(timer);
-  }, []);
+    // This effect ensures that any changes in isVisible from the parent are respected
+    if (!isVisible) {
+      onClose();  // This could call any additional logic when visibility is turned off
+    }
+  }, [isVisible, onClose]);
 
-  // Check if artworks is undefined or null, and return null if so
   if (!artworks) {
     return null;
   }
 
   return (
-    <div ref={artworkListRef} className={`artwork-list-container ${isVisible ? 'slide-in' : ''}`}>
-      {showOverlay && <div className="overlay"></div>}
+    <div ref={artworkListRef} className={`artwork-list-container ${isVisible ? 'showArt' : 'hideArt'}`}>
       {artworks.map(artwork => (
-        <div key={artwork.objectID} className="artwork-item">
-          {/* <h3 className="artwork-title">{artwork.title}</h3> */}
+        <div key={artwork.objectID} className="artwork-item" onClick={() => onClose()}>
           <img src={artwork.primaryImageSmall} alt={artwork.title} className="artwork-image" />
-          <p className="artwork-artist">Artist: {artwork.artistDisplayName}</p>
+          {/* <p className="artwork-artist">Artist: {artwork.artistDisplayName}</p> */}
         </div>
       ))}
     </div>

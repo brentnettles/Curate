@@ -16,7 +16,7 @@ function ArtworkDisplay({ galleryNumber }) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Fetched Artworks Data:", data);  // Log the fetched data
+        console.log("Fetched Artworks Data:", data); // Log the fetched data
         const validArtworks = data.filter(artwork => artwork.primaryImageSmall !== ""); // Filter out artworks without primaryImageSmall
         setArtworks(validArtworks);
         setIsVisible(validArtworks.length > 0); // Set isVisible to true if there are valid artworks
@@ -26,23 +26,27 @@ function ArtworkDisplay({ galleryNumber }) {
       }
     }
 
-    if (galleryNumber) {  // Ensure galleryNumber is not undefined or null
+    if (galleryNumber) { // Ensure galleryNumber is not undefined or null
       fetchArtworks();
     }
   }, [galleryNumber]); // Dependency array ensures fetch is called when galleryNumber updates
+
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible); // Toggle visibility
+  };
 
   if (error) {
     return <div>Error fetching data: {error}</div>;
   }
 
   return (
-    <div className="artwork-display-container">
+    <div className="artwork-display-container" onClick={toggleVisibility}>
         <div className="navigation-arrows">
             {/* Navigation arrows can be added here */}
         </div>
         <div className="artwork-list">
             {/* <h2>Artworks for Gallery {galleryNumber}</h2> */}
-            <ArtworkList artworks={artworks} isVisible={isVisible} /> {/* Pass isVisible prop */}
+            <ArtworkList artworks={artworks} isVisible={isVisible} onClose={() => setIsVisible(false)} />
         </div>
     </div>
   );

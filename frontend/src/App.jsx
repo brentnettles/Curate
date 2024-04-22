@@ -21,6 +21,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/floorplan" element={<Floorplan />} />
+          //add more Routes
+          
         </Routes>
       </div>
     </Router>

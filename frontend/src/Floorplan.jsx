@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import './Floorplan.css'; // Import CSS file
+import './Floorplan.css'; 
 import ArtworkDisplay from './ArtworkDisplay';
 
 function Floorplan() {
@@ -13,6 +13,7 @@ function Floorplan() {
             .then(svg => {
                 svgRef.current.innerHTML = svg;
                 const svgElement = svgRef.current.querySelector('svg');
+                
                 enhanceSVG(svgElement);
             });
     }, []);
@@ -49,16 +50,37 @@ function Floorplan() {
             .each(function () {
                 const rect = d3.select(this);
                 const id = rect.attr('id') ? rect.attr('id').replace(/[_]/g, '') : '___';
+                const originalColor = rect.style('fill'); // Store the original fill color
                 const group = rect.node().parentNode.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
                 d3.select(group).attr('class', 'room-group')
                     .style('cursor', 'pointer')
                     .on('click', () => {
                         setSelectedGallery(id);
+                    })
+                    .on('mouseover', function() {
+                        d3.select(this).select('text')
+                            .transition()
+                            .duration(150)
+                            .style('font-size', '4px');  // Increase font size on hover
+                        d3.select(this).select('rect')
+                            .transition()
+                            .duration(150)
+                            .style('fill', 'salmon');  // Change color on hover
+                    })
+                    .on('mouseout', function() {
+                        d3.select(this).select('text')
+                            .transition()
+                            .duration(150)
+                            .style('font-size', `${Math.min(parseFloat(rect.attr('width')), parseFloat(rect.attr('height'))) / 3}px`);  // Revert font size
+                        d3.select(this).select('rect')
+                            .transition()
+                            .duration(150)
+                            .style('fill', originalColor);  // Revert to original color
                     });
-
-                group.appendChild(rect.node());
-
-                d3.select(group).append('text')
+        
+                group.appendChild(rect.node());  // Append rectangle to group
+        
+                d3.select(group).append('text')  // Append text to group
                     .attr('x', parseFloat(rect.attr('x')) + parseFloat(rect.attr('width')) / 2)
                     .attr('y', parseFloat(rect.attr('y')) + parseFloat(rect.attr('height')) / 2)
                     .attr('dominant-baseline', 'middle')
@@ -70,13 +92,18 @@ function Floorplan() {
     };
 
     return (
-        <div className="floorplan-container">
-            <div ref={svgRef} className="floorplan-svg-container" />
-            <div className="artwork-display-container">
-                {selectedGallery && <ArtworkDisplay galleryNumber={selectedGallery} />}
+        <div className="main-container"> 
+            <div className="floorplan-container">
+                <div ref={svgRef} className="floorplan-svg-container" />
+                <div className="artwork-display-container">
+                    {selectedGallery && <ArtworkDisplay galleryNumber={selectedGallery} />}
+                </div>
             </div>
+            <div className="test-centering"></div>
         </div>
     );
+    
+    
 }
 
 export default Floorplan;
