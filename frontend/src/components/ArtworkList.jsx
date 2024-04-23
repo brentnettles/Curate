@@ -6,24 +6,18 @@ function ArtworkList({ artworks, isVisible, onClose }) {
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
-      if (artworkListRef.current && !artworkListRef.current.contains(event.target)) {
+      // Check if the target is inside artworkList or if the click is on the recenter button
+      if (artworkListRef.current && !artworkListRef.current.contains(event.target) &&
+          !event.target.closest('#recenter-button')) {
         onClose();
       }
     };
 
     document.addEventListener('mousedown', handleOutsideClick);
-
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [onClose]);
-
-  useEffect(() => {
-    // This effect ensures that any changes in isVisible from the parent are respected
-    if (!isVisible) {
-      onClose();  // This could call any additional logic when visibility is turned off
-    }
-  }, [isVisible, onClose]);
 
   if (!artworks) {
     return null;
@@ -34,7 +28,7 @@ function ArtworkList({ artworks, isVisible, onClose }) {
       {artworks.map(artwork => (
         <div key={artwork.objectID} className="artwork-item" onClick={() => onClose()}>
           <img src={artwork.primaryImageSmall} alt={artwork.title} className="artwork-image" />
-          {/* <p className="artwork-artist">Artist: {artwork.artistDisplayName}</p> */}
+          {/* Optionally, display the artist name or other information */}
         </div>
       ))}
     </div>
