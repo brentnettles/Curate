@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import './Floorplan.css'; 
+// import './Map.css'; 
 import ArtworkDisplay from './ArtworkDisplay';
 
 function Floorplan() {
@@ -8,7 +8,7 @@ function Floorplan() {
     const [selectedGallery, setSelectedGallery] = useState(null);
 
     useEffect(() => {
-        fetch("/floorplan2.svg")
+        fetch("/MetMap.svg")
             .then(res => res.text())
             .then(svg => {
                 svgRef.current.innerHTML = svg;
@@ -65,7 +65,7 @@ function Floorplan() {
                         d3.select(this).select('rect')
                             .transition()
                             .duration(150)
-                            .style('fill', 'salmon');  // Change color on hover
+                            .style('fill', 'salmon');  // Change hover
                     })
                     .on('mouseout', function() {
                         d3.select(this).select('text')
@@ -75,7 +75,7 @@ function Floorplan() {
                         d3.select(this).select('rect')
                             .transition()
                             .duration(150)
-                            .style('fill', originalColor);  // Revert to original color
+                            .style('fill', originalColor);  
                     });
         
                 group.appendChild(rect.node());  // Append rectangle to group
