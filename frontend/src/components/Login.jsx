@@ -12,9 +12,9 @@ function Login() {
         event.preventDefault();
 
         // Hardcoding user authentication for development
-        if (username === "Dev" && password === "123!") {
-            login({ name: "Dev", id: "123!" }); // Set user as logged in
-            navigate('/'); // Navigate to homepage or dashboard
+        if (username === "Mike" && password === "123!") {
+            login({ username: "Mike", id: "123!" });
+            navigate('/');
         } else {
             alert('Incorrect username or password');
         }

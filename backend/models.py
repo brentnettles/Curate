@@ -18,6 +18,7 @@ class User(db.Model, SerializerMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
     email_address = db.Column(db.String(255), unique=True, nullable=False)
@@ -55,12 +56,15 @@ class Artwork(db.Model, SerializerMixin):
 
 class ToView(db.Model, SerializerMixin):
     __tablename__ = 'to_view'
-    objectId = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     artwork_id = db.Column(db.Integer, db.ForeignKey('artwork.id'))
+    username = db.Column(db.String(255), nullable=False)  # Storing username for easier queries
+    galleryNumber = db.Column(db.String(255), nullable=False)  # Storing gallery number
     user = db.relationship('User', back_populates='to_views')
     artwork = db.relationship('Artwork', back_populates='to_views')
     serialize_rules = ('-user.to_views', '-artwork.to_views')
+
 
     def __repr__(self):
         return '<User %r>' % self.username

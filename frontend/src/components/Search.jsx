@@ -5,7 +5,7 @@ function Search() {
     const [searchTerm, setSearchTerm] = useState('');
     const [category, setCategory] = useState('');
     const [dateRange, setDateRange] = useState('');
-    const [priceRange, setPriceRange] = useState('');
+    const [department, setPriceRange] = useState('');
     const [results, setResults] = useState([]);
 
     const handleSearch = (event) => {
@@ -47,8 +47,8 @@ function Search() {
                 />
                 <input
                     type="text"
-                    placeholder="Price Range"
-                    value={priceRange}
+                    placeholder="Department"
+                    value={department}
                     onChange={(e) => setPriceRange(e.target.value)}
                     className="search-price"
                 />

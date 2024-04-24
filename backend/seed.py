@@ -1,14 +1,13 @@
 import json
-from app import app, db  # Ensure app is correctly imported from your main Flask application file
+from app import app, db
 from models import User, Artwork, ToView
 
 def load_artworks(json_path='artworks.json'):
     with open(json_path, 'r') as file:
         artworks_data = json.load(file)
         for artwork_data in artworks_data:
-            # Safely get constituents and handle None case
-            constituents = artwork_data.get('constituents') or [{}]  # Ensures a list with at least one empty dict
-            constituent = constituents[0]  # Safe to access first item now
+            constituents = artwork_data.get('constituents') or [{}]
+            constituent = constituents[0]
 
             additional_images = json.dumps(artwork_data.get('additionalImages', []))
             artwork = Artwork(
@@ -41,8 +40,8 @@ def load_artworks(json_path='artworks.json'):
 
 def create_users():
     users_data = [
-        {'username': 'Mike', 'first_name': 'Mike', 'last_name': 'Dresser', 'email_address': 'Mike@smile.com'},
-        {'username': 'Ben', 'first_name': 'Benjamin', 'last_name': 'Franklin', 'email_address': 'Ben@smile.com'}
+        {'username': 'Mike', 'first_name': 'Mike', 'last_name': 'Dresser', 'email_address': 'Mike@smile.com', 'password': 'mike123'},
+        {'username': 'Ben', 'first_name': 'Benjamin', 'last_name': 'Franklin', 'email_address': 'Ben@smile.com', 'password': 'ben123'}
     ]
     existing_users = User.query.with_entities(User.username).all()
     existing_usernames = {user.username for user in existing_users}
@@ -53,17 +52,13 @@ def create_users():
 
 def create_to_views():
     users = User.query.all()
-    artwork_ids = [3584, 12822]
-    artworks = Artwork.query.filter(Artwork.objectID.in_(artwork_ids)).all()
-    artwork_map = {artwork.objectID: artwork for artwork in artworks}
-
+    artworks = Artwork.query.all()
     for user in users:
-        for artwork_id in artwork_ids:
-            if artwork_id in artwork_map:
-                existing_to_view = ToView.query.filter_by(user_id=user.id, artwork_id=artwork_map[artwork_id].id).first()
-                if not existing_to_view:
-                    to_view = ToView(user_id=user.id, artwork_id=artwork_map[artwork_id].id)
-                    db.session.add(to_view)
+        for artwork in artworks:
+            existing_to_view = ToView.query.filter_by(user_id=user.id, artwork_id=artwork.id).first()
+            if not existing_to_view:
+                to_view = ToView(user_id=user.id, artwork_id=artwork.id, username=user.username, galleryNumber=artwork.galleryNumber)
+                db.session.add(to_view)
     db.session.commit()
 
 if __name__ == '__main__':

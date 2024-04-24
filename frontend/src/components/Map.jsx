@@ -19,19 +19,19 @@ function Floorplan() {
             });
     }, []);
 
-    useEffect(() => {
-        const handleOutsideClick = (event) => {
-            if (selectedGallery && !svgRef.current.contains(event.target)) {
-                setSelectedGallery(null);
-            }
-        };
+    // useEffect(() => {
+    //     const handleOutsideClick = (event) => {
+    //         if (selectedGallery && !svgRef.current.contains(event.target)) {
+    //             setSelectedGallery(null);
+    //         }
+    //     };
 
-        document.addEventListener('mousedown', handleOutsideClick);
+    //     document.addEventListener('mousedown', handleOutsideClick);
 
-        return () => {
-            document.removeEventListener('mousedown', handleOutsideClick);
-        };
-    }, [selectedGallery]);
+    //     return () => {
+    //         document.removeEventListener('mousedown', handleOutsideClick);
+    //     };
+    // }, [selectedGallery]);
 
     const enhanceSVG = (svgElement) => {
         const svg = d3.select(svgElement);
@@ -85,7 +85,8 @@ function Floorplan() {
             });
     };
 
-    const recenterSVG = () => {
+    const recenterSVG = (event) => {
+        event.stopPropagation(); // Prevent the event from bubbling up
         const svgElement = svgRef.current.querySelector('svg');
         d3.select(svgElement).transition().duration(750).call(zoom.current.transform, d3.zoomIdentity);
     };

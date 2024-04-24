@@ -1,14 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext'; // Make sure this import path is correct
+import { useAuth } from './contexts/AuthContext'; 
 import Navbar from './components/Navbar';
-import Map from './components/Map'; // Main map view, public
-import ArtworkDetail from './components/ArtworkDetail'; // Detail view for each artwork, should be public or protected based on your preference
-import ArtworkList from './components/ArtworkList'; // Possibly inside Map or a separate route if needed
-import Search from './components/Search'; // Search functionality, public or protected
-import Hunt from './components/Hunt'; // Scavenger Hunt, protected
-import UserPage from './components/UserPage'; // User's personal page, protected
-import Login from './components/Login'; // Login page, public
+import Map from './components/Map'; 
+import ArtworkDetail from './components/ArtworkDetail'; 
+import ArtworkList from './components/ArtworkList'; 
+import Search from './components/Search'; 
+import Hunt from './components/Hunt';
+import UserPage from './components/UserPage'; 
+import Login from './components/Login'; 
 
 function ProtectedRoute({ children }) {
     const { user } = useAuth();
@@ -45,7 +45,7 @@ function App() {
 export default App;
 
 
-
+//Test build routes / troubleshooting User State////////////////////////////
 
 // import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 // import { useState } from 'react'

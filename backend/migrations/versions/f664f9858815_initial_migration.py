@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 1b3d94bcc2ff
+Revision ID: f664f9858815
 Revises: 
-Create Date: 2024-04-22 17:23:04.724972
+Create Date: 2024-04-24 17:03:08.384500
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1b3d94bcc2ff'
+revision = 'f664f9858815'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -52,6 +52,7 @@ def upgrade():
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=255), nullable=False),
+    sa.Column('password', sa.String(length=255), nullable=False),
     sa.Column('first_name', sa.String(length=255), nullable=True),
     sa.Column('last_name', sa.String(length=255), nullable=True),
     sa.Column('email_address', sa.String(length=255), nullable=False),
@@ -60,12 +61,14 @@ def upgrade():
     sa.UniqueConstraint('username', name=op.f('uq_user_username'))
     )
     op.create_table('to_view',
-    sa.Column('objectId', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('artwork_id', sa.Integer(), nullable=True),
+    sa.Column('username', sa.String(length=255), nullable=False),
+    sa.Column('galleryNumber', sa.String(length=255), nullable=False),
     sa.ForeignKeyConstraint(['artwork_id'], ['artwork.id'], name=op.f('fk_to_view_artwork_id_artwork')),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_to_view_user_id_user')),
-    sa.PrimaryKeyConstraint('objectId', name=op.f('pk_to_view'))
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_to_view'))
     )
     # ### end Alembic commands ###
 
