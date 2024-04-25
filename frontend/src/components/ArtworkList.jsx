@@ -1,12 +1,21 @@
 import './ArtworkList.css';
 import React, { useRef } from 'react';
-import { useAuth } from '../contexts/AuthContext'; // Make sure this import path is correct
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function ArtworkList({ artworks, isVisible, onClose }) {
-  const { user } = useAuth();  // Using the useAuth hook to access the user
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const artworkListRef = useRef(null);
 
-  const saveArtwork = async (artwork) => {
+  const viewArtworkDetail = (artwork) => {
+    // Navigate with state
+    navigate(`/artwork/${artwork.objectID}`, { state: { artwork } });
+  };
+
+  const saveArtwork = async (artwork, event) => {
+    event.stopPropagation(); // Prevents navigating when clicking on the 'Save' button
+
     if (!user) {
       alert("Please log in to save artworks.");
       return;
@@ -45,9 +54,9 @@ function ArtworkList({ artworks, isVisible, onClose }) {
   return (
     <div ref={artworkListRef} className={`artwork-list-container ${isVisible ? 'showArt' : 'hideArt'}`}>
       {artworks.map(artwork => (
-        <div key={artwork.objectID} className="artwork-item">
+        <div key={artwork.objectID} className="artwork-item" onClick={() => viewArtworkDetail(artwork)}>
           <img src={artwork.primaryImageSmall} alt={artwork.title} className="artwork-image" />
-          <button onClick={() => saveArtwork(artwork)}>Save</button>  // Pass the whole artwork object
+          <button onClick={(e) => saveArtwork(artwork, e)}>Save</button>  
         </div>
       ))}
     </div>
