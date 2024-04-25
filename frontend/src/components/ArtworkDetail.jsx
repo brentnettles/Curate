@@ -57,3 +57,4 @@ function ArtworkDetail() {
 }
 
 export default ArtworkDetail;
+ use
