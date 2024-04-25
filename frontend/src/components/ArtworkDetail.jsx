@@ -48,7 +48,7 @@ function ArtworkDetail() {
       <div className="artwork-info">
         <h2>{artwork.title}</h2>
         <p><strong>Department:</strong> {artwork.department}</p>
-        <p><strong>Object Name:</strong> {artwork.objectName}</p>
+        <p><strong>Title:</strong> {artwork.title}</p>
         <p><strong>Artist:</strong> {artwork.artistDisplayName}</p>
         <p><strong>Artist Bio:</strong> {artwork.artistDisplayBio}</p>
       </div>
@@ -57,4 +57,4 @@ function ArtworkDetail() {
 }
 
 export default ArtworkDetail;
- use
+ 

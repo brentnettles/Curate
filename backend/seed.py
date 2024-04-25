@@ -6,6 +6,7 @@ def load_artworks(json_path='artworks.json'):
     with open(json_path, 'r') as file:
         artworks_data = json.load(file)
         for artwork_data in artworks_data:
+            # Extract the first constituent, if available
             constituents = artwork_data.get('constituents') or [{}]
             constituent = constituents[0]
 
@@ -13,6 +14,9 @@ def load_artworks(json_path='artworks.json'):
             artwork = Artwork(
                 objectID=artwork_data['objectID'],
                 isHighlight=artwork_data['isHighlight'],
+                artistDisplayName=artwork_data.get('artistDisplayName', 'Unknown Artist'),  # Directly from artwork_data
+                artistDisplayBio=artwork_data.get('artistDisplayBio', ''),  # Directly from artwork_data
+                objectDate=artwork_data.get('objectDate', ''),
                 accessionNumber=artwork_data['accessionNumber'],
                 accessionYear=artwork_data['accessionYear'],
                 isPublicDomain=artwork_data['isPublicDomain'],
