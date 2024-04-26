@@ -4,10 +4,11 @@ import centerIcon from '../buttons/center.png';
 import '../Style/Map.css';
 import ArtworkDisplay from './ArtworkDisplay';
 
-function Floorplan() {
+function Map_visual() {
     const svgRef = useRef();
     const [selectedGallery, setSelectedGallery] = useState(null);
-    const zoom = useRef(d3.zoom().scaleExtent([1, 8]));  // Ref for zoom to access in the recenter function
+    // Ref for zoom to access used in recenter function
+    const zoom = useRef(d3.zoom().scaleExtent([1, 8]));  
 
     useEffect(() => {
         fetch("/MetMap.svg")
@@ -73,7 +74,7 @@ function Floorplan() {
 
                 group.appendChild(rect.node());  // Append rectangle to group
 
-                // Append text to group
+                // TESTING Append text to group
                 d3.select(group).append('text')
                     .attr('x', parseFloat(rect.attr('x')) + parseFloat(rect.attr('width')) / 2)
                     .attr('y', parseFloat(rect.attr('y')) + parseFloat(rect.attr('height')) / 2)
@@ -86,7 +87,8 @@ function Floorplan() {
     };
 
     const recenterSVG = (event) => {
-        event.stopPropagation(); // Prevent the event from bubbling up
+        // Prevent zoom from triggering // debugging off clicks on the map
+        event.stopPropagation(); 
         const svgElement = svgRef.current.querySelector('svg');
         d3.select(svgElement).transition().duration(750).call(zoom.current.transform, d3.zoomIdentity);
     };
@@ -96,20 +98,20 @@ function Floorplan() {
             <div className="floorplan-container" style={{ position: 'relative' }}>
                 <div ref={svgRef} className="floorplan-svg-container" />
                 <button
-  id="recenter-button"
-  onClick={recenterSVG}
-  style={{
-    position: 'absolute',
-    right: '10px',
-    top: '10px',
-    background: `url(${centerIcon}) no-repeat center center`,
-    backgroundSize: 'cover',
-    width: '50px',
-    height: '50px',
-    border: 'none',
-    cursor: 'pointer'
-  }}
-></button>
+                    id="recenter-button"
+                    onClick={recenterSVG}
+                    style={{
+                        position: 'absolute',
+                        right: '10px',
+                        top: '10px',
+                        background: `url(${centerIcon}) no-repeat center center`,
+                        backgroundSize: 'cover',
+                        width: '50px',
+                        height: '50px',
+                        border: 'none',
+                        cursor: 'pointer'
+                    }}
+                    ></button>
                 <div className="artwork-display-container">
                     {selectedGallery && <ArtworkDisplay galleryNumber={selectedGallery} />}
                 </div>
@@ -118,4 +120,4 @@ function Floorplan() {
     );
 }
 
-export default Floorplan;
+export default Map_visual;

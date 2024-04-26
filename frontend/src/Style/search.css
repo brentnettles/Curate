@@ -32,6 +32,9 @@
 }
 
 .results {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
     background-color: #fff;
     padding: 20px;
     border-radius: 5px;
@@ -39,11 +42,24 @@
 }
 
 .result-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 25vw;  /* width of each item */
     margin-top: 10px;
     padding: 10px;
-    border-bottom: 1px solid #eee;
+    border: 1px solid #eee;
+    border-radius: 5px;
 }
 
+
+
+.result-item h3,
+.result-item p {
+    width: 100%;  /* Text fits the width of the image */
+    text-align: center;
+    overflow-wrap: break-word;  /* Ensures text breaks to avoid overflow */
+}
 .result-item:last-child {
     border-bottom: none;
 }
