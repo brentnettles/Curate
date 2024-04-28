@@ -26,57 +26,6 @@ def get_artworks_by_gallery(gallery_number):
 
 
 
-#MET API SEARCHES -------
-@app.route('/api/search', methods=['GET'])
-def search_artworks():
-    query = request.args.get('q', '')
-    isHighlight = request.args.get('isHighlight', '')
-    isOnView = request.args.get('isOnView', '')
-    departmentId = request.args.get('departmentId', '')
-
-    search_url = f"https://collectionapi.metmuseum.org/public/collection/v1/search?q={query}&isHighlight={isHighlight}&isOnView={isOnView}&departmentId={departmentId}"
-    try:
-        response = requests.get(search_url)
-        if response.status_code == 200:
-            return Response(response.text, mimetype='application/json'), 200
-        else:
-            return Response(json.dumps({"error": "Failed to fetch data from The Met API"}), mimetype='application/json'), response.status_code
-    except Exception as e:
-        return Response(json.dumps({"error": str(e)}), mimetype='application/json'), 500
-    
-@app.route('/api/search/complete', methods=['GET'])
-def search_artworks_complete():
-    query = request.args.get('q', '')
-    isHighlight = request.args.get('isHighlight', '')
-    isOnView = request.args.get('isOnView', '')
-    departmentId = request.args.get('departmentId', '')
-    limit = int(request.args.get('limit', 100))
-
-    search_url = f"https://collectionapi.metmuseum.org/public/collection/v1/search?q={query}&isHighlight={isHighlight}&isOnView={isOnView}&departmentId={departmentId}"
-    search_response = requests.get(search_url)
-
-    if search_response.status_code == 200:
-        search_results = search_response.json()
-        object_details = []
-        fetched_ids = set()
-
-        for object_id in search_results.get('objectIDs', [])[:limit]:
-            if object_id not in fetched_ids:
-                detail_url = f"https://collectionapi.metmuseum.org/public/collection/v1/objects/{object_id}"
-                detail_response = requests.get(detail_url)
-                if detail_response.status_code == 200:
-                    detail_data = detail_response.json()
-                    object_details.append({
-                        'objectID': detail_data['objectID'],
-                        'title': detail_data.get('title', ''),
-                        'artistDisplayName': detail_data.get('artistDisplayName', ''),
-                        'primaryImageSmall': detail_data.get('primaryImageSmall', ''),
-                    })
-                    fetched_ids.add(object_id)
-
-        return Response(json.dumps(object_details), mimetype='application/json'), 200
-    else:
-        return Response(json.dumps({"error": "Failed to fetch data from The Met API"}), mimetype='application/json'), search_response.status_code
 
 
 @app.route('/api/user-to-view', methods=['POST'])
@@ -86,16 +35,16 @@ def user_to_view():
     objectID = json_data.get('objectID')
     galleryNumber = json_data.get('galleryNumber')
 
-    if not username or not objectID or not galleryNumber:
-        return Response(json.dumps({'error': 'Missing data'}), mimetype='application/json'), 400
+    # if not username or not objectID or not galleryNumber:
+    #     return Response(json.dumps({'error': 'Missing data'}), mimetype='application/json'), 400
 
     user = User.query.filter_by(username=username).first()
-    if not user:
-        return Response(json.dumps({'error': 'User not found'}), mimetype='application/json'), 404
+    # if not user:
+    #     return Response(json.dumps({'error': 'User not found'}), mimetype='application/json'), 404
 
     artwork = Artwork.query.filter_by(objectID=objectID).first()
-    if not artwork:
-        return Response(json.dumps({'error': 'Artwork not found'}), mimetype='application/json'), 404
+    # if not artwork:
+    #     return Response(json.dumps({'error': 'Artwork not found'}), mimetype='application/json'), 404
 
     existing_view = ToView.query.filter_by(user_id=user.id, artwork_id=artwork.id).first()
     if existing_view:
@@ -110,6 +59,42 @@ def user_to_view():
         db.session.rollback()
         return Response(json.dumps({"error": str(e)}), mimetype='application/json'), 500
 
+@app.route('/api/user-artworks/<username>', methods=['GET'])
+def get_user_artworks(username):
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return Response(json.dumps({'error': 'User not found'}), mimetype='application/json'), 404
+
+    try:
+        # Assuming there's a relationship set up in your models that allows for fetching artworks directly
+        user_views = ToView.query.filter_by(user_id=user.id).all()
+        artworks = [Artwork.query.get(view.artwork_id).to_dict() for view in user_views if Artwork.query.get(view.artwork_id)]
+        
+        return Response(json.dumps({'artworks': artworks}), mimetype='application/json'), 200
+    except Exception as e:
+        return Response(json.dumps({"error": str(e)}), mimetype='application/json'), 500
+
+
+
+@app.route('/api/user-to-view/<int:artwork_id>', methods=['DELETE'])
+def delete_saved_artwork(artwork_id):
+
+    user_id = request.headers.get('User-ID') 
+
+    try:
+        to_view = ToView.query.filter_by(user_id=user_id, artwork_id=artwork_id).first()
+        if not to_view:
+            return Response(json.dumps({'error': 'No saved artwork found'}), mimetype='application/json'), 404
+
+        db.session.delete(to_view)
+        db.session.commit()
+        return Response(json.dumps({'message': 'Artwork removed successfully'}), mimetype='application/json'), 200
+    except Exception as e:
+        db.session.rollback()
+        return Response(json.dumps({'error': str(e)}), mimetype='application/json'), 500
+
+
+
 @app.route('/api/users', methods=['GET'])
 def get_all_users():
     try:
@@ -120,3 +105,56 @@ def get_all_users():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+#MET API SEARCHES ------- Nit using this for now. Fetching on the fontend tested faster. 
+# @app.route('/api/search', methods=['GET'])
+# def search_artworks():
+#     query = request.args.get('q', '')
+#     isHighlight = request.args.get('isHighlight', '')
+#     isOnView = request.args.get('isOnView', '')
+#     departmentId = request.args.get('departmentId', '')
+
+#     search_url = f"https://collectionapi.metmuseum.org/public/collection/v1/search?q={query}&isHighlight={isHighlight}&isOnView={isOnView}&departmentId={departmentId}"
+#     try:
+#         response = requests.get(search_url)
+#         if response.status_code == 200:
+#             return Response(response.text, mimetype='application/json'), 200
+#         else:
+#             return Response(json.dumps({"error": "Failed to fetch data from The Met API"}), mimetype='application/json'), response.status_code
+#     except Exception as e:
+#         return Response(json.dumps({"error": str(e)}), mimetype='application/json'), 500
+    
+# @app.route('/api/search/complete', methods=['GET'])
+# def search_artworks_complete():
+#     query = request.args.get('q', '')
+#     isHighlight = request.args.get('isHighlight', '')
+#     isOnView = request.args.get('isOnView', '')
+#     departmentId = request.args.get('departmentId', '')
+#     limit = int(request.args.get('limit', 100))
+
+#     search_url = f"https://collectionapi.metmuseum.org/public/collection/v1/search?q={query}&isHighlight={isHighlight}&isOnView={isOnView}&departmentId={departmentId}"
+#     search_response = requests.get(search_url)
+
+#     if search_response.status_code == 200:
+#         search_results = search_response.json()
+#         object_details = []
+#         fetched_ids = set()
+
+#         for object_id in search_results.get('objectIDs', [])[:limit]:
+#             if object_id not in fetched_ids:
+#                 detail_url = f"https://collectionapi.metmuseum.org/public/collection/v1/objects/{object_id}"
+#                 detail_response = requests.get(detail_url)
+#                 if detail_response.status_code == 200:
+#                     detail_data = detail_response.json()
+#                     object_details.append({
+#                         'objectID': detail_data['objectID'],
+#                         'title': detail_data.get('title', ''),
+#                         'artistDisplayName': detail_data.get('artistDisplayName', ''),
+#                         'primaryImageSmall': detail_data.get('primaryImageSmall', ''),
+#                     })
+#                     fetched_ids.add(object_id)
+
+#         return Response(json.dumps(object_details), mimetype='application/json'), 200
+#     else:
+#         return Response(json.dumps({"error": "Failed to fetch data from The Met API"}), mimetype='application/json'), search_response.status_code
