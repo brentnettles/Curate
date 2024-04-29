@@ -1,43 +1,62 @@
 .artwork-list-container {
   display: flex;
   flex-wrap: nowrap; 
-  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-x: auto; 
   overflow-y: hidden; 
   position: fixed;
-  bottom: -200px; 
+  bottom: 0;
   left: 0;
-  width: 100%;
-  height: 300px;
-  background-color: #f0f0f0af;
+  width: 80vw; 
+  height: auto;
+  background-color: #f0f0f0;
   padding: 10px;
-  align-items: center;
-  transition: bottom 0.5s ease-in-out; 
-}
-
-.showArt {
-  bottom: 0px; 
-}
-
-.hideArt {
-  bottom: -200px; /* Hide the container off-screen when not shown */
+  align-items: justify;
+  transition: bottom 0.5s ease-in-out;
 }
 
 .artwork-item {
+  position: relative;
   display: flex;
-  flex-direction: column; /* Stack image and text vertically */
-  align-items: center; /* Center content horizontally */
-  margin-right: 20px; /* Space between items */
-  color: black; /* Text color */
+  flex-direction: column;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.artwork-image-container {
+  position: relative;
+  width: auto;
+  height: 150px; /* Max height for the image */
+  cursor: pointer;
 }
 
 .artwork-image {
-  max-width: 180px; /* Fixed width */
-  max-height: 180px; /* Maintain aspect ratio */
+  max-height: 100%; /* Make image fit its container */
+  width: auto;
+  transition: transform 0.3s ease-in-out;
 }
 
-.artwork-title, .artwork-artist {
-  text-align: center; /* Center-align text */
-  word-wrap: break-word; /* Break long words to prevent overflow */
-  width: 100px; /* Width of text to match image width */
+.artwork-image:hover {
+  transform: scale(1.3); /* Magnify image on hover */
 }
 
+.button-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  padding: 5px;
+  margin-bottom: 5px;
+  border: none;
+  background-color: rgba(0, 123, 255, 0.8);
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.artwork-details {
+  text-align: center;
+}

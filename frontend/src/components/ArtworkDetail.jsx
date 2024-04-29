@@ -14,7 +14,7 @@ function ArtworkDetail() {
     return <div>No artwork data available.</div>;
   }
 
-  // Ensure additionalImages is an array
+
   const additionalImages = Array.isArray(artwork.additionalImages) ? artwork.additionalImages : JSON.parse(artwork.additionalImages || '[]');
 
   // State to manage the displayed primary image
@@ -35,7 +35,7 @@ function ArtworkDetail() {
             backgroundImage: `url(${backIcon})`,
             backgroundSize: 'cover'
           }}>
-            {/* Optionally empty if using image as content */}
+
           </button>
           <img src={currentPrimaryImage} alt={artwork.title} className="artwork-detail-image"/>
         </div>

@@ -20,12 +20,14 @@ function ArtworkDisplay({ galleryNumber }) {
       } catch (error) {
         console.error('Error fetching artworks:', error);
         setError(error.message);
-        setArtworks([]);  // Ensure artworks is always an array
+        setArtworks([]);  
       }
     }
 
     if (galleryNumber) {
       fetchArtworks();
+      // console.log(artworks)
+
     }
   }, [galleryNumber]);
 

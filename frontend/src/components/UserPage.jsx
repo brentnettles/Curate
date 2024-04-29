@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';  
+import { useAuth } from '../contexts/AuthContext';
 
 function UserPage() {
     const [artworks, setArtworks] = useState([]);
@@ -13,57 +13,59 @@ function UserPage() {
             return;
         }
 
+        console.log("User Info:", user);
+
         fetch(`http://localhost:5555/api/user-artworks/${user.username}`)
             .then(response => response.json())
             .then(data => {
                 if (data.artworks) {
                     setArtworks(data.artworks);
                 }
+                console.log(data);
             })
             .catch(error => console.error('Failed to fetch artworks:', error));
     }, [user]);
 
-    const navigateToArtwork = (artworkId) => {
-        navigate(`/artwork/${artworkId}`);
+    const navigateToArtwork = (objectID) => {
+        navigate(`/artwork/${objectID}`);
     };
-    //Endpoint still TBD
-    const removeArtwork = async (artworkId) => {
-      if (!user) return;
-  
-      try {
-          const response = await fetch(`http://localhost:5555/api/user-to-view/${artworkId}`, {
-              method: 'DELETE',
-              headers: {
-                  'Content-Type': 'application/json',
 
-              },
-              credentials: 'include' 
-          });
-  
-          if (!response.ok) {
-              const result = await response.json();
-              throw new Error(result.error || 'Failed to remove artwork');
-          }
-  
-          setArtworks(artworks.filter(artwork => artwork.objectID !== artworkId));
-          alert('Artwork removed successfully');
-      } catch (error) {
-          console.error('Error removing artwork:', error);
-          alert(error.message);
-      }
-  };
-  
+    const removeArtwork = async (artworkId) => {
+        if (!user) return;
+
+        console.log("Deleting artwork with ID:", artworkId); // Log the ID to ensure it's correct
+
+        try {
+            const response = await fetch(`http://localhost:5555/api/user-to-view/${artworkId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'User-ID': user.id  // Make sure user.id is the correct identifier
+                }
+            });
+
+            if (!response.ok) {
+                const result = await response.json();
+                throw new Error(result.error || 'Failed to remove artwork');
+            }
+
+            setArtworks(artworks.filter(artwork => artwork.id !== artworkId));
+            console.log('Artwork removed successfully:', artworkId);
+        } catch (error) {
+            console.error('Error removing artwork:', error);
+        }
+    };
 
     return (
         <div>
             <h1>Saved Artworks</h1>
             <div className="artwork-list">
                 {artworks.map(artwork => (
-                    <div key={artwork.objectID} className="artwork-item">
-                        <h3>{artwork.title}</h3>
+                    <div key={artwork.id} className="artwork-item">
                         <img src={artwork.primaryImageSmall} alt={artwork.title} onClick={() => navigateToArtwork(artwork.objectID)} />
+                        <h3>{artwork.title}</h3>
                         <p>Gallery: {artwork.galleryNumber}</p>
-                        <button onClick={() => removeArtwork(artwork.objectID)}>Remove</button>
+                        <button onClick={() => removeArtwork(artwork.id)}>Remove</button>
                     </div>
                 ))}
             </div>

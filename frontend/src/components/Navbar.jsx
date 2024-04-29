@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';  // Adjust the path as necessary
+import { useAuth } from '../contexts/AuthContext'; 
 
 function Navbar() {
     const { user, logout } = useAuth();
@@ -10,7 +10,7 @@ function Navbar() {
 
     const handleLogout = () => {
         logout();
-        navigate('/');  // Optionally redirect to the home page after logout
+        navigate('/'); 
     };
 
     return (

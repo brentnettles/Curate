@@ -34,18 +34,8 @@ def user_to_view():
     username = json_data.get('username')
     objectID = json_data.get('objectID')
     galleryNumber = json_data.get('galleryNumber')
-
-    # if not username or not objectID or not galleryNumber:
-    #     return Response(json.dumps({'error': 'Missing data'}), mimetype='application/json'), 400
-
     user = User.query.filter_by(username=username).first()
-    # if not user:
-    #     return Response(json.dumps({'error': 'User not found'}), mimetype='application/json'), 404
-
     artwork = Artwork.query.filter_by(objectID=objectID).first()
-    # if not artwork:
-    #     return Response(json.dumps({'error': 'Artwork not found'}), mimetype='application/json'), 404
-
     existing_view = ToView.query.filter_by(user_id=user.id, artwork_id=artwork.id).first()
     if existing_view:
         return Response(json.dumps({'message': 'Artwork already saved'}), mimetype='application/json'), 200
@@ -66,7 +56,7 @@ def get_user_artworks(username):
         return Response(json.dumps({'error': 'User not found'}), mimetype='application/json'), 404
 
     try:
-        # Assuming there's a relationship set up in your models that allows for fetching artworks directly
+
         user_views = ToView.query.filter_by(user_id=user.id).all()
         artworks = [Artwork.query.get(view.artwork_id).to_dict() for view in user_views if Artwork.query.get(view.artwork_id)]
         
@@ -75,11 +65,29 @@ def get_user_artworks(username):
         return Response(json.dumps({"error": str(e)}), mimetype='application/json'), 500
 
 
+## The below was working in postman / troubleshooting objectID vs artwork_id
+# @app.route('/api/user-to-view/<int:artwork_id>', methods=['DELETE'])
+# def delete_saved_artwork(artwork_id):
+
+#     user_id = request.headers.get('User-ID') 
+
+#     try:
+#         to_view = ToView.query.filter_by(user_id=user_id, artwork_id=artwork_id).first()
+#         if not to_view:
+#             return Response(json.dumps({'error': 'No saved artwork found'}), mimetype='application/json'), 404
+
+#         db.session.delete(to_view)
+#         db.session.commit()
+#         return Response(json.dumps({'message': 'Artwork removed successfully'}), mimetype='application/json'), 200
+#     except Exception as e:
+#         db.session.rollback()
+#         return Response(json.dumps({'error': str(e)}), mimetype='application/json'), 500
 
 @app.route('/api/user-to-view/<int:artwork_id>', methods=['DELETE'])
 def delete_saved_artwork(artwork_id):
-
-    user_id = request.headers.get('User-ID') 
+    user_id = request.headers.get('User-ID')
+    if not user_id:
+        return Response(json.dumps({'error': 'User-ID header is missing'}), mimetype='application/json'), 400
 
     try:
         to_view = ToView.query.filter_by(user_id=user_id, artwork_id=artwork_id).first()
@@ -92,7 +100,6 @@ def delete_saved_artwork(artwork_id):
     except Exception as e:
         db.session.rollback()
         return Response(json.dumps({'error': str(e)}), mimetype='application/json'), 500
-
 
 
 @app.route('/api/users', methods=['GET'])

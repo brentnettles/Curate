@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+
 function ArtworkList({ artworks, isVisible, onClose }) {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ function ArtworkList({ artworks, isVisible, onClose }) {
   };
 
   const saveArtwork = async (artwork, event) => {
-    event.stopPropagation(); // Prevents navigating when clicking on the 'Save' button
+    event.stopPropagation(); // Stops change when clicking on the 'Save' button
 
     if (!user) {
       alert("Please log in to save artworks.");
@@ -24,10 +25,10 @@ function ArtworkList({ artworks, isVisible, onClose }) {
     const postData = {
       username: user.username, 
       objectID: artwork.objectID,
-      galleryNumber: artwork.galleryNumber // Using gallery number from artwork
+      galleryNumber: artwork.galleryNumber 
     };
 
-    console.log("Sending POST request with data:", postData);  // Log the data being sent
+    console.log("Sending POST request with data:", postData); 
 
     try {
       const response = await fetch(`http://127.0.0.1:5555/api/user-to-view`, {
@@ -38,16 +39,16 @@ function ArtworkList({ artworks, isVisible, onClose }) {
         body: JSON.stringify(postData)
       });
 
-      const responseData = await response.json();  // Assuming server sends back JSON
-      console.log("Server response:", responseData);  // Log the server response
+      const responseData = await response.json();  
+      console.log("Server response:", responseData); 
 
       if (!response.ok) {
         throw new Error(`Failed to save artwork: ${response.statusText}`);
       }
-      alert("Artwork saved successfully!");
+      // alert("Artwork saved successfully!");
     } catch (error) {
       console.error('Error saving artwork:', error);
-      alert("Failed to save artwork. Check console for details.");
+      // alert("Failed to save artwork. Check console for details.");
     }
   };
 

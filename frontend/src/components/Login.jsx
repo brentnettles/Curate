@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext'; // Make sure this import path is correct
+import { useAuth } from '../contexts/AuthContext'; 
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -13,7 +13,7 @@ function Login() {
 
         // Hardcoding user authentication for development
         if (username === "Mike" && password === "123!") {
-            login({ username: "Mike", id: "123!" });
+            login({ username: "Mike", id: "1" });
             navigate('/');
         } else {
             alert('Incorrect username or password');

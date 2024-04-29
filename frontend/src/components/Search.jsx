@@ -3,13 +3,13 @@ import '../Style/search.css';
 import departments from '../departments.json'; 
 
 function Search() {
-    const [searchTerm, setSearchTerm] = useState('Paintings');
+    const [searchTerm, setSearchTerm] = useState([]);
     const [isHighlight, setIsHighlight] = useState(false);
     const [isOnView, setIsOnView] = useState(false);
     const [departmentId, setDepartmentId] = useState('');
     const [results, setResults] = useState([]);
-    const [fetchLimit, setFetchLimit] = useState(25); // Initially fetch 25 items
-    const [searchType, setSearchType] = useState('artistCulture'); // Toggle for search type
+    const [fetchLimit, setFetchLimit] = useState(25); // Initially fetch 25 
+    const [searchType, setSearchType] = useState('artistCulture'); 
 
     useEffect(() => {
         fetchResults();  
@@ -116,7 +116,7 @@ function Search() {
                         type="checkbox"
                         checked={isOnView}
                         onChange={(e) => { setIsOnView(e.target.checked); handleFilterChange(); }}
-                        disabled={searchType === 'medium'}  // Assuming you also need this filter to be conditional
+                        disabled={searchType === 'medium'} 
                     />
                     Filter by is On View
                 </label>
