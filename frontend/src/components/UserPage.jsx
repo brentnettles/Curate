@@ -33,14 +33,14 @@ function UserPage() {
     const removeArtwork = async (artworkId) => {
         if (!user) return;
 
-        console.log("Deleting artwork with ID:", artworkId); // Log the ID to ensure it's correct
+        console.log("Deleting artwork with ID:", artworkId); // Log the ID 
 
         try {
             const response = await fetch(`http://localhost:5555/api/user-to-view/${artworkId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'User-ID': user.id  // Make sure user.id is the correct identifier
+                    'User-ID': user.id  // Testing the User-ID header
                 }
             });
 

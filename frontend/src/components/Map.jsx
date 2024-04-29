@@ -3,11 +3,12 @@ import * as d3 from 'd3';
 import centerIcon from '../buttons/center.png';
 import '../Style/Map.css';
 import ArtworkDisplay from './ArtworkDisplay';
+import { useAuth } from '../contexts/AuthContext';
 
 function Map_visual() {
     const svgRef = useRef();
     const [selectedGallery, setSelectedGallery] = useState(null);
-    // Ref for zoom to access used in recenter function
+    const { savedArtworks } = useAuth(); // Access saved artworks from the Auth context
     const zoom = useRef(d3.zoom().scaleExtent([1, 8]));  
 
     useEffect(() => {
@@ -17,22 +18,9 @@ function Map_visual() {
                 svgRef.current.innerHTML = svg;
                 const svgElement = svgRef.current.querySelector('svg');
                 enhanceSVG(svgElement);
+                highlightSavedGalleries(); // Ensures highlights are updated on fetch and context changes
             });
-    }, []);
-
-    // useEffect(() => {
-    //     const handleOutsideClick = (event) => {
-    //         if (selectedGallery && !svgRef.current.contains(event.target)) {
-    //             setSelectedGallery(null);
-    //         }
-    //     };
-
-    //     document.addEventListener('mousedown', handleOutsideClick);
-
-    //     return () => {
-    //         document.removeEventListener('mousedown', handleOutsideClick);
-    //     };
-    // }, [selectedGallery]);
+    }, [savedArtworks]); // Add savedArtworks as a dependency to update when changes
 
     const enhanceSVG = (svgElement) => {
         const svg = d3.select(svgElement);
@@ -51,7 +39,7 @@ function Map_visual() {
         galleriesLayer.selectAll('rect')
             .each(function () {
                 const rect = d3.select(this);
-                const id = rect.attr('id') ? rect.attr('id').replace(/[_]/g, '') : '___';
+                const id = rect.attr('id').replace(/[_]/g, '');
                 const originalColor = rect.style('fill');  // Store the original fill color
                 const group = rect.node().parentNode.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
                 d3.select(group).attr('class', 'room-group')
@@ -74,7 +62,7 @@ function Map_visual() {
 
                 group.appendChild(rect.node());  // Append rectangle to group
 
-                // TESTING Append text to group
+                // Append text to group
                 d3.select(group).append('text')
                     .attr('x', parseFloat(rect.attr('x')) + parseFloat(rect.attr('width')) / 2)
                     .attr('y', parseFloat(rect.attr('y')) + parseFloat(rect.attr('height')) / 2)
@@ -83,11 +71,29 @@ function Map_visual() {
                     .text(id)
                     .style('fill', 'black')
                     .style('font-size', `${Math.min(parseFloat(rect.attr('width')), parseFloat(rect.attr('height'))) / 3}px`);
+
+                // Highlight if saved
+                if (savedArtworks.has(id)) {
+                    rect.style('stroke', 'red').style('stroke-width', '4');
+                }
             });
     };
 
+    const highlightSavedGalleries = () => {
+        const svg = d3.select(svgRef.current).select('svg');
+        const galleriesLayer = svg.select('#Floor_1_Galleries');
+        galleriesLayer.selectAll('rect').each(function () {
+            const rect = d3.select(this);
+            const id = rect.attr('id').replace(/[_]/g, '');  // Ensure the ID is cleaned properly
+            if (savedArtworks.has(id)) {
+                rect.style('stroke', 'red').style('stroke-width', '4'); // Highlight saved galleries
+            } else {
+                rect.style('stroke', 'none');
+            }
+        });
+    };
+
     const recenterSVG = (event) => {
-        // Prevent zoom from triggering // debugging off clicks on the map
         event.stopPropagation(); 
         const svgElement = svgRef.current.querySelector('svg');
         d3.select(svgElement).transition().duration(750).call(zoom.current.transform, d3.zoomIdentity);
@@ -111,7 +117,7 @@ function Map_visual() {
                         border: 'none',
                         cursor: 'pointer'
                     }}
-                    ></button>
+                ></button>
                 <div className="artwork-display-container">
                     {selectedGallery && <ArtworkDisplay galleryNumber={selectedGallery} />}
                 </div>

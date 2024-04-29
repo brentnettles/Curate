@@ -3,16 +3,18 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
-    const [savedArtworks, setSavedArtworks] = useState(new Set()); // Manage saved artworks IDs
+    const [user, setUser] = useState(() => {
+        const savedUser = localStorage.getItem('user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
+    const [savedArtworks, setSavedArtworks] = useState(() => {
+        const loadedArtworks = localStorage.getItem('savedArtworks');
+        return new Set(loadedArtworks ? JSON.parse(loadedArtworks) : []);
+    });
 
     useEffect(() => {
-        // Load saved artworks from local storage or initialize if not present
-        const loadedArtworks = JSON.parse(localStorage.getItem('savedArtworks')) || [];
-        setSavedArtworks(new Set(loadedArtworks));
-    }, []);
-
-    useEffect(() => {
+        // Log the current state of saved artworks for debugging
+        console.log("Current saved artworks:", Array.from(savedArtworks));
         // Save the savedArtworks to local storage whenever it changes
         localStorage.setItem('savedArtworks', JSON.stringify(Array.from(savedArtworks)));
     }, [savedArtworks]);
@@ -24,19 +26,23 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         localStorage.removeItem('user');
-        localStorage.removeItem('savedArtworks'); 
+        localStorage.removeItem('savedArtworks');
         setUser(null);
-        setSavedArtworks(new Set()); // Reset the artworks state
-        console.log("Logged out, user set to null");
+        setSavedArtworks(new Set()); // Clear the artworks state
+        console.log("Logged out, user set to null, and artworks cleared");
     };
 
-    const saveArtwork = (artworkId) => {
-        setSavedArtworks(new Set(savedArtworks.add(artworkId)));
+    const saveArtwork = (galleryNumber) => {
+        setSavedArtworks(prev => new Set([...prev, galleryNumber]));
     };
 
     const removeArtwork = (artworkId) => {
-        savedArtworks.delete(artworkId);
-        setSavedArtworks(new Set([...savedArtworks]));
+        setSavedArtworks(prevSavedArtworks => {
+            const updatedArtworks = new Set(prevSavedArtworks);
+            updatedArtworks.delete(artworkId);
+            return updatedArtworks;
+        });
+        console.log("Artwork removed:", artworkId);
     };
 
     return (
@@ -52,5 +58,7 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
+
+
 
 export const useAuth = () => useContext(AuthContext);
