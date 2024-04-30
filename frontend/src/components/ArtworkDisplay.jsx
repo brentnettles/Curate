@@ -38,7 +38,7 @@ function ArtworkDisplay({ galleryNumber }) {
   return (
     <div className="artwork-display-container">
       <div className="navigation-arrows">
-        {/* Navigation arrows can be added here */}
+
       </div>
       <ArtworkList artworks={artworks} isVisible={isVisible} onClose={() => setIsVisible(false)} />
     </div>
@@ -47,37 +47,3 @@ function ArtworkDisplay({ galleryNumber }) {
 
 export default ArtworkDisplay;
 
-
-
-  // useEffect(() => {
-  //   const handleOutsideClick = (event) => {
-  //     if (displayRef.current && !displayRef.current.contains(event.target)) {
-  //       setIsVisible(false); // Modify this logic if it's too aggressive
-  //     }
-  //   };
-  
-  //   document.addEventListener('mousedown', handleOutsideClick);
-  //   return () => {
-  //     document.removeEventListener('mousedown', handleOutsideClick);
-  //   };
-  // }, []);
-
-//   if (error) {
-//     return <div>Error fetching data: {error}</div>;
-//   }
-
-//   return (
-//     <div>
-//     {/* // <div ref={displayRef} className="artwork-display-container" onClick={(e) => e.stopPropagation()}> */}
-//         <div className="navigation-arrows">
-//             {/* Navigation arrows can be added here */}
-//         </div>
-//         <div className="artwork-list">
-//             {/* <h2>Artworks for Gallery {galleryNumber}</h2> */}
-//             <ArtworkList artworks={artworks} isVisible={isVisible} onClose={() => setIsVisible(false)} />
-//         </div>
-//     </div>
-//   );
-// }
-
-// export default ArtworkDisplay;

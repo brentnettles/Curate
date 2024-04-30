@@ -32,22 +32,27 @@ def get_artworks_by_gallery(gallery_number):
 def user_to_view():
     json_data = request.get_json()
     username = json_data.get('username')
-    objectID = json_data.get('objectID')
+    objectID = json_data.get('objectID')  # Use objectID directly
     galleryNumber = json_data.get('galleryNumber')
     user = User.query.filter_by(username=username).first()
-    artwork = Artwork.query.filter_by(objectID=objectID).first()
-    existing_view = ToView.query.filter_by(user_id=user.id, artwork_id=artwork.id).first()
+    artwork = Artwork.query.filter_by(objectID=objectID).first()  # Correctly using objectID to find artwork
+
+    if not artwork:
+        return Response(json.dumps({'error': 'Artwork not found'}), mimetype='application/json'), 404
+
+    existing_view = ToView.query.filter_by(user_id=user.id, artwork_objectID=objectID).first()  # Update this filter to use objectID
     if existing_view:
         return Response(json.dumps({'message': 'Artwork already saved'}), mimetype='application/json'), 200
 
     try:
-        new_to_view = ToView(user_id=user.id, artwork_id=artwork.id, username=username, galleryNumber=galleryNumber)
+        new_to_view = ToView(user_id=user.id, artwork_objectID=objectID, username=username, galleryNumber=galleryNumber)  # Update to use artwork_objectID
         db.session.add(new_to_view)
         db.session.commit()
         return Response(json.dumps({'message': 'Artwork saved successfully'}), mimetype='application/json'), 201
     except Exception as e:
         db.session.rollback()
         return Response(json.dumps({"error": str(e)}), mimetype='application/json'), 500
+
 
 @app.route('/api/user-artworks/<username>', methods=['GET'])
 def get_user_artworks(username):
@@ -56,13 +61,32 @@ def get_user_artworks(username):
         return Response(json.dumps({'error': 'User not found'}), mimetype='application/json'), 404
 
     try:
-
         user_views = ToView.query.filter_by(user_id=user.id).all()
-        artworks = [Artwork.query.get(view.artwork_id).to_dict() for view in user_views if Artwork.query.get(view.artwork_id)]
+        artworks = [view.artwork.to_dict() for view in user_views if view.artwork]  # Utilize the relationship to directly access artworks
         
         return Response(json.dumps({'artworks': artworks}), mimetype='application/json'), 200
     except Exception as e:
         return Response(json.dumps({"error": str(e)}), mimetype='application/json'), 500
+
+
+@app.route('/api/user-to-view/<objectID>', methods=['DELETE'])
+def delete_user_artwork(objectID):
+    user_id = request.headers.get('User-ID')
+    if not user_id:
+        return {'error': 'User ID is required'}, 400
+
+    try:
+
+        to_view_record = ToView.query.join(Artwork).filter(Artwork.objectID == objectID, ToView.user_id == user_id).first()
+        if not to_view_record:
+            return {'error': 'Artwork not found or not associated with user'}, 404
+
+        db.session.delete(to_view_record)
+        db.session.commit()
+        return {'message': 'Artwork removed successfully'}, 200
+    except Exception as e:
+        db.session.rollback()
+        return {'error': str(e)}, 500
 
 
 ## The below was working in postman / troubleshooting objectID vs artwork_id
@@ -83,35 +107,35 @@ def get_user_artworks(username):
 #         db.session.rollback()
 #         return Response(json.dumps({'error': str(e)}), mimetype='application/json'), 500
 
-@app.route('/api/user-to-view/<int:artwork_id>', methods=['DELETE'])
-def delete_saved_artwork(artwork_id):
-    user_id = request.headers.get('User-ID')
-    if not user_id:
-        return Response(json.dumps({'error': 'User-ID header is missing'}), mimetype='application/json'), 400
+# @app.route('/api/user-to-view/<int:artwork_id>', methods=['DELETE'])
+# def delete_saved_artwork(artwork_id):
+#     user_id = request.headers.get('User-ID')
+#     if not user_id:
+#         return Response(json.dumps({'error': 'User-ID header is missing'}), mimetype='application/json'), 400
 
-    try:
-        to_view = ToView.query.filter_by(user_id=user_id, artwork_id=artwork_id).first()
-        if not to_view:
-            return Response(json.dumps({'error': 'No saved artwork found'}), mimetype='application/json'), 404
+#     try:
+#         to_view = ToView.query.filter_by(user_id=user_id, artwork_id=artwork_id).first()
+#         if not to_view:
+#             return Response(json.dumps({'error': 'No saved artwork found'}), mimetype='application/json'), 404
 
-        db.session.delete(to_view)
-        db.session.commit()
-        return Response(json.dumps({'message': 'Artwork removed successfully'}), mimetype='application/json'), 200
-    except Exception as e:
-        db.session.rollback()
-        return Response(json.dumps({'error': str(e)}), mimetype='application/json'), 500
+#         db.session.delete(to_view)
+#         db.session.commit()
+#         return Response(json.dumps({'message': 'Artwork removed successfully'}), mimetype='application/json'), 200
+#     except Exception as e:
+#         db.session.rollback()
+#         return Response(json.dumps({'error': str(e)}), mimetype='application/json'), 500
 
 
-@app.route('/api/users', methods=['GET'])
-def get_all_users():
-    try:
-        users = User.query.all()
-        return Response(json.dumps({'users': [user.to_dict() for user in users]}), mimetype='application/json'), 200
-    except Exception as e:
-        return Response(json.dumps({"error": str(e)}), mimetype='application/json'), 500
+# @app.route('/api/users', methods=['GET'])
+# def get_all_users():
+#     try:
+#         users = User.query.all()
+#         return Response(json.dumps({'users': [user.to_dict() for user in users]}), mimetype='application/json'), 200
+#     except Exception as e:
+#         return Response(json.dumps({"error": str(e)}), mimetype='application/json'), 500
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 
 #MET API SEARCHES ------- Nit using this for now. Fetching on the fontend tested faster. 

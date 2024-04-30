@@ -1,32 +1,52 @@
-import './ArtworkList.css';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import ArtworkActions from './ArtworkActions'; // Make sure the path is correct
+import ArtworkActions from './ArtworkActions';
 
-function ArtworkList({ artworks, isVisible, onClose }) {
-  const { user } = useAuth();
+function ArtworkList({ artworks, isVisible, setIsVisible, refreshArtworks }) {
   const navigate = useNavigate();
-  const artworkListRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!artworks.length && !loading) {
+      setError('No artworks to display.');
+    } else {
+      setError('');
+    }
+    setLoading(false);
+  }, [artworks, loading]);
 
   const viewArtworkDetail = (artwork) => {
     navigate(`/artwork/${artwork.objectID}`, { state: { artwork } });
   };
 
-  // Callback to handle any updates after actions are completed
-  const onActionComplete = () => {
-    console.log("Action completed, refresh needed.");
-    // Optionally refresh the list or perform other actions
+  const handleClose = () => {
+    setIsVisible(false);
   };
 
   return (
-    <div ref={artworkListRef} className={`artwork-list-container ${isVisible ? 'showArt' : 'hideArt'}`}>
-      {artworks.map(artwork => (
-        <div key={artwork.objectID} className="artwork-item">
-          <img src={artwork.primaryImageSmall} alt={artwork.title} className="artwork-image" onClick={() => viewArtworkDetail(artwork)} />
-          <ArtworkActions artwork={artwork} onActionComplete={onActionComplete} />
-        </div>
-      ))}
+    <div className={`artwork-list-container ${isVisible ? 'showArt' : 'hideArt'}`}>
+      <button onClick={handleClose} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 100 }}>Close</button>
+      {loading ? (
+        <p>Loading artworks...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : (
+        artworks.map(artwork => (
+          <div key={artwork.objectID} className="artwork-item">
+            <div className="artwork-image-container" onClick={() => viewArtworkDetail(artwork)}>
+              <img src={artwork.primaryImageSmall} alt={artwork.title} className="artwork-image" />
+              <div className="button-container">
+                <ArtworkActions artwork={artwork} onActionComplete={refreshArtworks} />
+              </div>
+            </div>
+            <div className="artwork-details">
+              {/* Displaying the title or other details */}
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 }

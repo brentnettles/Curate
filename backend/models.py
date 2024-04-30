@@ -64,11 +64,11 @@ class ToView(db.Model, SerializerMixin):
     __tablename__ = 'to_view'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    artwork_id = db.Column(db.Integer, db.ForeignKey('artwork.id'))
+    artwork_objectID = db.Column(db.Integer, db.ForeignKey('artwork.objectID'))  # Change to reference objectID
     username = db.Column(db.String(255), nullable=False)  # Storing username for easier queries
     galleryNumber = db.Column(db.String(255), nullable=False)  # Storing gallery number
     user = db.relationship('User', back_populates='to_views')
-    artwork = db.relationship('Artwork', back_populates='to_views')
+    artwork = db.relationship('Artwork', back_populates='to_views', foreign_keys=[artwork_objectID])
     serialize_rules = ('-user.to_views', '-artwork.to_views')
 
 
