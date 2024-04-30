@@ -27,7 +27,9 @@ function ArtworkList({ artworks, isVisible, setIsVisible, refreshArtworks }) {
 
   return (
     <div className={`artwork-list-container ${isVisible ? 'showArt' : 'hideArt'}`}>
-      <button onClick={handleClose} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 100 }}>Close</button>
+      <div className="button-container">
+        <button className="close-button" onClick={handleClose}></button>
+      </div>
       {loading ? (
         <p>Loading artworks...</p>
       ) : error ? (
@@ -35,14 +37,11 @@ function ArtworkList({ artworks, isVisible, setIsVisible, refreshArtworks }) {
       ) : (
         artworks.map(artwork => (
           <div key={artwork.objectID} className="artwork-item">
+            <div className="artwork-details">
+              <ArtworkActions artwork={artwork} onActionComplete={refreshArtworks} />
+            </div>
             <div className="artwork-image-container" onClick={() => viewArtworkDetail(artwork)}>
               <img src={artwork.primaryImageSmall} alt={artwork.title} className="artwork-image" />
-              <div className="button-container">
-                <ArtworkActions artwork={artwork} onActionComplete={refreshArtworks} />
-              </div>
-            </div>
-            <div className="artwork-details">
-              {/* Displaying the title or other details */}
             </div>
           </div>
         ))

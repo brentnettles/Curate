@@ -1,7 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { saveArtwork, deleteArtwork } from '../services/apiService';  // Ensure these are imported
+import { saveArtwork, deleteArtwork } from '../services/apiService'; 
+import closeIcon from '../buttons/down.png';
+import saveIcon from '../buttons/pin.png';
+import inspectIcon from '../buttons/search.png';
 
 const ArtworkActions = ({ artwork, viewGallery, onActionComplete }) => {
   const { user, savedArtworks, saveArtworkContext, removeArtworkContext } = useAuth();
@@ -15,6 +18,7 @@ const ArtworkActions = ({ artwork, viewGallery, onActionComplete }) => {
   };
 
   const handleSave = async (event) => {
+    event.preventDefault(); 
     event.stopPropagation();
     if (!user) {
       console.log("Please log in to save artworks.");
@@ -54,11 +58,11 @@ const ArtworkActions = ({ artwork, viewGallery, onActionComplete }) => {
 
   return (
     <div className="artwork-actions">
-      {!isSaved && <button onClick={handleSave}>Save</button>}
-      {isSaved && <button onClick={handleRemove}>Remove</button>}
-      <button onClick={handleInspect}>Inspect</button>
-      {viewGallery && <button onClick={() => viewGallery(artwork.galleryNumber)}>View Gallery</button>}
-    </div>
+  {!savedArtworks.has(artwork.objectID) && <button className="button save-button" onClick={handleSave} title="Save to My List"></button>}
+  {savedArtworks.has(artwork.objectID) && <button className="button remove-button" onClick={handleRemove} title="Remove Artwork"></button>}
+  <button className="button inspect-button" onClick={handleInspect} title="View Details"></button>
+  {viewGallery && <button className="button view-gallery-button" onClick={() => viewGallery(artwork.galleryNumber)} title="View Gallery">View Gallery</button>}
+</div>
   );
 };
 

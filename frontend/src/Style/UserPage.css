@@ -1,0 +1,27 @@
+.save-artwork-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.save-artwork-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 80%;
+}
+
+.save-artwork-info {
+    text-align: center;
+    padding-top: 10px;
+}
+
+.save-artwork-image {
+    max-height: 300px;  
+    max-width: 100%;  
+    cursor: pointer;
+}

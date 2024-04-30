@@ -18,9 +18,15 @@ function Map_visual() {
                 svgRef.current.innerHTML = svg;
                 const svgElement = svgRef.current.querySelector('svg');
                 enhanceSVG(svgElement);
-                highlightSavedGalleries(); // Ensures highlights are updated on fetch and context changes
             });
-    }, [savedArtworks]); // Add savedArtworks as a dependency to update when changes
+    }, []); // Removed savedArtworks from the dependencies
+
+    useEffect(() => {
+        // This effect is only responsible for updating highlights
+        if (svgRef.current) {
+            highlightSavedGalleries();
+        }
+    }, [savedArtworks]); // Only re-run when savedArtworks changes
 
     const enhanceSVG = (svgElement) => {
         const svg = d3.select(svgElement);
@@ -34,32 +40,22 @@ function Map_visual() {
         svg.call(zoom.current);
         svg.call(zoom.current.transform, d3.zoomIdentity);
 
-        // Set up gallery interactions
+        setupInteractions(svg);
+    };
+
+    const setupInteractions = (svg) => {
         const galleriesLayer = svg.select('#Floor_1_Galleries');
         galleriesLayer.selectAll('rect')
             .each(function () {
                 const rect = d3.select(this);
                 const id = rect.attr('id').replace(/[_]/g, '');
-                const originalColor = rect.style('fill');  // Store the original fill color
                 const group = rect.node().parentNode.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
                 d3.select(group).attr('class', 'room-group')
                     .style('cursor', 'pointer')
-                    .on('click', () => {
-                        setSelectedGallery(id);
-                    })
-                    .on('mouseover', function() {
-                        d3.select(this).select('rect')
-                            .transition()
-                            .duration(150)
-                            .style('fill', 'salmon');  // Change hover color
-                    })
-                    .on('mouseout', function() {
-                        d3.select(this).select('rect')
-                            .transition()
-                            .duration(150)
-                            .style('fill', originalColor);  // Revert fill color
-                    });
-
+                    .on('click', () => setSelectedGallery(id))
+                    .on('mouseover', () => rect.transition().duration(150).style('fill', 'salmon'))
+                    .on('mouseout', () => rect.transition().duration(150).style('fill', ''));
+                
                 group.appendChild(rect.node());  // Append rectangle to group
 
                 // Append text to group
@@ -71,11 +67,6 @@ function Map_visual() {
                     .text(id)
                     .style('fill', 'black')
                     .style('font-size', `${Math.min(parseFloat(rect.attr('width')), parseFloat(rect.attr('height'))) / 3}px`);
-
-                // Highlight if saved
-                if (savedArtworks.has(id)) {
-                    rect.style('stroke', 'red').style('stroke-width', '4');
-                }
             });
     };
 
@@ -84,12 +75,8 @@ function Map_visual() {
         const galleriesLayer = svg.select('#Floor_1_Galleries');
         galleriesLayer.selectAll('rect').each(function () {
             const rect = d3.select(this);
-            const id = rect.attr('id').replace(/[_]/g, '');  // Ensure the ID is cleaned properly
-            if (savedArtworks.has(id)) {
-                rect.style('stroke', 'red').style('stroke-width', '4'); // Highlight saved galleries
-            } else {
-                rect.style('stroke', 'none');
-            }
+            const id = rect.attr('id').replace(/[_]/g, '');
+            rect.style('stroke', savedArtworks.has(id) ? 'red' : 'none').style('stroke-width', savedArtworks.has(id) ? '4' : '0');
         });
     };
 

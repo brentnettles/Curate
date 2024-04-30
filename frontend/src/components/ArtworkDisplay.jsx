@@ -1,3 +1,7 @@
+
+//This component should be moved to ApiService.jsx / 
+//Will need to reconfigure a few things and this is far down on the list 
+
 import React, { useEffect, useState } from 'react';
 import './ArtworkList.css';
 import ArtworkList from './ArtworkList';
@@ -37,9 +41,7 @@ function ArtworkDisplay({ galleryNumber }) {
 
   return (
     <div className="artwork-display-container">
-      <div className="navigation-arrows">
-
-      </div>
+    
       <ArtworkList artworks={artworks} isVisible={isVisible} onClose={() => setIsVisible(false)} />
     </div>
   );
