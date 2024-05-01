@@ -8,15 +8,14 @@ export const AuthProvider = ({ children }) => {
         return savedUser ? JSON.parse(savedUser) : null;
     });
 
-    const [collections, setCollections] = useState(() => {
-        // TESTING NEW collections
-        const loadedCollections = localStorage.getItem('collections');
-        return loadedCollections ? JSON.parse(loadedCollections) : {};
-    });
-
     const [savedArtworks, setSavedArtworks] = useState(() => {
         const loadedArtworks = localStorage.getItem('savedArtworks');
         return new Set(loadedArtworks ? JSON.parse(loadedArtworks) : []);
+    });
+
+    const [collections, setCollections] = useState(() => {
+        const loadedCollections = localStorage.getItem('collections');
+        return loadedCollections ? JSON.parse(loadedCollections) : [];
     });
 
     useEffect(() => {
@@ -35,18 +34,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('collections');
         setUser(null);
         setSavedArtworks(new Set());
-        setCollections({});
+        setCollections([]); // Ensure this is reset to an empty array
     };
 
     const saveArtworkContext = (objectID) => {
         setSavedArtworks(prev => new Set([...prev, objectID]));
-    };
-
-    const addToCollection = (artworkId, collectionName) => {
-        setCollections(prev => ({
-            ...prev,
-            [collectionName]: [...(prev[collectionName] || []), artworkId]
-        }));
     };
 
     const removeArtworkContext = (objectID) => {
@@ -57,15 +49,41 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    const createCollection = (name) => {
+        setCollections(prev => {
+            if (!prev.find(c => c.name === name)) {
+                console.log("Collection created:", name); // Log when a new collection is created
+                return [...prev, { name, artworks: [] }];
+            }
+            return prev;
+        });
+    };
+
+    const addArtworkToCollection = (artworkId, collectionName) => {
+        setCollections(prev => {
+            const index = prev.findIndex(coll => coll.name === collectionName);
+            if (index !== -1) {
+                // Update existing collection
+                console.log("Artwork added to collection:", collectionName, "Artwork ID:", artworkId); // Log when artwork is added
+                return prev.map((coll, i) => i === index ? { ...coll, artworks: [...coll.artworks, artworkId] } : coll);
+            } else {
+                // Add new collection
+                console.log("Creating new collection and adding artwork:", collectionName, "Artwork ID:", artworkId); // Log when creating and adding
+                return [...prev, { name: collectionName, artworks: [artworkId] }];
+            }
+        });
+    };
+
     return (
         <AuthContext.Provider value={{
-            user, 
-            login, 
-            logout, 
-            savedArtworks, 
+            user,
+            login,
+            logout,
+            savedArtworks,
             collections,
-            saveArtworkContext, 
-            addToCollection,
+            saveArtworkContext,
+            addArtworkToCollection,
+            createCollection,
             removeArtworkContext
         }}>
             {children}

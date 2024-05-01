@@ -1,31 +1,51 @@
 /* Style/ArtworkActions.css */
 .button {
-    width: 30px;
-    height: 30px;
-    border: none;
-    background-color: transparent;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    cursor: pointer;
-    border-radius: 5px;
-    margin: 5px;
-    display: inline-block; /* Ensures buttons align properly */
-  }
-  
-  .save-button {
-    background-image: url('/src/buttons/add.png');
-  }
-  
-  .remove-button {
-    background-image: url('/src/buttons/remove.png');
-  }
-  
-  .inspect-button {
-    background-image: url('/src/buttons/inspect.png');
-  }
-  
-  .view-gallery-button {
-    background-image: url('/src/buttons/gallery.png');
-  }
-  
+  width: 30px;
+  height: 30px;
+  border: none;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 5px;
+  display: inline-block; /* Ensures buttons align properly */
+}
+
+.save-button {
+  background-image: url('/src/buttons/add.png');
+}
+
+.remove-button {
+  background-image: url('/src/buttons/remove.png');
+}
+
+.inspect-button {
+  background-image: url('/src/buttons/inspect.png');
+}
+
+.view-gallery-button {
+  background-image: url('/src/buttons/gallery.png');
+}
+
+.collection-button {
+  background-image: url('/src/buttons/stack.png'); 
+}
+
+.dropdown {
+  position: absolute;
+  top: 35px; /* Adjust this as needed to appear right below the button */
+  right: 0;
+  width: auto; /* Adjust width as needed */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+
+.collection-button img {
+  width: 100%;
+  height: auto;
+}
