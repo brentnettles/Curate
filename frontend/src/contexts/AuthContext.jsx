@@ -7,18 +7,22 @@ export const AuthProvider = ({ children }) => {
         const savedUser = localStorage.getItem('user');
         return savedUser ? JSON.parse(savedUser) : null;
     });
+
+    const [collections, setCollections] = useState(() => {
+        // TESTING NEW collections
+        const loadedCollections = localStorage.getItem('collections');
+        return loadedCollections ? JSON.parse(loadedCollections) : {};
+    });
+
     const [savedArtworks, setSavedArtworks] = useState(() => {
-        // Read the saved artworks from local storage
         const loadedArtworks = localStorage.getItem('savedArtworks');
         return new Set(loadedArtworks ? JSON.parse(loadedArtworks) : []);
     });
 
     useEffect(() => {
-        // Log the current state / debugging
-        console.log("Current saved artworks:", Array.from(savedArtworks));
-        // Save the savedArtworks to local storage whenever it changes
         localStorage.setItem('savedArtworks', JSON.stringify(Array.from(savedArtworks)));
-    }, [savedArtworks]);
+        localStorage.setItem('collections', JSON.stringify(collections));
+    }, [savedArtworks, collections]);
 
     const login = (userData) => {
         localStorage.setItem('user', JSON.stringify(userData));
@@ -28,22 +32,27 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('savedArtworks');
+        localStorage.removeItem('collections');
         setUser(null);
-        setSavedArtworks(new Set()); // update artworks state
-        console.log("Logged out, user set to null, and artworks cleared");
+        setSavedArtworks(new Set());
+        setCollections({});
     };
 
     const saveArtworkContext = (objectID) => {
-
         setSavedArtworks(prev => new Set([...prev, objectID]));
+    };
+
+    const addToCollection = (artworkId, collectionName) => {
+        setCollections(prev => ({
+            ...prev,
+            [collectionName]: [...(prev[collectionName] || []), artworkId]
+        }));
     };
 
     const removeArtworkContext = (objectID) => {
         setSavedArtworks(prev => {
             const updatedArtworks = new Set([...prev]);
             updatedArtworks.delete(objectID);
-            console.log("Before removal:", Array.from(prev)); // Log before removal
-            console.log("After removal:", Array.from(updatedArtworks)); // Log after removal
             return updatedArtworks;
         });
     };
@@ -54,7 +63,9 @@ export const AuthProvider = ({ children }) => {
             login, 
             logout, 
             savedArtworks, 
+            collections,
             saveArtworkContext, 
+            addToCollection,
             removeArtworkContext
         }}>
             {children}

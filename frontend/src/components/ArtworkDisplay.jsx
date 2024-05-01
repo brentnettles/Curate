@@ -3,7 +3,7 @@
 //Will need to reconfigure a few things and this is far down on the list 
 
 import React, { useEffect, useState } from 'react';
-import './ArtworkList.css';
+
 import ArtworkList from './ArtworkList';
 
 function ArtworkDisplay({ galleryNumber }) {
