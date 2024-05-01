@@ -1,7 +1,7 @@
 // apiService.jsx
 const BASE_URL = 'http://localhost:5555/api';
 
-// TESTING Setup one function to handle errors for request to backend
+// Setup one function to handle errors for request to backend
 async function fetchWithErrors(url, options) {
     const response = await fetch(url, options);
     if (!response.ok) {
@@ -26,7 +26,7 @@ export const deleteArtwork = async (artworkId, userId) => {
 
 // Backend save artwork function
 export const saveArtwork = async (artworkData, userId) => {
-    const url = `${BASE_URL}/user-to-view`; 
+    const url = `${BASE_URL}/user-to-view`;  // Adjust if endpoint differs
     const options = {
         method: 'POST',
         headers: {
@@ -34,6 +34,6 @@ export const saveArtwork = async (artworkData, userId) => {
             'User-ID': userId
         },
         body: JSON.stringify(artworkData)
-    }; //testing
-    return fetchWithErrors(url, options); 
+    };
+    return fetchWithErrors(url, options); // Ensure to return the result from fetchWithErrors
 };

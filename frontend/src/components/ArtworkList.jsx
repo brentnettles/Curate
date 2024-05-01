@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import ArtworkActions from './ArtworkActions';
-import '../Style/ArtworkList.css';
 
 function ArtworkList({ artworks, isVisible, setIsVisible, refreshArtworks }) {
   const navigate = useNavigate();
@@ -38,11 +37,11 @@ function ArtworkList({ artworks, isVisible, setIsVisible, refreshArtworks }) {
       ) : (
         artworks.map(artwork => (
           <div key={artwork.objectID} className="artwork-item">
-            <div className="artwork-image-container" onClick={() => viewArtworkDetail(artwork)}>
-              <img src={artwork.primaryImageSmall} alt={artwork.title} className="artwork-image" />
-            </div>
             <div className="artwork-details">
               <ArtworkActions artwork={artwork} onActionComplete={refreshArtworks} />
+            </div>
+            <div className="artwork-image-container" onClick={() => viewArtworkDetail(artwork)}>
+              <img src={artwork.primaryImageSmall} alt={artwork.title} className="artwork-image" />
             </div>
           </div>
         ))

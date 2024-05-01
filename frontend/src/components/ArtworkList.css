@@ -43,7 +43,7 @@
   transition: transform 0.3s ease-in-out;
   object-fit: contain; 
 }
-/* 
+
 .button-container {
   position: absolute;
   top: 10px; 
@@ -88,4 +88,4 @@
   border: none;
   cursor: pointer;
   z-index: 100;
-} */
+}

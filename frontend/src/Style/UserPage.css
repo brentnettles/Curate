@@ -1,8 +1,7 @@
 .save-artwork-list {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
+    flex-direction: column;
+    align-items: center;
     padding: 20px;
 }
 
@@ -10,51 +9,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 20px;
     border: 1px solid #ccc;
     padding: 10px;
-    width: 20vw;  
-    height: 25vh;  /* Fixed height */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-    overflow: hidden; 
-    justify-content: space-between; /* Ensures content is spaced out and buttons stay at bottom */
-}
-
-.save-artwork-item:hover {
-    transform: scale(1.05);
+    width: 80%;
 }
 
 .save-artwork-info {
-    width: 100%;  
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
     padding-top: 10px;
 }
 
 .save-artwork-image {
-    max-height: 16vh;  /* Adjust to fit within the item */
-    width: 100%;  /* Responsive width */
-    object-fit: contain;  /* Ensures the entire image is visible without distortion */
+    max-height: 300px;  
+    max-width: 100%;  
     cursor: pointer;
-}
-
-.save-artwork-title {
-    font-size: 1rem; 
-    font-weight: bold;  
-    text-align: center;
-    width: 100%;  
-}
-
-.save-artwork-gallery {
-    font-size: 0.75rem;  
-    color: #666;
-    text-align: center;
-}
-
-.artwork-actions {
-    width: 100%;  /* Full width of the item */
-    display: flex;
-    justify-content: center;  /* Center the buttons */
-    padding: 5px 0;  /* Padding for spacing */
 }

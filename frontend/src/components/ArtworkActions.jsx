@@ -2,7 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { saveArtwork, deleteArtwork } from '../services/apiService'; 
-import '../Style/ArtworkActions.css';
+import closeIcon from '../buttons/down.png';
+import saveIcon from '../buttons/pin.png';
+import inspectIcon from '../buttons/search.png';
 
 const ArtworkActions = ({ artwork, viewGallery, onActionComplete }) => {
   const { user, savedArtworks, saveArtworkContext, removeArtworkContext } = useAuth();
