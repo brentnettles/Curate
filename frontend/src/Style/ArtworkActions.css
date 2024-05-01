@@ -1,0 +1,31 @@
+/* Style/ArtworkActions.css */
+.button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 5px;
+    display: inline-block; /* Ensures buttons align properly */
+  }
+  
+  .save-button {
+    background-image: url('/src/buttons/add.png');
+  }
+  
+  .remove-button {
+    background-image: url('/src/buttons/remove.png');
+  }
+  
+  .inspect-button {
+    background-image: url('/src/buttons/inspect.png');
+  }
+  
+  .view-gallery-button {
+    background-image: url('/src/buttons/gallery.png');
+  }
+  
