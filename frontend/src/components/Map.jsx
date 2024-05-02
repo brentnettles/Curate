@@ -28,6 +28,11 @@ function Map_visual() {
         }
     }, [savedArtworks]);
 
+    // d3 map overview~ svg:1 layer is map, 2nd layer is galleries
+    // each rectangle in the svg has an id = to the galleryNumber
+    // select the id, append as text to the rectangle
+    // reference the galleryNumber in the id of the svg for highlightSavedGalleries function
+    
     const enhanceSVG = (svgElement) => {
         const svg = d3.select(svgElement);
         zoom.current.on('zoom', (event) => {
@@ -57,6 +62,7 @@ function Map_visual() {
                 .attr('y', parseFloat(rect.attr('y')) + parseFloat(rect.attr('height')) / 2)
                 .attr('dominant-baseline', 'middle')
                 .attr('text-anchor', 'middle')
+                //extract the "galleryNumber" from the id of the svg
                 .text(id)
                 .style('fill', 'black')
                 .style('font-size', `${Math.min(parseFloat(rect.attr('width')), parseFloat(rect.attr('height'))) / 3}px`);
@@ -69,8 +75,10 @@ function Map_visual() {
         galleriesLayer.selectAll('rect').each(function() {
             const rect = d3.select(this);
             const id = rect.attr('id').replace(/[_]/g, '');
-            rect.style('stroke', savedArtworks.has(id) ? 'red' : 'none')
-                .style('stroke-width', savedArtworks.has(id) ? '4' : '0');
+            // Check if any saved artwork matches the current gallery id
+            const isSaved = Array.from(savedArtworks).some(art => art.galleryNumber === id);
+            rect.style('stroke', isSaved ? 'red' : 'none')
+                .style('stroke-width', isSaved ? '4' : '0');
         });
     };
 

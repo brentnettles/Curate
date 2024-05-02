@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
+//Some redundant code checks here - troubleshooting keeping State in sync with local storage and backend
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -11,12 +13,14 @@ export const AuthProvider = ({ children }) => {
     });
     const [collections, setCollections] = useState(() => JSON.parse(localStorage.getItem('collections') || '[]'));
 
+    //Buggy without the useEffect
     useEffect(() => {
         localStorage.setItem('savedArtworks', JSON.stringify(Array.from(savedArtworks)));
         localStorage.setItem('collections', JSON.stringify(collections));
         console.log("Local storage updated:", { savedArtworks: Array.from(savedArtworks), collections });
     }, [savedArtworks, collections]);
 
+    //Need galleryNumber for Map feature and objectID for artwork render 
     useEffect(() => {
         if (user) {
             fetch(`http://localhost:5555/api/user-artworks/${user.username}`)
