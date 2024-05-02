@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { saveArtwork, deleteArtwork } from '../services/apiService';
 import '../Style/ArtworkActions.css';
 
-const ArtworkActions = ({ artwork, viewGallery, onActionComplete }) => {
+const ArtworkActions = ({ artwork, viewGallery, onActionComplete = () => {} }) => {
   const { user, savedArtworks, saveArtworkContext, removeArtworkContext, collections, createCollection, addArtworkToCollection } = useAuth();
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
+
+  const isArtworkSaved = savedArtworks.has(artwork.objectID) || Array.from(savedArtworks).some(art => art.objectID === artwork.objectID);
 
   const handleInspect = (event) => {
     event.stopPropagation();
@@ -28,9 +31,9 @@ const ArtworkActions = ({ artwork, viewGallery, onActionComplete }) => {
     };
 
     try {
-      await saveArtwork(postData, user.id);
-      saveArtworkContext(artwork.objectID);
-      console.log("Artwork saved successfully");
+      const response = await saveArtwork(postData, user.id);
+      saveArtworkContext({ objectID: artwork.objectID, galleryNumber: artwork.galleryNumber });
+      console.log("Artwork saved successfully:", response);
       onActionComplete();
     } catch (error) {
       console.error('Error saving artwork:', error);
@@ -44,9 +47,9 @@ const ArtworkActions = ({ artwork, viewGallery, onActionComplete }) => {
       return;
     }
     try {
-      await deleteArtwork(artwork.objectID, user.id);
+      const response = await deleteArtwork(artwork.objectID, user.id);
       removeArtworkContext(artwork.objectID);
-      console.log("Artwork removed successfully");
+      console.log("Artwork removed successfully:", response);
       onActionComplete();
     } catch (error) {
       console.error('Error removing artwork:', error);
@@ -64,8 +67,8 @@ const ArtworkActions = ({ artwork, viewGallery, onActionComplete }) => {
 
   return (
     <div className="artwork-actions">
-      {!savedArtworks.has(artwork.objectID) && <button className="button save-button" onClick={handleSave} title="Save to My List"></button>}
-      {savedArtworks.has(artwork.objectID) && <button className="button remove-button" onClick={handleRemove} title="Remove Artwork"></button>}
+      {!isArtworkSaved && <button className="button save-button" onClick={handleSave} title="Save to My List"></button>}
+      {isArtworkSaved && <button className="button remove-button" onClick={handleRemove} title="Remove Artwork"></button>}
       <button className="button inspect-button" onClick={handleInspect} title="View Details"></button>
       <button className="button collection-button" onClick={() => setShowDropdown(!showDropdown)} title="Manage Collections"></button>
       {viewGallery && <button className="button view-gallery-button" onClick={() => viewGallery(artwork.galleryNumber)} title="View Gallery"></button>}

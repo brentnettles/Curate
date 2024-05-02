@@ -1,17 +1,20 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 
+// Button to add an artwork to a collection in ArtworkActions / Rendered in UserPage
+
+
 function Collections({ artworkId }) {
     const { collections, addArtworkToCollection, createCollection } = useContext(AuthContext);
     const [newCollectionName, setNewCollectionName] = useState('');
 
-    const handleCreateAndAdd = () => {
-        if (newCollectionName.trim() !== '') {
-            createCollection(newCollectionName);
-            addArtworkToCollection(artworkId, newCollectionName);
-            setNewCollectionName('');
-        }
-    };
+    // const handleCreateAndAdd = () => {
+    //     if (newCollectionName.trim() !== '') {
+    //         createCollection(newCollectionName);
+    //         addArtworkToCollection(artworkId, newCollectionName);
+    //         setNewCollectionName('');
+    //     }
+    // };
 
     return (
         <div>
@@ -20,7 +23,7 @@ function Collections({ artworkId }) {
                 onChange={(e) => setNewCollectionName(e.target.value)}
                 placeholder="New or existing collection name"
             />
-            <button onClick={handleCreateAndAdd}>Create/Add to Collection</button>
+            <button onClick={handleCreateAndAdd}> + New Collection</button>
             <ul>
                 {collections.map(collection => (
                     <li key={collection.name}>

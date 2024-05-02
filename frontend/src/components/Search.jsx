@@ -25,6 +25,7 @@ function Search() {
         fetchResults();
     };
 
+    //load additional artworks
     const handleSeeMore = async () => {
         setFetchLimit(prevLimit => prevLimit + 12);  
         fetchResults();
@@ -36,6 +37,7 @@ function Search() {
         if (searchType === 'medium') {
             url.searchParams.append('medium', searchTerm);
         } else {
+            //compounds the search query / search parameters
             url.searchParams.append('q', searchTerm);
             if (isHighlight) url.searchParams.append('isHighlight', 'true');
             if (isOnView) url.searchParams.append('isOnView', 'true');

@@ -13,11 +13,11 @@
     border: 1px solid #ccc;
     padding: 10px;
     width: 20vw;  
-    height: 25vh;  /* Fixed height */
+    height: 30vh;  /* Fixed height */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     transition: transform 0.3s ease;
     overflow: hidden; 
-    justify-content: space-between; /* Ensures content is spaced out and buttons stay at bottom */
+    justify-content: space-between; 
 }
 
 .save-artwork-item:hover {
@@ -25,7 +25,9 @@
 }
 
 .save-artwork-info {
-    width: 100%;  
+    font-size: 0.75rem; 
+    width: 80%;  
+    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -33,15 +35,15 @@
 }
 
 .save-artwork-image {
-    max-height: 16vh;  /* Adjust to fit within the item */
-    width: 100%;  /* Responsive width */
-    object-fit: contain;  /* Ensures the entire image is visible without distortion */
+    max-height: 18vh;  
+    width: 100%;  
+    object-fit: contain; 
     cursor: pointer;
 }
 
 .save-artwork-title {
-    font-size: 1rem; 
-    font-weight: bold;  
+    font-size: 0.55rem; 
+    /* font-weight: bold;   */
     text-align: center;
     width: 100%;  
 }

@@ -1,90 +1,96 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(() => {
-        const savedUser = localStorage.getItem('user');
-        return savedUser ? JSON.parse(savedUser) : null;
-    });
-
+    const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')));
     const [savedArtworks, setSavedArtworks] = useState(() => {
-        const loadedArtworks = localStorage.getItem('savedArtworks');
-        return new Set(loadedArtworks ? JSON.parse(loadedArtworks) : []);
+        // Parse the saved artworks as an array of objects
+        const data = JSON.parse(localStorage.getItem('savedArtworks') || '[]');
+        return new Set(data.map(item => ({ objectID: item.objectID, galleryNumber: item.galleryNumber })));
     });
-
-    const [collections, setCollections] = useState(() => {
-        const loadedCollections = localStorage.getItem('collections');
-        return loadedCollections ? JSON.parse(loadedCollections) : [];
-    });
+    const [collections, setCollections] = useState(() => JSON.parse(localStorage.getItem('collections') || '[]'));
 
     useEffect(() => {
         localStorage.setItem('savedArtworks', JSON.stringify(Array.from(savedArtworks)));
         localStorage.setItem('collections', JSON.stringify(collections));
+        console.log("Local storage updated:", { savedArtworks: Array.from(savedArtworks), collections });
     }, [savedArtworks, collections]);
 
-    const login = (userData) => {
+    useEffect(() => {
+        if (user) {
+            fetch(`http://localhost:5555/api/user-artworks/${user.username}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.artworks) {
+                        const artworks = new Set(data.artworks.map(art => ({
+                            objectID: art.objectID,
+                            galleryNumber: art.galleryNumber
+                        })));
+                        setSavedArtworks(artworks);
+                        console.log("Saved artworks fetched and set:", Array.from(artworks));
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to fetch saved artworks:', error);
+                    setSavedArtworks(new Set()); // Reset if fetch fails
+                });
+        } else {
+            setSavedArtworks(new Set()); // Clear artworks on logout
+        }
+    }, [user]);
+
+    const login = userData => {
         localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
     };
 
     const logout = () => {
-        localStorage.removeItem('user');
-        localStorage.removeItem('savedArtworks');
-        localStorage.removeItem('collections');
+        localStorage.clear();
         setUser(null);
         setSavedArtworks(new Set());
-        setCollections([]); // Ensure this is reset to an empty array
+        setCollections([]);
     };
 
-    const saveArtworkContext = (objectID) => {
-        setSavedArtworks(prev => new Set([...prev, objectID]));
-    };
+    const saveArtworkContext = useCallback(({ objectID, galleryNumber }) => {
+        setSavedArtworks(prev => new Set([...prev, { objectID, galleryNumber }]));
+    }, []);
 
-    const removeArtworkContext = (objectID) => {
+    const removeArtworkContext = useCallback(objectID => {
         setSavedArtworks(prev => {
-            const updatedArtworks = new Set([...prev]);
-            updatedArtworks.delete(objectID);
-            return updatedArtworks;
+            const updated = new Set([...prev].filter(art => art.objectID !== objectID));
+            return updated;
         });
-    };
+    }, []);
 
-    const createCollection = (name) => {
-        setCollections(prev => {
-            if (!prev.find(c => c.name === name)) {
-                console.log("Collection created:", name); // Log when a new collection is created
-                return [...prev, { name, artworks: [] }];
-            }
-            return prev;
-        });
+    const createCollection = name => {
+        setCollections(prev => [...prev, { name, artworks: [] }]);
     };
 
     const addArtworkToCollection = (artworkId, collectionName) => {
         setCollections(prev => {
             const index = prev.findIndex(coll => coll.name === collectionName);
             if (index !== -1) {
-                // Update existing collection
-                console.log("Artwork added to collection:", collectionName, "Artwork ID:", artworkId); // Log when artwork is added
                 return prev.map((coll, i) => i === index ? { ...coll, artworks: [...coll.artworks, artworkId] } : coll);
-            } else {
-                // Add new collection
-                console.log("Creating new collection and adding artwork:", collectionName, "Artwork ID:", artworkId); // Log when creating and adding
-                return [...prev, { name: collectionName, artworks: [artworkId] }];
             }
+            return [...prev, { name: collectionName, artworks: [artworkId] }];
         });
     };
 
     return (
         <AuthContext.Provider value={{
             user,
+            setUser,
             login,
             logout,
             savedArtworks,
+            setSavedArtworks,
+            updateSavedArtworks: setSavedArtworks,
             collections,
             saveArtworkContext,
-            addArtworkToCollection,
+            removeArtworkContext,
             createCollection,
-            removeArtworkContext
+            addArtworkToCollection
         }}>
             {children}
         </AuthContext.Provider>

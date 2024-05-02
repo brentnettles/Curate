@@ -1,4 +1,4 @@
-// apiService.jsx
+// apiService.jsx - Goal is to keep the majority of the API request here ~
 const BASE_URL = 'http://localhost:5555/api';
 
 // TESTING Setup one function to handle errors for request to backend
