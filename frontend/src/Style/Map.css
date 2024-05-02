@@ -1,31 +1,41 @@
 .main-container {
-    position: relative; /* Needed to position children absolutely within this container */
-    height: 100%; /* Ensures the container takes full height of its parent, adjust as needed */
-    width: 100%; /* Ensures the container takes full width of its parent */
+    position: relative; 
+    height: 100%; 
+    width: 100%; 
 }
 
 .floorplan-container {
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 100px; /* Positions the container 200px from the top */
+    top: 100px; 
     left: 0;
     right: 0;
-    margin: auto; /* Centers the container horizontally */
-    width: 90%; /* Adjust the width as per your requirement */
-    max-width: 1200px; /* Maximum width of the container */
-    z-index: 10; /* Ensures the container stays on top */
-    background: #fff; /* Background color, adjust as needed */
-    border: 1px solid #ccc; /* Border properties, adjust as needed */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* Optional: adds shadow for better visibility */
+    margin: auto; 
+    width: 90%; 
+    max-width: 1200px; 
+    z-index: 10; 
+    background: #fff; 
+    border: 1px solid #ccc; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
 }
 
 .floorplan-svg-container {
-    flex: 1; /* Takes up as much space as possible within the flex container */
-    position: relative; /* Needed for absolute positioning of children if any */
+    flex: 1; 
+    position: relative; 
 }
 
 .artwork-display-container {
-    width: 100%; /* Full width of its parent */
-    padding: 20px; /* Padding inside the container */
+    width: 100%; 
+    padding: 20px; 
+}
+
+.saved-gallery {
+    stroke: red;
+    stroke-width: 4px;
+}
+
+.normal-gallery {
+    stroke: none;
+    stroke-width: 0;
 }

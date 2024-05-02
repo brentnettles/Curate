@@ -32,7 +32,7 @@ function Map_visual() {
     // each rectangle in the svg has an id = to the galleryNumber
     // select the id, append as text to the rectangle
     // reference the galleryNumber in the id of the svg for highlightSavedGalleries function
-    
+
     const enhanceSVG = (svgElement) => {
         const svg = d3.select(svgElement);
         zoom.current.on('zoom', (event) => {
@@ -55,19 +55,23 @@ function Map_visual() {
                 .style('cursor', 'pointer')
                 .on('click', () => setSelectedGallery(id))
                 .on('mouseover', () => rect.transition().duration(150).style('fill', 'salmon'))
-                .on('mouseout', () => rect.transition().duration(150).style('fill', ''));
+                .on('mouseout', () => {
+                    // Check if the gallery is saved and reset fill color accordingly
+                    const isSaved = Array.from(savedArtworks).some(art => art.galleryNumber === id);
+                    rect.transition().duration(150).style('fill', isSaved ? 'rgba(255, 0, 0, 0.2)' : '');
+                });
             group.appendChild(rect.node());
             d3.select(group).append('text')
                 .attr('x', parseFloat(rect.attr('x')) + parseFloat(rect.attr('width')) / 2)
                 .attr('y', parseFloat(rect.attr('y')) + parseFloat(rect.attr('height')) / 2)
                 .attr('dominant-baseline', 'middle')
                 .attr('text-anchor', 'middle')
-                //extract the "galleryNumber" from the id of the svg
                 .text(id)
                 .style('fill', 'black')
                 .style('font-size', `${Math.min(parseFloat(rect.attr('width')), parseFloat(rect.attr('height'))) / 3}px`);
         });
     };
+    
 
     const highlightSavedGalleries = (svgElement) => {
         const svg = d3.select(svgElement);
@@ -75,12 +79,38 @@ function Map_visual() {
         galleriesLayer.selectAll('rect').each(function() {
             const rect = d3.select(this);
             const id = rect.attr('id').replace(/[_]/g, '');
-            // Check if any saved artwork matches the current gallery id
             const isSaved = Array.from(savedArtworks).some(art => art.galleryNumber === id);
-            rect.style('stroke', isSaved ? 'red' : 'none')
-                .style('stroke-width', isSaved ? '4' : '0');
+            
+            // Toggle the 'saved-gallery' class based on saved state
+            rect.classed('saved-gallery', isSaved)
+                .classed('normal-gallery', !isSaved);
+    
+            if (isSaved) {
+                rect.style('stroke', 'black')
+                    .style('stroke-width', '1')
+                    .style('fill', 'rgba(255, 0, 0, 0.2)');  // Light red fill for saved
+            } else {
+                // Reset to no inline styles so class styles take over
+                rect.style('stroke', null)
+                    .style('stroke-width', null)
+                    .style('fill', null);
+            }
         });
     };
+
+    // const highlightSavedGalleries = (svgElement) => {
+    //     const svg = d3.select(svgElement);
+    //     const galleriesLayer = svg.select('#Floor_1_Galleries');
+    //     galleriesLayer.selectAll('rect').each(function() {
+    //         const rect = d3.select(this);
+    //         const id = rect.attr('id').replace(/[_]/g, '');
+    //         // Check if any saved artwork matches the current gallery id
+    //         const isSaved = Array.from(savedArtworks).some(art => art.galleryNumber === id);
+    //         rect.style('stroke', isSaved ? 'red' : 'none')
+    //             .style('stroke-width', isSaved ? '1' : '0')
+    //             .style('fill', isSaved ? 'rgba(255, 0, 0, 0.2)' : 'none');
+    //     });
+    // };
 
     const recenterSVG = (event) => {
         event.stopPropagation();
@@ -116,7 +146,7 @@ function Map_visual() {
 
 export default Map_visual;
 
-
+// early version below 80% functionality
 
 // import React, { useEffect, useRef, useState } from 'react';
 // import * as d3 from 'd3';

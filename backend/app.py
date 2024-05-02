@@ -4,7 +4,7 @@ from flask import Flask, request, json, Response
 from flask_migrate import Migrate
 from flask_cors import CORS
 from sqlalchemy import func
-
+from sqlalchemy.sql.expression import func
 from models import db, Artwork, ToView, User
 
 app = Flask(__name__, static_folder=os.path.join(os.getcwd(), 'assets'))
@@ -87,6 +87,37 @@ def delete_user_artwork(objectID):
     except Exception as e:
         db.session.rollback()
         return {'error': str(e)}, 500
+    
+
+
+@app.route('/api/scavenger-hunt', methods=['GET'])
+def scavenger_hunt():
+    try:
+        # Query to select 6 unique artworks  -  primaryImageSmall is not null or empty
+        # ensuring each artwork has a unique galleryNumber.
+        artworks = Artwork.query \
+            .filter(Artwork.primaryImageSmall != None, Artwork.primaryImageSmall != '') \
+            .distinct(Artwork.galleryNumber) \
+            .order_by(func.random()) \
+            .limit(6) \
+            .all()
+
+        # will make results to_dict later. Testing now...
+        results = []
+        for artwork in artworks:
+            results.append({
+                "objectID": artwork.objectID,
+                "primaryImageSmall": artwork.primaryImageSmall,
+                "title": artwork.title,
+                "artistDisplayName": artwork.artistDisplayName,
+                "galleryNumber": artwork.galleryNumber
+            })
+
+        # Convert the Python dictionary to JSON and return the response
+        return Response(json.dumps(results), mimetype='application/json'), 200
+    except Exception as e:
+        # Handle exceptions and return an error message
+        return Response(json.dumps({"error": str(e)}), mimetype='application/json'), 500
 
 
 ## The below was working in postman / troubleshooting objectID vs artwork_id
