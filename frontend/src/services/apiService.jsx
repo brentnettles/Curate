@@ -37,3 +37,8 @@ export const saveArtwork = async (artworkData, userId) => {
     }; //testing
     return fetchWithErrors(url, options); 
 };
+
+export const fetchScavengerHunt = async () => {
+    const url = `${BASE_URL}/scavenger-hunt`;
+    return fetchWithErrors(url, { method: 'GET' });
+};

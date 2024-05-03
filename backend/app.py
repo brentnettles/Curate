@@ -45,7 +45,7 @@ def user_to_view():
         return Response(json.dumps({'message': 'Artwork already saved'}), mimetype='application/json'), 200
 
     try:
-        new_to_view = ToView(user_id=user.id, artwork_objectID=objectID, username=username, galleryNumber=galleryNumber)  # Update to use artwork_objectID
+        new_to_view = ToView(user_id=user.id, artwork_objectID=objectID, username=username, galleryNumber=galleryNumber)  
         db.session.add(new_to_view)
         db.session.commit()
         return Response(json.dumps({'message': 'Artwork saved successfully'}), mimetype='application/json'), 201

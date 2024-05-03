@@ -1,39 +1,65 @@
-.artwork-list {
+/* Scavenger-specific artwork list layout */
+.scavenger-artwork-list {
     display: flex;
-    flex-direction: column; 
-    align-items: center; 
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Specific item styling for scavenger hunt */
+.scavenger-artwork-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid #007BFF;  /* Blue border to distinguish */
+    padding: 10px;
+    width: 20vw;
+    height: 30vh;
+    box-shadow: 0 4px 8px rgba(0, 0, 255, 0.1); /* Slightly blue shadow */
+    transition: transform 0.3s ease;
+    overflow: hidden;
+    justify-content: space-between;
+}
+
+.scavenger-artwork-item:hover {
+    transform: scale(1.05);
+    border-color: #0056b3; /* Darker blue on hover */
+}
+
+.scavenger-artwork-info {
+    font-size: 0.75rem;
+    width: 80%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.scavenger-artwork-image {
+    max-height: 18vh;
+    width: 100%;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.scavenger-artwork-title {
+    font-size: 0.55rem;
+    text-align: center;
     width: 100%;
 }
 
-.artwork-item {
+.scavenger-artwork-gallery {
+    font-size: 0.75rem;
+    color: #666;
+    text-align: center;
+}
+
+/* Specific actions area for scavenger items */
+.scavenger-artwork-actions {
+    width: 100%;
     display: flex;
-    align-items: center;
     justify-content: center;
-    margin-bottom: 20px;
-    width: 80vw;
-    padding: 10px;
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    flex-direction: row-reverse; 
-}
-
-.artwork-details {
-    flex: 1; 
-    text-align: center; 
-    display: flex;
-    flex-direction: column; 
-    justify-content: center; 
-    padding-right: 20px;
-}
-
-.artwork-image-container {
-    flex: 1; 
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
-}
-
-.artwork-image {
-    max-width: 90%; 
-    height: auto; 
+    padding: 5px 0;
 }

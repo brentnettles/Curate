@@ -22,8 +22,11 @@ class User(db.Model, SerializerMixin):
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
     email_address = db.Column(db.String(255), unique=True, nullable=False)
+    
     to_views = db.relationship('ToView', back_populates='user')
-    serialize_rules = ('-to_views.user',)
+    collections = db.relationship('Collection', back_populates='user')
+    serialize_rules = ('-to_views.user', '-collections.user')
+
 
 class Artwork(db.Model, SerializerMixin):
     __tablename__ = 'artwork'
@@ -41,7 +44,6 @@ class Artwork(db.Model, SerializerMixin):
     isPublicDomain = db.Column(db.Boolean)
     primaryImage = db.Column(db.String(255))
     primaryImageSmall = db.Column(db.String(255))
-    additionalImages = db.Column(db.Text)
     department = db.Column(db.String(255))
     objectName = db.Column(db.String(255))
     title = db.Column(db.String(255))
@@ -54,19 +56,20 @@ class Artwork(db.Model, SerializerMixin):
     medium = db.Column(db.String(255))
     dimensions = db.Column(db.Text)
     galleryNumber = db.Column(db.String(255), index=True)
-    classification = db.Column(db.String(255))
-    repository = db.Column(db.String(255))
     objectURL = db.Column(db.String(255))
+
     to_views = db.relationship('ToView', back_populates='artwork')
+    collections = db.relationship('CollectionArtworks', back_populates='artwork')
+
     serialize_rules = ('-to_views.artwork',)
 
 class ToView(db.Model, SerializerMixin):
     __tablename__ = 'to_view'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    artwork_objectID = db.Column(db.Integer, db.ForeignKey('artwork.objectID'))  # Change to reference objectID
-    username = db.Column(db.String(255), nullable=False)  # Storing username for easier queries
-    galleryNumber = db.Column(db.String(255), nullable=False)  # Storing gallery number
+    artwork_objectID = db.Column(db.Integer, db.ForeignKey('artwork.objectID')) 
+    username = db.Column(db.String(255), nullable=False)
+    galleryNumber = db.Column(db.String(255), nullable=False) 
     user = db.relationship('User', back_populates='to_views')
     artwork = db.relationship('Artwork', back_populates='to_views', foreign_keys=[artwork_objectID])
     serialize_rules = ('-user.to_views', '-artwork.to_views')
@@ -74,3 +77,40 @@ class ToView(db.Model, SerializerMixin):
 
     def __repr__(self):
         return '<User %r>' % self.username
+    
+class Collection(db.Model, SerializerMixin):
+    __tablename__ = 'collection'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship('User', back_populates='collections')
+    artworks = db.relationship('CollectionArtworks', back_populates='collection')
+    serialize_rules = ('-user.collections',)
+
+    def __repr__(self):
+        return f'<Collection {self.name}>'
+
+#Join Table, here we go...
+class CollectionArtworks(db.Model, SerializerMixin):
+    __tablename__ = 'collection_artworks'
+    collection_id = db.Column(db.Integer, db.ForeignKey('collection.id'), primary_key=True)
+    artwork_id = db.Column(db.Integer, db.ForeignKey('artwork.objectID'), primary_key=True)
+    collection = db.relationship('Collection', back_populates='artworks')
+    artwork = db.relationship('Artwork', back_populates='collections')
+    serialize_rules = ('-collection.artworks', '-artwork.collections')
+
+
+#Goal --- 
+# Relationships:
+# User to ToView: One-to-many. A user can have many artworks they've saved or viewed.
+# User to Collection: One-to-many. A user can create multiple collections.
+# Artwork to ToView: One-to-many. An artwork can be saved/viewed by many users.
+# Artwork to CollectionArtworks: Many-to-many with Collection via CollectionArtworks.
+# Collection to CollectionArtworks: One-to-many. A collection can include many artworks.
+
+# Use ~ 
+# User: profile data
+# Artwork: Central repository of all artwork data (local /saveable and works with Map)
+# ToView: Manages the artworks each user / hoping to add "recently viewed" or a "history".
+# Collection: Allows users to create named groups of artworks (like playlists), enhancing organization and personalization.
+# CollectionArtworks: Enables artworks to be grouped into collections flexibly, supporting many-to-many relationships.

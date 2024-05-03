@@ -98,19 +98,6 @@ function Map_visual() {
         });
     };
 
-    // const highlightSavedGalleries = (svgElement) => {
-    //     const svg = d3.select(svgElement);
-    //     const galleriesLayer = svg.select('#Floor_1_Galleries');
-    //     galleriesLayer.selectAll('rect').each(function() {
-    //         const rect = d3.select(this);
-    //         const id = rect.attr('id').replace(/[_]/g, '');
-    //         // Check if any saved artwork matches the current gallery id
-    //         const isSaved = Array.from(savedArtworks).some(art => art.galleryNumber === id);
-    //         rect.style('stroke', isSaved ? 'red' : 'none')
-    //             .style('stroke-width', isSaved ? '1' : '0')
-    //             .style('fill', isSaved ? 'rgba(255, 0, 0, 0.2)' : 'none');
-    //     });
-    // };
 
     const recenterSVG = (event) => {
         event.stopPropagation();

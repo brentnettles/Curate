@@ -1,14 +1,14 @@
+// App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext'; 
+import { useAuth } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
-import Map from './components/Map'; 
-import ArtworkDetail from './components/ArtworkDetail'; 
-import ArtworkList from './components/ArtworkList'; 
-import Search from './components/Search'; 
-import Hunt from './components/Hunt';
-import UserPage from './components/UserPage'; 
-import Login from './components/Login'; 
+import Map from './components/Map';
+import ArtworkDetail from './components/ArtworkDetail';
+import ArtworkList from './components/ArtworkList';
+import Search from './components/Search';
+import CollectionsPage from './components/CollectionsPage'; // Renamed from UserPage
+import Login from './components/Login';
 
 function ProtectedRoute({ children }) {
     const { user } = useAuth();
@@ -21,19 +21,13 @@ function App() {
             <Navbar />
             <Routes>
                 <Route path="/" element={<Map />}>
-                    {/* Nested route for ArtworkList if it's displayed within the Map */}
                     <Route path="artwork-list" element={<ArtworkList />} />
                 </Route>
                 <Route path="artwork/:id" element={<ArtworkDetail />} />
                 <Route path="search" element={<Search />} />
-                <Route path="hunt" element={
+                <Route path="collections" element={
                     <ProtectedRoute>
-                        <Hunt />
-                    </ProtectedRoute>
-                } />
-                <Route path="user" element={
-                    <ProtectedRoute>
-                        <UserPage />
+                        <CollectionsPage />
                     </ProtectedRoute>
                 } />
                 <Route path="login" element={<Login />} />
