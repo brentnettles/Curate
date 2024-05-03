@@ -10,8 +10,12 @@ function ScavengerHunt() {
     const handleGenerateHunt = async () => {
         setLoading(true);
         try {
-            const data = await fetchScavengerHunt();
-            // Initialize artworks with a 'found' status
+            const response = await fetchScavengerHunt();  // Fetch data
+            const data = response.artworks; 
+            //Tetsing
+            console.log("Received:", data);
+    
+            
             const initializedArtworks = data.map(art => ({ ...art, found: false }));
             setArtworks(initializedArtworks);
             setError('');
@@ -24,29 +28,18 @@ function ScavengerHunt() {
         }
     };
 
-    // Mark artwork as found
-    const markAsFound = objectID => {
-        setArtworks(currentArtworks =>
-            currentArtworks.map(art =>
-                art.objectID === objectID ? { ...art, found: true } : art
-            )
-        );
-    };
-
     // Check if all artworks have been found
     useEffect(() => {
         if (artworks.length > 0 && artworks.every(art => art.found)) {
-            console.log("All artworks have been found!");
-            // Optional: Trigger any actions when all are found or reset automatically
-            // handleGenerateHunt();
+            console.log("All artworks have been found!"); // Optional action when all artworks are found
+            // handleGenerateHunt(); // Uncomment to regenerate the hunt automatically
         }
     }, [artworks]);
 
     return (
         <div>
             <h1>Scavenger Hunt</h1>
-            <p>Explore the Met.</p>
-            <p> A selection of artworks will be provided to you. Seek out the item and use the information provided on the object's Title Card to confirm you've located the artwork.</p>
+            <p>Explore the Met. A selection of artworks will be provided to you. Seek out the item and use the information provided on the object's Title Card to confirm you've located the artwork.</p>
             <button onClick={handleGenerateHunt} className="generate-hunt-button">Generate Scavenger Hunt</button>
             {loading ? <p>Loading...</p> : error ? <p>{error}</p> : (
                 <div className="save-artwork-list">

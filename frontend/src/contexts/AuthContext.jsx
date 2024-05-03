@@ -71,6 +71,10 @@ export const AuthProvider = ({ children }) => {
         setCollections(prev => [...prev, { name, artworks: [] }]);
     };
 
+    // const removeCollection = useCallback(collectionId => {
+    //     setCollections(prev => prev.filter(coll => coll.id !== collectionId));
+    // }, []);
+
     const addArtworkToCollection = (artworkId, collectionName) => {
         setCollections(prev => {
             const index = prev.findIndex(coll => coll.name === collectionName);

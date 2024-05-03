@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ArtworkActions from './ArtworkActions';
-import ScavengerHunt from './Hunt'; // Ensure this is imported correctly
+import ScavengerHunt from './Hunt';
 import '../Style/CollectionsPage.css';
 
 function CollectionsPage() {
     const [artworks, setArtworks] = useState([]);
     const [selectedCollection, setSelectedCollection] = useState('All');
     const [showScavengerHunt, setShowScavengerHunt] = useState(false);
-    const { user, collections } = useAuth();
+    const [showCollectionsSelector, setShowCollectionsSelector] = useState(false);
+    const { user, collections, removeCollection } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -31,6 +32,22 @@ function CollectionsPage() {
 
     const handleSelectCollection = (collectionName) => {
         setSelectedCollection(collectionName);
+        setShowScavengerHunt(false);  // Hide Scavenger Hunt when selecting a collection
+    };
+
+    const handleDeleteCollection = async (collectionId) => {
+        if (window.confirm("Are you sure you want to delete this collection?")) {
+            try {
+                await deleteCollection(collectionId);  // Assuming deleteCollection is correctly set up in apiService
+                removeCollection(collectionId);  // Update state to remove the collection
+                if (selectedCollection === collectionId) {
+                    setSelectedCollection('All');  // Reset selection if the deleted collection was active
+                }
+            } catch (error) {
+                console.error('Failed to delete collection:', error);
+                alert('Failed to delete collection.');
+            }
+        }
     };
 
     return (
@@ -39,18 +56,32 @@ function CollectionsPage() {
             <button onClick={() => setShowScavengerHunt(!showScavengerHunt)}>
                 {showScavengerHunt ? 'Hide Scavenger Hunt' : 'Show Scavenger Hunt'}
             </button>
+            
+            <button onClick={() => setShowCollectionsSelector(!showCollectionsSelector)}>
+                {showCollectionsSelector ? 'Hide Collections Selector' : 'Show Collections Selector'}
+            </button>
+
             {showScavengerHunt && <ScavengerHunt />}
-            <div>
-                <select onChange={handleSelectCollection}>
-                    <option value="All">All Saved Artworks</option>
+
+            {showCollectionsSelector && (
+                <ul className={`collections-selector ${showCollectionsSelector ? 'active' : ''}`}>
+                    <li onClick={() => handleSelectCollection('All')}
+                        className={selectedCollection === 'All' ? 'active' : ''} 
+                        key="all">
+                        All Saved Artworks
+                    </li>
                     {collections.map(col => (
-                        <option key={col.name} value={col.name}>{col.name}</option>
+                        <li key={col.id} className={selectedCollection === col.name ? 'active' : ''}>
+                            <span onClick={() => handleSelectCollection(col.name)}>{col.name}</span>
+                            <button onClick={() => handleDeleteCollection(col.id)}>🗑️</button>
+                        </li>
                     ))}
-                </select>
-            </div>
-            {selectedCollection === 'All' && (
-                <div className="save-artwork-list">
-                    {artworks.map(artwork => (
+                </ul>
+            )}
+
+            <div className="save-artwork-list">
+                {selectedCollection === 'All'
+                    ? artworks.map(artwork => (
                         <div key={artwork.objectID} className="save-artwork-item">
                             <img src={artwork.primaryImageSmall} alt={artwork.title} onClick={() => navigate(`/artwork/${artwork.objectID}`)} className="save-artwork-image"/>
                             <div className="save-artwork-info">
@@ -59,18 +90,12 @@ function CollectionsPage() {
                                 <ArtworkActions artwork={artwork} onActionComplete={() => setArtworks(current => current.filter(a => a.objectID !== artwork.objectID))} />
                             </div>
                         </div>
-                    ))}
-                </div>
-            )}
-            {selectedCollection !== 'All' && selectedCollection !== 'Scavenger Hunt' && (
-                <div className="save-artwork-list">
-                    {artworks.filter(art => art.collectionName === selectedCollection).map(artwork => (
-                        <div key={artwork.objectID} className="save-artwork-item">
-                            {/* Similar layout as above */}
-                        </div>
-                    ))}
-                </div>
-            )}
+                      ))
+                    : collections.find(col => col.name === selectedCollection)?.artworks.map(artwork => (
+                        <ArtworkActions key={artwork.objectID} artwork={artwork} />
+                      ))
+                }
+            </div>
         </div>
     );
 }

@@ -60,3 +60,64 @@
     justify-content: center;  /* Center the buttons */
     padding: 5px 0;  /* Padding for spacing */
 }
+
+/* .collections-selector {
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    list-style: none;
+    width: 250px; 
+    max-height: 200px; 
+    overflow-y: auto; 
+    position: relative; 
+} */
+
+.collections-selector {
+    list-style-type: none;
+    width: 250px;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, visibility 0.3s ease-out;
+    max-height: 0;  /* Start with max-height as 0 to hide content */
+    visibility: hidden;
+}
+
+.collections-selector.active {
+    max-height: 500px;  /* Adjust based on your content size */
+    visibility: visible;
+}
+
+.collections-selector li {
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.collections-selector li:hover {
+    background-color: #e6e6e6;
+}
+
+.collections-selector li.active {
+    font-weight: bold;
+    background-color: #dedede;
+}
+
+.collections-selector button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: red;
+    font-size: 1rem;
+}
+
+/* Adjust the button not to stretch the line height */
+.collections-selector button {
+    line-height: 1;
+    padding: 0 5px;
+}
