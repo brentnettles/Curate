@@ -38,10 +38,10 @@ function CollectionsPage() {
     const handleDeleteCollection = async (collectionId) => {
         if (window.confirm("Are you sure you want to delete this collection?")) {
             try {
-                await deleteCollection(collectionId);  // Assuming deleteCollection is correctly set up in apiService
-                removeCollection(collectionId);  // Update state to remove the collection
+                await deleteCollection(collectionId);  
+                removeCollection(collectionId);  
                 if (selectedCollection === collectionId) {
-                    setSelectedCollection('All');  // Reset selection if the deleted collection was active
+                    setSelectedCollection('All');  
                 }
             } catch (error) {
                 console.error('Failed to delete collection:', error);

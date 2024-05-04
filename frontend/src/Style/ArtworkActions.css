@@ -10,7 +10,7 @@
   cursor: pointer;
   border-radius: 5px;
   margin: 5px;
-  display: inline-block; /* Ensures buttons align properly */
+  display: inline-block; 
 }
 
 .save-button {

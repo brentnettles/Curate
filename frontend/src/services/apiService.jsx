@@ -57,7 +57,7 @@ export const addCollection = async (collectionData, userId) => {
 export const getCollectionsByUsername = async (username) => {
     const url = `${BASE_URL}/collections/${username}`;
     const response = await fetchWithErrors(url, { method: 'GET' });
-    return response.collections; // Assuming the backend sends an object with a 'collections' array
+    return response.collections; 
 };
 
 // Add an artwork to a collection

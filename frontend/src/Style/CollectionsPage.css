@@ -55,10 +55,10 @@
 }
 
 .artwork-actions {
-    width: 100%;  /* Full width of the item */
+    width: 100%;  
     display: flex;
-    justify-content: center;  /* Center the buttons */
-    padding: 5px 0;  /* Padding for spacing */
+    justify-content: center;  
+    padding: 5px 0;  
 }
 
 /* .collections-selector {
@@ -86,7 +86,7 @@
 }
 
 .collections-selector.active {
-    max-height: 500px;  /* Adjust based on your content size */
+    max-height: 500px;  
     visibility: visible;
 }
 
@@ -116,7 +116,7 @@
     font-size: 1rem;
 }
 
-/* Adjust the button not to stretch the line height */
+
 .collections-selector button {
     line-height: 1;
     padding: 0 5px;
