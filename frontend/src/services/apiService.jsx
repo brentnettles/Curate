@@ -61,14 +61,28 @@ export const getCollectionsByUsername = async (username) => {
 };
 
 // Add an artwork to a collection
-export const addArtworkToCollection = async (collectionId, artworkId) => {
+// export const addArtworkToCollection = async (collectionId, artworkId) => {
+//     const url = `${BASE_URL}/collections/${collectionId}/artworks`;
+//     const options = {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({ artworkId })
+//     };
+//     return fetchWithErrors(url, options);
+// };
+export const addArtworkToCollection = async (collectionId, artwork) => {
     const url = `${BASE_URL}/collections/${collectionId}/artworks`;
     const options = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ artworkId })
+        body: JSON.stringify({
+            artworkId: artwork.objectID,  // assuming 'artwork' includes 'objectID'
+            galleryNumber: artwork.galleryNumber  // include gallery number if needed
+        })
     };
     return fetchWithErrors(url, options);
 };

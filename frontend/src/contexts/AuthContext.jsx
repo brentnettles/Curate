@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { addCollection } from '../services/apiService';
 
 //Some redundant code checks here - troubleshooting keeping State in sync with local storage and backend
 
@@ -67,8 +68,27 @@ export const AuthProvider = ({ children }) => {
         });
     }, []);
 
-    const createCollection = name => {
-        setCollections(prev => [...prev, { name, artworks: [] }]);
+    // Add a new collection + artwork to the collection POST 
+    // called in ArtworkActions / using useAuth 
+    const createCollection = async (collectionName, artworkData) => {
+        // Prepare the data
+        const collectionData = {
+            name: collectionName,
+            username: user.username,
+            artworkId: artworkData.objectID,
+            galleryNumber: artworkData.galleryNumber  // Include gallery number if your backend can process it
+        };
+    
+        try {
+            const newCollection = await addCollection(collectionData, user.id);
+            if (newCollection && newCollection.artworks) {
+                newCollection.artworks.push(artworkData);  // Manually add the artwork data if backend doesn't automatically return it in the collection
+            }
+            setCollections(prev => [...prev, newCollection]);
+            console.log("Collection created successfully:", newCollection);
+        } catch (error) {
+            console.error("Error creating collection:", error);
+        }
     };
 
     // const removeCollection = useCallback(collectionId => {

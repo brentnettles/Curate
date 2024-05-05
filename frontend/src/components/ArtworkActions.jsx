@@ -56,12 +56,19 @@ const ArtworkActions = ({ artwork, viewGallery, onActionComplete = () => {} }) =
     }
   };
 
-  const handleCreateAndAddToCollection = () => {
+  const handleCreateAndAddToCollection = async () => {
     if (newCollectionName.trim() !== '') {
-      createCollection(newCollectionName);
-      addArtworkToCollection(artwork.objectID, newCollectionName);
-      setNewCollectionName('');
-      setShowDropdown(false);
+        // Prepare the artwork data for the collection
+        const artworkData = {
+            objectID: artwork.objectID,
+            galleryNumber: artwork.galleryNumber
+        };
+
+        // Call createCollection (Auth Context) and pass the artwork data
+        await createCollection(newCollectionName, artworkData);
+        setNewCollectionName('');
+        setShowDropdown(false);
+        onActionComplete();  // Notify the parent component of the update
     }
   };
 

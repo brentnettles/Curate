@@ -14,6 +14,7 @@ convention = {
 
 db = SQLAlchemy(metadata=MetaData(naming_convention=convention))
 
+
 class User(db.Model, SerializerMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
@@ -25,8 +26,8 @@ class User(db.Model, SerializerMixin):
     
     to_views = db.relationship('ToView', back_populates='user')
     collections = db.relationship('Collection', back_populates='user')
-    serialize_rules = ('-to_views.user', '-collections.user')
 
+    serialize_rules = ('-to_views.user', '-collections.user')
 
 class Artwork(db.Model, SerializerMixin):
     __tablename__ = 'artwork'
@@ -37,7 +38,6 @@ class Artwork(db.Model, SerializerMixin):
     artistDisplayBio = db.Column(db.String(255))
     medium = db.Column(db.String(255))
     objectDate = db.Column(db.String(255))
-    artistNationality = db.Column(db.String(255))
     classification = db.Column(db.String(255))
     accessionNumber = db.Column(db.String(255))
     accessionYear = db.Column(db.String(255))
@@ -48,12 +48,8 @@ class Artwork(db.Model, SerializerMixin):
     objectName = db.Column(db.String(255))
     title = db.Column(db.String(255))
     artistName = db.Column(db.String(255))
-    artistNationality = db.Column(db.String(255))
     artistBeginDate = db.Column(db.String(255))
     artistEndDate = db.Column(db.String(255))
-    artistWikidataURL = db.Column(db.String(255))
-    artistUlanURL = db.Column(db.String(255))
-    medium = db.Column(db.String(255))
     dimensions = db.Column(db.Text)
     galleryNumber = db.Column(db.String(255), index=True)
     objectURL = db.Column(db.String(255))
@@ -61,23 +57,25 @@ class Artwork(db.Model, SerializerMixin):
     to_views = db.relationship('ToView', back_populates='artwork')
     collections = db.relationship('CollectionArtworks', back_populates='artwork')
 
-    serialize_rules = ('-to_views.artwork',)
+    serialize_rules = (
+        '-to_views',  
+        '-collections' 
+    )
 
 class ToView(db.Model, SerializerMixin):
     __tablename__ = 'to_view'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    artwork_objectID = db.Column(db.Integer, db.ForeignKey('artwork.objectID')) 
-    username = db.Column(db.String(255), nullable=False)
-    galleryNumber = db.Column(db.String(255), nullable=False) 
+    artwork_objectID = db.Column(db.Integer, db.ForeignKey('artwork.objectID'))
+    is_active = db.Column(db.Boolean, default=True)  # To track if the view is active or historical
     user = db.relationship('User', back_populates='to_views')
-    artwork = db.relationship('Artwork', back_populates='to_views', foreign_keys=[artwork_objectID])
-    serialize_rules = ('-user.to_views', '-artwork.to_views')
+    artwork = db.relationship('Artwork', back_populates='to_views')
 
+    serialize_rules = (
+        '-user.to_views', 
+        '-artwork.to_views'  
+    )
 
-    def __repr__(self):
-        return '<User %r>' % self.username
-    
 class Collection(db.Model, SerializerMixin):
     __tablename__ = 'collection'
     id = db.Column(db.Integer, primary_key=True)
@@ -85,19 +83,25 @@ class Collection(db.Model, SerializerMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User', back_populates='collections')
     artworks = db.relationship('CollectionArtworks', back_populates='collection')
-    serialize_rules = ('-user.collections',)
 
-    def __repr__(self):
-        return f'<Collection {self.name}>'
+    serialize_rules = (
+        '-collection.artworks',  
+        '-artwork.collections'  
+    )
+    
 
-#Join Table, here we go...
 class CollectionArtworks(db.Model, SerializerMixin):
     __tablename__ = 'collection_artworks'
     collection_id = db.Column(db.Integer, db.ForeignKey('collection.id'), primary_key=True)
-    artwork_id = db.Column(db.Integer, db.ForeignKey('artwork.objectID'), primary_key=True)
+    artwork_objectID = db.Column(db.Integer, db.ForeignKey('artwork.objectID'), primary_key=True)
+    is_active = db.Column(db.Boolean, default=True)  # To manage active status within the collection
     collection = db.relationship('Collection', back_populates='artworks')
     artwork = db.relationship('Artwork', back_populates='collections')
-    serialize_rules = ('-collection.artworks', '-artwork.collections')
+
+    serialize_rules = (
+        '-collection.artworks', 
+        '-artwork.collections'
+    )
 
 
 #Goal --- 

@@ -24,6 +24,7 @@ function CollectionsPage() {
             .then(response => response.json())
             .then(data => {
                 if (data.artworks) {
+                    console.log("Fetched artworks for user:", data.artworks); // Log loaded artworks
                     setArtworks(data.artworks);
                 }
             })
@@ -31,21 +32,30 @@ function CollectionsPage() {
     }, [user, navigate]);
 
     const handleSelectCollection = (collectionName) => {
+        console.log("Collection selected:", collectionName); // Log which collection was selected
         setSelectedCollection(collectionName);
-        setShowScavengerHunt(false);  // Hide Scavenger Hunt when selecting a collection
+        setShowScavengerHunt(false); // Hide Scavenger Hunt when selecting a collection
+    
+        // Find the collection by name to fetch its associated artworks
+        const selectedCollectionArtworks = collections.find(col => col.name === collectionName)?.artworks;
+        console.log("Artworks in selected collection:", selectedCollectionArtworks); // Log the artworks of the selected collection
+    
+        if (!selectedCollectionArtworks) {
+            console.log("No artworks found for this collection or collection does not exist.");
+        }
     };
 
     const handleDeleteCollection = async (collectionId) => {
         if (window.confirm("Are you sure you want to delete this collection?")) {
             try {
-                await deleteCollection(collectionId);  
-                removeCollection(collectionId);  
+                await deleteCollection(collectionId);
+                removeCollection(collectionId);
+                console.log("Deleted collection ID:", collectionId); // Log the ID of the collection that was deleted
                 if (selectedCollection === collectionId) {
-                    setSelectedCollection('All');  
+                    setSelectedCollection('All'); // Reset selection if the deleted collection was active
                 }
             } catch (error) {
                 console.error('Failed to delete collection:', error);
-                alert('Failed to delete collection.');
             }
         }
     };
@@ -80,22 +90,29 @@ function CollectionsPage() {
             )}
 
             <div className="save-artwork-list">
-                {selectedCollection === 'All'
-                    ? artworks.map(artwork => (
-                        <div key={artwork.objectID} className="save-artwork-item">
-                            <img src={artwork.primaryImageSmall} alt={artwork.title} onClick={() => navigate(`/artwork/${artwork.objectID}`)} className="save-artwork-image"/>
-                            <div className="save-artwork-info">
-                                <h3>{artwork.title}</h3>
-                                <p>Gallery: {artwork.galleryNumber}</p>
-                                <ArtworkActions artwork={artwork} onActionComplete={() => setArtworks(current => current.filter(a => a.objectID !== artwork.objectID))} />
-                            </div>
-                        </div>
-                      ))
-                    : collections.find(col => col.name === selectedCollection)?.artworks.map(artwork => (
-                        <ArtworkActions key={artwork.objectID} artwork={artwork} />
-                      ))
-                }
+    {selectedCollection === 'All'
+        ? artworks.map(artwork => (
+            <div key={artwork.objectID} className="save-artwork-item">
+                <img src={artwork.primaryImageSmall} alt={artwork.title} onClick={() => navigate(`/artwork/${artwork.objectID}`)} className="save-artwork-image"/>
+                <div className="save-artwork-info">
+                    <h3>{artwork.title}</h3>
+                    <p>Gallery: {artwork.galleryNumber}</p>
+                    <ArtworkActions artwork={artwork} onActionComplete={() => setArtworks(current => current.filter(a => a.objectID !== artwork.objectID))} />
+                </div>
             </div>
+          ))
+        : collections.find(col => col.name === selectedCollection)?.artworks.map(artwork => (
+            <div key={artwork.objectID} className="save-artwork-item">
+                <img src={artwork.primaryImageSmall} alt={artwork.title} onClick={() => navigate(`/artwork/${artwork.objectID}`)} className="save-artwork-image"/>
+                <div className="save-artwork-info">
+                    <h3>{artwork.title}</h3>
+                    <p>Gallery: {artwork.galleryNumber}</p>
+                    <ArtworkActions artwork={artwork} onActionComplete={() => setArtworks(current => current.filter(a => a.objectID !== artwork.objectID))} />
+                </div>
+            </div>
+          ))
+    }
+</div>
         </div>
     );
 }
