@@ -84,10 +84,8 @@ class Collection(db.Model, SerializerMixin):
     user = db.relationship('User', back_populates='collections')
     artworks = db.relationship('CollectionArtworks', back_populates='collection')
 
-    serialize_rules = (
-        '-collection.artworks',  
-        '-artwork.collections'  
-    )
+
+    serialize_rules = ('-user.collections', '-artworks.artwork')
     
 
 class CollectionArtworks(db.Model, SerializerMixin):

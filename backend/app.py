@@ -1,11 +1,12 @@
 import os
-import requests
 from flask import Flask, request, json, Response
 from flask_migrate import Migrate
 from flask_cors import CORS
 from sqlalchemy import func
 from sqlalchemy.sql.expression import func
 from models import db, Artwork, ToView, User, CollectionArtworks, Collection
+from datetime import datetime
+
 
 app = Flask(__name__, static_folder=os.path.join(os.getcwd(), 'assets'))
 app.secret_key = os.environ.get('SECRET_KEY', 'default_secret_key')
@@ -28,7 +29,7 @@ def get_artworks_by_gallery(gallery_number):
 
 
 # GET Artwork by objectID
-@app.route('/api/artworks/by-id/<int:object_id>', methods=['GET'])
+@app.route('/api/artworks/by-id/<int:object_id>')
 def get_artwork_by_id(object_id):
     artwork = Artwork.query.filter_by(objectID=object_id).first()
     if artwork:
@@ -37,7 +38,7 @@ def get_artwork_by_id(object_id):
         return {'error': 'Artwork not found'}, 404
 
 # GET all saved/to_view artworks for a user
-@app.route('/api/saved-artworks/<int:user_id>', methods=['GET'])
+@app.route('/api/saved-artworks/<int:user_id>')
 def get_saved_artworks(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -89,12 +90,7 @@ def update_saved_artwork(view_id):
     return {'message': 'Artwork marked as inactive'}, 200
 
 
-# Collections / GET POST DELETE / Collection{id}
-#GET all collections for a user
-@app.route('/api/collections')
-def get_collections():
-    collections = Collection.query.all()
-    return {'collections': [collection.to_dict() for collection in collections]}, 200
+# Collections 
 
 #Create collection and Add artwork to collection
 @app.route('/api/collections', methods=['POST'])
@@ -129,42 +125,100 @@ def create_collection():
     return {'message': 'Collection created', 'collection': new_collection.to_dict()}, 201
 
 
-##Scavenger Hunt - Request = random artworks / Post = user verify objectID
-# @app.route('/api/scavenger-hunt', methods=['GET', 'POST'])
-# def scavenger_hunt():
-#     if request.method == 'GET':
-#         try:
-#             # Select 6 unique artworks ensuring each has a visible primary image and unique gallery number
-#             artworks = Artwork.query \
-#                 .filter(Artwork.primaryImageSmall != None, Artwork.primaryImageSmall != '') \
-#                 .distinct(Artwork.galleryNumber) \
-#                 .order_by(func.random()) \
-#                 .limit(6) \
-#                 .all()
+@app.route('/api/collections/<int:user_id>', methods=['GET'])
+def get_collections(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return {'error': 'User not found'}, 404
 
-#             results = [artwork.to_dict(rules=('-collections', '-to_views')) for artwork in artworks]
-#             return {'artworks': results}, 200
-#         except Exception as e:
-#             return {'error': str(e)}, 500
+    collections = Collection.query.filter_by(user_id=user_id).all()
+    try:
+        collections_data = [collection.to_dict() for collection in collections]
+        return {'collections': collections_data}, 200
+    except Exception as e:
+        return {'error': 'An error occurred during serialization', 'details': str(e)}, 500
 
-#     elif request.method == 'POST':
-#         # verify if the user has found the correct artwork by entering the ObjectID
-#         json_data = request.get_json()
-#         object_id = json_data.get('objectID')
-#         user_input = json_data.get('userInput')
+#Delete Collection
+@app.route('/api/collections/<int:collection_id>', methods=['DELETE'])
+def delete_collection(collection_id):
+    collection = Collection.query.get(collection_id)
+    if not collection:
+        return {'error': 'Collection not found'}, 404
 
-#         try:
-#             artwork = Artwork.query.filter_by(objectID=object_id).first()
-#             if not artwork:
-#                 return {'error': 'Artwork not found'}, 404
+    try:
+        # getting errors / need to first delete the collection_artworks for the collection on JOIN table
+        CollectionArtworks.query.filter_by(collection_id=collection_id).delete()
 
-#             # Check ObjectID of the artwork
-#             if str(artwork.objectID) == user_input:
-#                 return {'message': 'Correct! You have found the artwork.'}, 200
-#             else:
-#                 return {'message': 'Incorrect! Please try again.'}, 400
-#         except Exception as e:
-#             return {'error': str(e)}, 500
+        # Now delete the collection itself
+        db.session.delete(collection)
+        db.session.commit()
+        return {'message': 'Collection deleted successfully'}, 200
+    except Exception as e:
+        db.session.rollback()  # Rollback in case of any issue
+        return {'error': str(e)}, 500
+
+#Update Collection - mark item as inactive / might be unnecessary
+@app.route('/api/collection-artworks/<int:collection_artwork_id>', methods=['PATCH'])
+def mark_artwork_inactive_in_collection(collection_artwork_id):
+    collection_artwork = CollectionArtworks.query.get(collection_artwork_id)
+    if not collection_artwork:
+        return {'error': 'Collection artwork not found'}, 404
+    
+    collection_artwork.is_active = False
+    db.session.commit()
+    return {'message': 'Artwork marked as inactive in collection'}, 200
+
+
+#Scavenger Hunt - Request = random artworks / Post = user verify objectID
+@app.route('/api/scavenger-hunt', methods=['GET', 'POST'])
+def scavenger_hunt():
+    if request.method == 'GET':
+        try:
+            # Select 6 unique artworks ensuring each has a visible primary image and unique gallery number
+            artworks = Artwork.query \
+                .filter(Artwork.primaryImageSmall != None, Artwork.primaryImageSmall != '') \
+                .distinct(Artwork.galleryNumber) \
+                .order_by(func.random()) \
+                .limit(6) \
+                .all()
+
+            results = [artwork.to_dict(rules=('-collections', '-to_views')) for artwork in artworks]
+            return {'artworks': results}, 200
+        except Exception as e:
+            return {'error': str(e)}, 500
+
+
+#Save Scavenger Hunt as a collection w/ todays date 
+@app.route('/api/save-scavenger-hunt', methods=['POST'])
+def save_scavenger_hunt():
+    json_data = request.get_json()
+    user_id = json_data.get('user_id')
+    object_ids = json_data.get('object_ids')  # List of object IDs from the scavenger hunt
+
+    user = User.query.get(user_id)
+    if not user:
+        return {'error': 'User not found'}, 404
+
+    # Create new collection
+    today = datetime.now().strftime("%Y-%m-%d")
+    new_collection = Collection(name=f"Scavenger Hunt - {today}", user_id=user_id)
+    db.session.add(new_collection)
+    db.session.flush()  # Get new collection ID
+
+    # Add artworks to the new collection
+    for object_id in object_ids:
+        artwork = Artwork.query.filter_by(objectID=object_id).first()
+        if artwork:
+            new_artwork_in_collection = CollectionArtworks(
+                collection_id=new_collection.id, 
+                artwork_objectID=artwork.objectID, 
+                is_active=True
+            )
+            db.session.add(new_artwork_in_collection)
+
+    db.session.commit()
+    return {'message': 'Scavenger hunt saved as a collection', 'collection_id': new_collection.id}, 201
+
 
 
 
