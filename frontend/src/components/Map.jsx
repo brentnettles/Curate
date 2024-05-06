@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import centerIcon from '../buttons/center.png';
 import '../Style/Map.css';
-import ArtworkDisplay from './ArtworkDisplay';
+// import ArtworkDisplay from './ArtworkDisplay';
+import ArtworkList from './ArtworkList';
 import { useAuth } from '../contexts/AuthContext';
 
 function Map_visual() {
@@ -124,7 +125,9 @@ function Map_visual() {
                     }}
                 ></button>
                 <div className="artwork-display-container">
-                    {selectedGallery && <ArtworkDisplay galleryNumber={selectedGallery} />}
+                {selectedGallery && (
+                    <ArtworkList galleryNumber={selectedGallery} />
+                )}
                 </div>
             </div>
         </div>
@@ -132,4 +135,3 @@ function Map_visual() {
 }
 
 export default Map_visual;
-

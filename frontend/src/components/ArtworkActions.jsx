@@ -1,104 +1,56 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { saveArtwork, deleteArtwork } from '../services/apiService';
+import { saveArtwork, markArtworkAsInactive } from '../services/apiService';
+import ManageCollections from './ManageCollections';
 import '../Style/ArtworkActions.css';
 
-const ArtworkActions = ({ artwork, viewGallery, onActionComplete = () => {} }) => {
-  const { user, savedArtworks, saveArtworkContext, removeArtworkContext, collections, createCollection, addArtworkToCollection } = useAuth();
+const ArtworkActions = ({ artwork }) => {
+  const { user, savedArtworks, saveArtworkContext, removeArtworkContext } = useAuth();
   const navigate = useNavigate();
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [newCollectionName, setNewCollectionName] = useState('');
+  const [showManageCollections, setShowManageCollections] = useState(false);
 
-  const isArtworkSaved = savedArtworks.has(artwork.objectID) || Array.from(savedArtworks).some(art => art.objectID === artwork.objectID);
-
-  const handleInspect = (event) => {
-    event.stopPropagation();
+  const handleInspect = () => {
     navigate(`/artwork/${artwork.objectID}`, { state: { artwork } });
   };
 
-  const handleSave = async (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleSave = async () => {
     if (!user) {
-      console.log("Please log in to save artworks.");
+      alert("Please log in to save artworks.");
       return;
     }
-    const postData = {
-        objectID: artwork.objectID,
-        username: user.username,
-        galleryNumber: artwork.galleryNumber
-    };
-
+    const artworkData = { objectID: artwork.objectID, galleryNumber: artwork.galleryNumber };
     try {
-      const response = await saveArtwork(postData, user.id);
-      saveArtworkContext({ objectID: artwork.objectID, galleryNumber: artwork.galleryNumber });
-      console.log("Artwork saved successfully:", response);
-      onActionComplete();
+      await saveArtwork(artworkData, user.id);
+      saveArtworkContext(artworkData);
+      console.log("Artwork saved successfully:", artworkData);
     } catch (error) {
       console.error('Error saving artwork:', error);
     }
   };
 
-  const handleRemove = async (event) => {
-    event.stopPropagation();
-    if (!user) {
-      console.log("Please log in to remove artworks.");
-      return;
-    }
+  const handleRemove = async () => {
+    console.log('Remove button clicked');
+    console.log('Artwork and objectID are defined:', artwork.objectID);
     try {
-      const response = await deleteArtwork(artwork.objectID, user.id);
+      await markArtworkAsInactive(artwork.objectID, user.id);
       removeArtworkContext(artwork.objectID);
-      console.log("Artwork removed successfully:", response);
-      onActionComplete();
+      console.log('Artwork marked as inactive');
     } catch (error) {
-      console.error('Error removing artwork:', error);
-    }
-  };
-
-  const handleCreateAndAddToCollection = async () => {
-    if (newCollectionName.trim() !== '') {
-        // Prepare the artwork data for the collection
-        const artworkData = {
-            objectID: artwork.objectID,
-            galleryNumber: artwork.galleryNumber
-        };
-
-        // Call createCollection (Auth Context) and pass the artwork data
-        await createCollection(newCollectionName, artworkData);
-        setNewCollectionName('');
-        setShowDropdown(false);
-        onActionComplete();  // Notify the parent component of the update
+      console.error('Error updating artwork status:', error);
     }
   };
 
   return (
     <div className="artwork-actions">
-      {!isArtworkSaved && <button className="button save-button" onClick={handleSave} title="Save to My List"></button>}
-      {isArtworkSaved && <button className="button remove-button" onClick={handleRemove} title="Remove Artwork"></button>}
-      <button className="button inspect-button" onClick={handleInspect} title="View Details"></button>
-      <button className="button collection-button" onClick={() => setShowDropdown(!showDropdown)} title="Manage Collections"></button>
-      {viewGallery && <button className="button view-gallery-button" onClick={() => viewGallery(artwork.galleryNumber)} title="View Gallery"></button>}
-
-      {showDropdown && (
-        <div className="dropdown" onMouseLeave={() => setShowDropdown(false)}>
-          <ul>
-            {collections.map(col => (
-              <li key={col.name}>
-                <button onClick={() => addArtworkToCollection(artwork.objectID, col.name)}>{col.name}</button>
-              </li>
-            ))}
-            <li>
-              <input
-                value={newCollectionName}
-                onChange={(e) => setNewCollectionName(e.target.value)}
-                placeholder="New collection name"
-              />
-              <button onClick={handleCreateAndAddToCollection}>Create/Add</button>
-            </li>
-          </ul>
-        </div>
+      {!savedArtworks[artwork.objectID]?.isActive ? (
+        <button className="button save-button" onClick={handleSave} title="Save to My List"></button>
+      ) : (
+        <button className="button remove-button" onClick={handleRemove} title="Remove Artwork"></button>
       )}
+      <button className="button inspect-button" onClick={handleInspect} title="View Details"></button>
+      <button className="button collection-button" onClick={() => setShowManageCollections(true)} title="Manage Collections"></button>
+      {showManageCollections && <ManageCollections artwork={artwork} onClose={() => setShowManageCollections(false)} />}
     </div>
   );
 };

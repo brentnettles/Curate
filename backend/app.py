@@ -15,7 +15,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 Migrate(app, db)
-CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": ["http://localhost:5173"]}})
+# CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": ["http://localhost:5173"]}})
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+
 
 
 # GET All Artworks by galleyNumber
@@ -37,15 +39,19 @@ def get_artwork_by_id(object_id):
     else:
         return {'error': 'Artwork not found'}, 404
 
-# GET all saved/to_view artworks for a user
+# GET all saved/to_view artworks for a user including is_active status
 @app.route('/api/saved-artworks/<int:user_id>')
 def get_saved_artworks(user_id):
     user = User.query.get(user_id)
     if not user:
         return {'error': 'User not found'}, 404
-    
-    to_views = ToView.query.filter_by(user_id=user.id, is_active=True).all()
-    saved_artworks = [view.artwork.to_dict() for view in to_views if view.artwork]
+
+    to_views = ToView.query.filter_by(user_id=user.id).all()
+    saved_artworks = [{
+        **view.artwork.to_dict(),
+        'is_active': view.is_active  # Including is_active status
+    } for view in to_views if view.artwork]
+
     return saved_artworks, 200
 
 # POST a new artwork to a user's saved/to_view list
@@ -76,20 +82,20 @@ def save_artwork():
     return {'message': 'Artwork saved'}, 201
 
 
-# PATCH to update (mark as inactive) a saved artwork 
-#using endpoint from to_view table ID of save artwork
-@app.route('/api/saved-artworks/<int:view_id>', methods=['PATCH'])
-def update_saved_artwork(view_id):
-    to_view = ToView.query.get(view_id)
+@app.route('/api/saved-artworks/<int:object_id>', methods=['PATCH'])
+def update_saved_artwork(object_id):
+    user_id = request.headers.get('User-ID')  
+    if not user_id:
+        return {'error': 'User ID required'}, 400
+
+    to_view = ToView.query.filter_by(user_id=user_id, artwork_objectID=object_id).first()
     if not to_view:
         return {'error': 'Saved artwork not found'}, 404
-    
+
     to_view.is_active = False  # Mark the artwork view as inactive
     db.session.commit()
     
     return {'message': 'Artwork marked as inactive'}, 200
-
-
 # Collections 
 
 #Create collection and Add artwork to collection

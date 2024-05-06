@@ -35,7 +35,7 @@
 }
 
 .save-artwork-image {
-    max-height: 18vh;  
+    max-height: 16vh;  
     width: 100%;  
     object-fit: contain; 
     cursor: pointer;

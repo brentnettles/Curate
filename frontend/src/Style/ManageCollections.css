@@ -1,0 +1,39 @@
+.manage-collections-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30vw;
+    min-width: 300px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1050; /* High z-index to ensure it's above other content */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .manage-collections-modal select,
+  .manage-collections-modal input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: calc(100% - 20px);
+  }
+  
+  .manage-collections-modal button {
+    background-color: #cacaca;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .manage-collections-modal button:hover {
+    background-color: #fe9797;
+  }
+  
