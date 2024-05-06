@@ -14,8 +14,9 @@ function Navbar() {
     return (
         <div className="navbar">
             <Link to="/">Map</Link>
-            <Link to="/search">Search</Link>
-            <Link to="/collections">Collections</Link>  
+            <Link to="/search">Search Artworks</Link>
+            <Link to="/collections">Saved Collections</Link>  
+            <Link to="/discover">Discover</Link>  
             {user ? (
                 <button onClick={handleLogout} className="logout-button">Logout</button>
             ) : (

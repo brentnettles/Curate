@@ -55,7 +55,7 @@ function ArtworkList({ galleryNumber }) {
     return (
         <div className={`artwork-list-container ${isVisible ? 'showArt' : 'hideArt'}`}>
             <div className="button-container">
-                <button className="close-button" onClick={handleClose}>Close</button>
+                <button className="close-button" onClick={handleClose}></button>
             </div>
             {loading ? (
                 <p>Loading artworks...</p>

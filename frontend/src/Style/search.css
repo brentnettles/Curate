@@ -1,21 +1,33 @@
 /* src/Style/search.css */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
 .search-container {
-    padding: 20px;
-    background-color: #f1f1f1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
 }
 
 .search-form {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    width: 80%;
+    max-width: 960px;
     margin-bottom: 20px;
-}
-
-.search-input, .search-select, .search-date, .search-price {
-    flex-grow: 1;
-    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    overflow: hidden;  /* Ensures inner elements do not break the rounded corners */
+    background-color: #fff;
+}
+
+.search-input, .search-type-select {
+    flex-grow: 1;
+    padding: 10px;
+    border: none;
+    outline: none; /* Removes the outline to keep it clean */
 }
 
 .search-button {
@@ -23,7 +35,6 @@
     background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
 }
 
@@ -31,35 +42,77 @@
     background-color: #45a049;
 }
 
-.results {
+.filter-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    background-color: #fff;
-    padding: 20px;
+    width: 80%;
+    max-width: 960px;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+.filter-department-select, .filter-highlight-checkbox, .filter-onview-checkbox {
+    padding: 10px;
+    background-color: #f1f1f1;
     border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Creates a responsive grid */
+    gap: 20px;
+    width: 80%;
+    max-width: 960px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
 }
 
 .result-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 25vw;  /* width of each item */
-    margin-top: 10px;
-    padding: 10px;
     border: 1px solid #eee;
     border-radius: 5px;
+    overflow: hidden;
 }
 
+.artwork-image {
+    width: auto;
+    height: 320px; /* Fixed height for uniformity */
+    /* object-fit: cover; */
+}
 
-
-.result-item h3,
-.result-item p {
-    width: 100%;  /* Text fits the width of the image */
+.result-item h3, .result-item p {
+    padding: 5px 10px;
     text-align: center;
-    overflow-wrap: break-word;  /* Ensures text breaks to avoid overflow */
 }
-.result-item:last-child {
-    border-bottom: none;
+
+.see-more-button {
+    padding: 10px 20px;
+    margin: 20px auto;
+    display: block; /* Center the button */
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.see-more-button:hover {
+    background-color: #555;
+}
+
+.loader {
+    border: 5px solid #f3f3f3; /* Light grey */
+    border-top: 5px solid #626262; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

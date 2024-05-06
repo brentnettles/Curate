@@ -43,6 +43,21 @@
   transition: transform 0.3s ease-in-out;
   object-fit: contain; 
 }
+
+.close-button {
+  position: fixed; 
+  top: 520px; 
+  /* right: center; 
+  */
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background: url('/src/buttons/close.png') no-repeat center center;
+  background-size: cover;
+  border: none;
+  cursor: pointer;
+}
+
 /* 
 .button-container {
   position: absolute;

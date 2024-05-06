@@ -9,6 +9,7 @@ import ArtworkList from './components/ArtworkList';
 import Search from './components/Search';
 import CollectionsPage from './components/CollectionsPage'; // Renamed from UserPage
 import Login from './components/Login';
+import Discover from './components/Discover';
 
 function ProtectedRoute({ children }) {
     const { user } = useAuth();
@@ -28,6 +29,11 @@ function App() {
                 <Route path="collections" element={
                     <ProtectedRoute>
                         <CollectionsPage />
+                    </ProtectedRoute>
+                } />
+                <Route path="discover" element={
+                    <ProtectedRoute>
+                        <Discover/>
                     </ProtectedRoute>
                 } />
                 <Route path="login" element={<Login />} />

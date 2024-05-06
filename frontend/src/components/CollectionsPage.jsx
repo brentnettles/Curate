@@ -82,7 +82,7 @@ function CollectionsPage() {
             <h2>Saved History</h2>
             <div className="saved-history">
                 {inactiveArtworks.map((artwork, index) => (
-                    <div key={artwork.objectID || index} className="save-artwork-item">
+                    <div key={artwork.objectID || index} className="save-artwork-item-history">
                         <img src={artwork.primaryImageSmall} alt={artwork.title} className="save-artwork-image" />
                         <div className="save-artwork-info">
                             <h3 className="save-artwork-title">{artwork.title}</h3>

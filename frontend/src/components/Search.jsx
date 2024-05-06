@@ -3,13 +3,14 @@ import '../Style/search.css';
 import departments from '../departments.json'; 
 
 function Search() {
-    const [searchTerm, setSearchTerm] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [isHighlight, setIsHighlight] = useState(false);
     const [isOnView, setIsOnView] = useState(false);
     const [departmentId, setDepartmentId] = useState('');
     const [results, setResults] = useState([]);
-    const [fetchLimit, setFetchLimit] = useState(25); // Initially fetch 25 
-    const [searchType, setSearchType] = useState('artistCulture'); 
+    const [loading, setLoading] = useState(false);
+    const [fetchLimit, setFetchLimit] = useState(25);
+    const [searchType, setSearchType] = useState('artistCulture');
 
     useEffect(() => {
         fetchResults();  
@@ -25,40 +26,36 @@ function Search() {
         fetchResults();
     };
 
-    //load additional artworks
     const handleSeeMore = async () => {
-        setFetchLimit(prevLimit => prevLimit + 12);  
+        setFetchLimit(prevLimit => prevLimit + 12);
         fetchResults();
     };
 
     const fetchResults = async () => {
+        setLoading(true);
         const baseUrl = 'https://collectionapi.metmuseum.org/public/collection/v1/search';
         const url = new URL(baseUrl);
         if (searchType === 'medium') {
             url.searchParams.append('medium', searchTerm);
         } else {
-            //compounds the search query / search parameters
             url.searchParams.append('q', searchTerm);
             if (isHighlight) url.searchParams.append('isHighlight', 'true');
             if (isOnView) url.searchParams.append('isOnView', 'true');
             if (departmentId) url.searchParams.append('departmentId', departmentId);
         }
-    
+
         try {
             const response = await fetch(url);
             const data = await response.json();
-            console.log(`Total IDs fetched: ${data.objectIDs ? data.objectIDs.length : 0}`);
-    
             if (data.objectIDs && data.objectIDs.length) {
-                const objectIDs = data.objectIDs.slice(0, fetchLimit);  
-    
+                const objectIDs = data.objectIDs.slice(0, fetchLimit);
                 const details = await Promise.all(
                     objectIDs.map(id =>
                         fetch(`https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`)
                         .then(response => response.json())
                     )
                 );
-    
+
                 const filteredDetails = details.filter(item => item.primaryImageSmall);
                 setResults(filteredDetails);
             } else {
@@ -67,6 +64,8 @@ function Search() {
         } catch (error) {
             console.error('Failed to fetch artworks:', error);
             setResults([]);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -86,12 +85,13 @@ function Search() {
                     placeholder={searchType === 'medium' ? 'Enter Medium' : 'Search...'}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
                     className="search-input"
                 />
                 <button type="submit" className="search-button">Search</button>
             </form>
             <div className="filter-row">
-            <select
+                <select
                     value={departmentId}
                     onChange={(e) => { setDepartmentId(e.target.value); handleFilterChange(); }}
                     className="filter-department-select"
@@ -102,8 +102,8 @@ function Search() {
                         <option key={dept.departmentId} value={dept.departmentId}>
                             {dept.displayName}
                         </option>
-                ))}
-            </select>
+                    ))}
+                </select>
                 <label className="filter-highlight-checkbox">
                     <input
                         type="checkbox"
@@ -118,20 +118,22 @@ function Search() {
                         type="checkbox"
                         checked={isOnView}
                         onChange={(e) => { setIsOnView(e.target.checked); handleFilterChange(); }}
-                        disabled={searchType === 'medium'} 
+                        disabled={searchType === 'medium'}
                     />
                     Filter by is On View
                 </label>
             </div>
-            <div className="results">
-                {results.map((item) => (
-                    <div key={item.objectID} className="result-item">
-                        <img src={item.primaryImageSmall} alt={item.title} className="artwork-image" />
-                        <h3>{item.title}</h3>
-                        <p>{item.artistDisplayName}</p>
-                    </div>
-                ))}
-            </div>
+            {loading ? <div className="loader"></div> : (
+                <div className="results">
+                    {results.map((item) => (
+                        <div key={item.objectID} className="result-item">
+                            <img src={item.primaryImageSmall} alt={item.title} className="artwork-image" />
+                            <h3>{item.title}</h3>
+                            <p>{item.artistDisplayName}</p>
+                        </div>
+                    ))}
+                </div>
+            )}
             {results.length > 0 && (
                 <button onClick={handleSeeMore} className="search-button see-more-button">See More</button>
             )}

@@ -235,6 +235,25 @@ def scavenger_hunt():
             return {'error': str(e)}, 500
 
 
+@app.route('/api/verify-artwork', methods=['POST'])
+def verify_artwork():
+    json_data = request.get_json()
+    user_input_id = json_data.get('userInputId')
+    expected_object_id = json_data.get('objectId')  
+
+    # Logging debug
+    print(f"User input ID: {user_input_id}")
+    print(f"Expected object ID: {expected_object_id}")
+
+
+    if str(user_input_id) == str(expected_object_id):
+        print("Artwork confirmed as found.")
+        return {'success': 'Correct! Artwork confirmed as found.', 'found': True}, 200
+    else:
+        print(f"Object ID mismatch. Expected: {expected_object_id}, Received: {user_input_id}")
+        return {'error': 'ObjectID not confirmed', 'found': False}, 400
+
+
 #Save Scavenger Hunt as a collection w/ todays date 
 @app.route('/api/save-scavenger-hunt', methods=['POST'])
 def save_scavenger_hunt():
