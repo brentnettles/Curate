@@ -174,6 +174,47 @@ def mark_artwork_inactive_in_collection(collection_artwork_id):
     db.session.commit()
     return {'message': 'Artwork marked as inactive in collection'}, 200
 
+@app.route('/api/collections/add', methods=['POST'])
+def add_artwork_to_collection():
+    json_data = request.get_json()
+    collection_name = json_data.get('collectionName')
+    artwork_id = json_data.get('artworkId')
+    user_id = json_data.get('userId')
+
+    # Check if the user exists
+    user = User.query.get(user_id)
+    if not user:
+        return {'error': 'User not found'}, 404
+
+    # Check if collection exists or create a new one
+    collection = Collection.query.filter_by(name=collection_name, user_id=user_id).first()
+    if not collection:
+        collection = Collection(name=collection_name, user_id=user_id)
+        db.session.add(collection)
+        db.session.flush()  # Flush to assign an ID to new_collection without committing transaction
+
+    # Check if artwork exists
+    artwork = Artwork.query.filter_by(objectID=artwork_id).first()
+    if not artwork:
+        db.session.rollback()  # Roll back transaction if no artwork is found
+        return {'error': 'Artwork not found'}, 404
+
+    # Create or update the collection_artworks link
+    collection_artwork = CollectionArtworks.query.filter_by(collection_id=collection.id, artwork_objectID=artwork_id).first()
+    if collection_artwork:
+        collection_artwork.is_active = True  # Reactivate the artwork in collection if it was inactive
+    else:
+        # Add new artwork to the collection
+        collection_artwork = CollectionArtworks(
+            collection_id=collection.id, 
+            artwork_objectID=artwork_id, 
+            is_active=True
+        )
+        db.session.add(collection_artwork)
+
+    db.session.commit()
+    return {'message': 'Artwork added to collection', 'collection': collection.to_dict()}, 201
+
 
 #Scavenger Hunt - Request = random artworks / Post = user verify objectID
 @app.route('/api/scavenger-hunt', methods=['GET', 'POST'])

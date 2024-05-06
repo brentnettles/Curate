@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
             console.error('Failed to fetch collections:', error);
             setCollections([]);
         }
-    }, []); // Add any real dependencies if there are any
+    }, []); 
     
 
     useEffect(() => {
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
     
     const removeArtworkContext = useCallback(async (objectID) => {
         if (!user) return;  // Check user is not null
-        const previousState = { ...savedArtworks[objectID] };  // Save previous state for potential rollback
+        const previousState = { ...savedArtworks[objectID] };  
         
         // Optimistically update UI
         setSavedArtworks(prev => {
@@ -117,6 +117,42 @@ export const AuthProvider = ({ children }) => {
         }
     }, [user, savedArtworks]);
 
+    const [artworkCollectionMap, setArtworkCollectionMap] = useState(() => {
+        return JSON.parse(localStorage.getItem('artworkCollectionMap') || '{}');
+    });
+    
+    const updateArtworkCollectionMap = (artworkId, collectionId) => {
+        const updatedMap = { ...artworkCollectionMap, [artworkId]: collectionId };
+        setArtworkCollectionMap(updatedMap);
+        localStorage.setItem('artworkCollectionMap', JSON.stringify(updatedMap));
+    };
+
+    const [toggleStates, setToggleStates] = useState({});
+
+    // "+/-" button toggles the visibility of the collection
+    const toggleCollectionVisibility = async (collectionId, artworkId) => {
+        const currentKey = `${collectionId}-${artworkId}`;
+        const isActive = toggleStates[currentKey];
+        setToggleStates(prev => ({ ...prev, [currentKey]: !isActive }));
+    
+        if (!isActive) {
+            try {
+                console.log(`Adding artwork ${artworkId} to collection ${collectionId}`);
+                await addArtworkToCollection(collection.name, artworkId, user.id);
+            } catch (error) {
+                console.error('Error adding artwork to collection:', error);
+            }
+        } else {
+            try {
+                console.log(`Marking artwork ${artworkId} as inactive in collection ${collectionId}`);
+                await markArtworkAsInactive(artworkId, user.id);
+            } catch (error) {
+                console.error('Error marking artwork as inactive:', error);
+            }
+        }
+    };
+    
+
     return (
         <AuthContext.Provider value={{
             user,
@@ -129,7 +165,11 @@ export const AuthProvider = ({ children }) => {
             setCollections,
             saveArtworkContext,
             removeArtworkContext,
-            handleGetCollections
+            handleGetCollections,
+            toggleStates,
+            setToggleStates,
+            toggleCollectionVisibility,
+            updateArtworkCollectionMap
         }}>
             {children}
         </AuthContext.Provider>

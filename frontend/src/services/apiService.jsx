@@ -57,20 +57,22 @@ export const getSavedArtworksByUserId = async (userId) => {
 };
 
 
-export const addArtworkToCollection = async (collectionId, artwork) => {
-    const url = `${BASE_URL}/collections/${collectionId}/artworks`;
+export const addArtworkToCollection = async (collectionName, artworkId, userId) => {
+    const url = `${BASE_URL}/collections/add`;  
     const options = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            artworkId: artwork.objectID,
-            galleryNumber: artwork.galleryNumber
+            collectionName: collectionName,
+            artworkId: artworkId,
+            userId: userId
         })
     };
     return fetchWithErrors(url, options);
 };
+
 
 export const addCollection = async (collectionData) => {
     const url = `${BASE_URL}/collections`;
@@ -78,7 +80,7 @@ export const addCollection = async (collectionData) => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'User-ID': collectionData.user_id // Assuming the user ID is needed in the headers
+            'User-ID': collectionData.user_id 
         },
         body: JSON.stringify(collectionData)
     };
@@ -86,7 +88,7 @@ export const addCollection = async (collectionData) => {
     if (!response.ok) {
         throw new Error('Failed to create collection: ' + await response.text());
     }
-    return response; // Return the raw response for further processing
+    return response; 
 };
 
 export const getCollectionsByUserId = async (userId) => {
