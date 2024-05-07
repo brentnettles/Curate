@@ -1,7 +1,7 @@
+import { getSavedArtworksByUserId, getCollectionsByUserId, getArtworkById } from '../services/apiService';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getSavedArtworksByUserId, getCollectionsByUserId, getArtworkById } from '../services/apiService';
 import ArtworkActions from './ArtworkActions';
 import '../Style/CollectionsPage.css';
 
@@ -24,9 +24,12 @@ function CollectionsPage() {
             try {
                 const artworks = await getSavedArtworksByUserId(user.id);
                 const { collections } = await getCollectionsByUserId(user.id);
-                setFetchedArtworks(artworks);
+                // Filter artworks into active and inactive
+                const activeArtworks = artworks.filter(art => art.isActive);
+                const historyArtworks = artworks.filter(art => !art.isActive);
+                setFetchedArtworks(activeArtworks);
+                setInactiveArtworks(historyArtworks);
                 setCollections(collections);
-                setInactiveArtworks(artworks.filter(art => !art.isActive));
             } catch (error) {
                 console.error("Failed to fetch data:", error);
             }
@@ -41,7 +44,7 @@ function CollectionsPage() {
                 const selectedCollection = collections.find(c => c.id === parseInt(selectedCollectionId));
                 if (selectedCollection && selectedCollection.artworks) {
                     const artworkPromises = selectedCollection.artworks.map(artwork =>
-                        getArtworkById(artwork.artwork_objectID)
+                        getSavedArtworksByUserId(artwork.artwork_objectID) // Assuming this function fetches individual artwork details
                     );
                     const artworks = await Promise.all(artworkPromises);
                     setArtworksDetails(artworks);
@@ -71,9 +74,7 @@ function CollectionsPage() {
                         <div className="save-artwork-info">
                             <h3 className="save-artwork-title">{artwork.title}</h3>
                             <p className="save-artwork-gallery">Gallery: {artwork.galleryNumber}</p>
-                            <div className="artwork-actions">
-                                <ArtworkActions artwork={artwork} isActive={true} />
-                            </div>
+                            <ArtworkActions artwork={artwork} isActive={artwork.isActive} />
                         </div>
                     </div>
                 ))}
@@ -87,9 +88,7 @@ function CollectionsPage() {
                         <div className="save-artwork-info">
                             <h3 className="save-artwork-title">{artwork.title}</h3>
                             <p className="save-artwork-gallery">Gallery: {artwork.galleryNumber}</p>
-                            <div className="artwork-actions">
-                                <ArtworkActions artwork={artwork} isActive={false} />
-                            </div>
+                            <ArtworkActions artwork={artwork} isActive={false} />
                         </div>
                     </div>
                 ))}

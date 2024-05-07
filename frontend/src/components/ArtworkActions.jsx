@@ -10,6 +10,9 @@ const ArtworkActions = ({ artwork }) => {
   const navigate = useNavigate();
   const [showManageCollections, setShowManageCollections] = useState(false);
 
+  // Check if the artwork is saved
+  const isArtworkSaved = savedArtworks.some(art => art.objectID === artwork.objectID && art.isActive);
+
   const handleInspect = () => {
     navigate(`/artwork/${artwork.objectID}`, { state: { artwork } });
   };
@@ -43,10 +46,10 @@ const ArtworkActions = ({ artwork }) => {
 
   return (
     <div className="artwork-actions">
-      {!savedArtworks[artwork.objectID]?.isActive ? (
-        <button className="button save-button" onClick={handleSave} title="Save to My List"></button>
-      ) : (
+      {isArtworkSaved ? (
         <button className="button remove-button" onClick={handleRemove} title="Remove Artwork"></button>
+      ) : (
+        <button className="button save-button" onClick={handleSave} title="Save to My List"></button>
       )}
       <button className="button inspect-button" onClick={handleInspect} title="View Details"></button>
       <button className="button collection-button" onClick={() => setShowManageCollections(true)} title="Manage Collections"></button>

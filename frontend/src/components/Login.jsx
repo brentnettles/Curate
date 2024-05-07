@@ -12,8 +12,8 @@ function Login() {
         event.preventDefault();
 
         // Hardcoding user authentication for development
-        if (username === "Mike" && password === "123!") {
-            login({ username: "Mike", id: "1" });
+        if (username === "Brento" && password === "123!") {
+            login({ username: "Brento", id: "3" });
             navigate('/');
         } else {
             alert('Incorrect username or password');

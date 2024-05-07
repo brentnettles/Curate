@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import centerIcon from '../buttons/center.png';
 import '../Style/Map.css';
-// import ArtworkDisplay from './ArtworkDisplay';
 import ArtworkList from './ArtworkList';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -12,6 +11,16 @@ function Map_visual() {
     const { user, savedArtworks } = useAuth();
     const zoom = useRef(d3.zoom().scaleExtent([1, 8]));
 
+    // Highlight saved galleries when savedArtworks changes
+    
+    // d3 map overview~ svg:1 layer is map, 2nd layer is galleries
+    // each rectangle in the svg has an id = to the galleryNumber
+    // select the id, append as text to the rectangle
+    // reference the galleryNumber in the id of the svg for highlightSavedGalleries function
+
+
+    const [updateTrigger, setUpdateTrigger] = useState(false);
+
     useEffect(() => {
         fetch("/MetMap.svg")
             .then(res => res.text())
@@ -19,20 +28,17 @@ function Map_visual() {
                 svgRef.current.innerHTML = svg;
                 const svgElement = svgRef.current.querySelector('svg');
                 enhanceSVG(svgElement);
+                highlightSavedGalleries(svgElement, savedArtworks);
             });
-    }, []);
+    }, [updateTrigger]); // Dependency on updateTrigger to force re-render
 
     useEffect(() => {
         const svgElement = svgRef.current.querySelector('svg');
-        if (svgElement) {
-            highlightSavedGalleries(svgElement);
+        if (svgElement && savedArtworks) {
+            console.log("Highlighting saved galleries with updated artworks:", savedArtworks);
+            highlightSavedGalleries(svgElement, savedArtworks);
         }
     }, [savedArtworks]);
-
-    // d3 map overview~ svg:1 layer is map, 2nd layer is galleries
-    // each rectangle in the svg has an id = to the galleryNumber
-    // select the id, append as text to the rectangle
-    // reference the galleryNumber in the id of the svg for highlightSavedGalleries function
 
     const enhanceSVG = (svgElement) => {
         const svg = d3.select(svgElement);
@@ -45,22 +51,30 @@ function Map_visual() {
         setupInteractions(svg);
     };
 
+    const setGalleryFill = (rect, isSaved) => {
+        rect.transition().duration(150).style('fill', isSaved ? 'rgba(255, 0, 0, 0.2)' : '');
+    };
+
     const setupInteractions = (svg) => {
         const galleriesLayer = svg.select('#Floor_1_Galleries');
         galleriesLayer.selectAll('rect').each(function() {
             const rect = d3.select(this);
             const id = rect.attr('id').replace(/[_]/g, '');
             const group = rect.node().parentNode.appendChild(document.createElementNS('http://www.w3.org/2000/svg', 'g'));
+    
             d3.select(group)
                 .attr('class', 'room-group')
                 .style('cursor', 'pointer')
                 .on('click', () => setSelectedGallery(id))
-                .on('mouseover', () => rect.transition().duration(150).style('fill', 'salmon'))
-                .on('mouseout', () => {
-                    // Check if the gallery is saved and reset fill color accordingly
+                .on('mouseover', () => {
                     const isSaved = Array.from(savedArtworks).some(art => art.galleryNumber === id);
-                    rect.transition().duration(150).style('fill', isSaved ? 'rgba(255, 0, 0, 0.2)' : '');
+                    rect.transition().duration(150).style('fill', isSaved ? 'rgba(255, 0, 0, 0.5)' : 'salmon');
+                })
+                .on('mouseout', () => {
+                    const isSaved = Array.from(savedArtworks).some(art => art.galleryNumber === id);
+                    setGalleryFill(rect, isSaved);
                 });
+    
             group.appendChild(rect.node());
             d3.select(group).append('text')
                 .attr('x', parseFloat(rect.attr('x')) + parseFloat(rect.attr('width')) / 2)
@@ -73,31 +87,21 @@ function Map_visual() {
         });
     };
     
+   
 
-    const highlightSavedGalleries = (svgElement) => {
+    const highlightSavedGalleries = (svgElement, savedArtworks) => {
         const svg = d3.select(svgElement);
         const galleriesLayer = svg.select('#Floor_1_Galleries');
+    
+        const savedGalleryNumbers = new Set(Object.values(savedArtworks).map(art => art.galleryNumber));
         galleriesLayer.selectAll('rect').each(function() {
             const rect = d3.select(this);
             const id = rect.attr('id').replace(/[_]/g, '');
-            const isSaved = Array.from(savedArtworks).some(art => art.galleryNumber === id);
-            
-            // Toggle the 'saved-gallery' class based on saved state
-            rect.classed('saved-gallery', isSaved)
-                .classed('normal-gallery', !isSaved);
-    
-            if (isSaved) {
-                rect.style('stroke', 'black')
-                    .style('stroke-width', '1')
-                    .style('fill', 'rgba(255, 0, 0, 0.2)');  // Light red fill for saved
-            } else {
-                // Reset to no inline styles so class styles take over
-                rect.style('stroke', null)
-                    .style('stroke-width', null)
-                    .style('fill', null);
-            }
+            const isSaved = savedGalleryNumbers.has(id);
+            setGalleryFill(rect, isSaved); // Centralize fill logic here as well
         });
     };
+    
 
 
     const recenterSVG = (event) => {
