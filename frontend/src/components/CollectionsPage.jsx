@@ -1,7 +1,7 @@
-import { getSavedArtworksByUserId, getCollectionsByUserId, getArtworkById } from '../services/apiService';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { getSavedArtworksByUserId, getCollectionsByUserId } from '../services/apiService';
 import ArtworkActions from './ArtworkActions';
 import '../Style/CollectionsPage.css';
 
@@ -23,12 +23,15 @@ function CollectionsPage() {
         const fetchData = async () => {
             try {
                 const artworks = await getSavedArtworksByUserId(user.id);
+                console.log("Fetched artworks:", artworks); // Log fetched data
                 const { collections } = await getCollectionsByUserId(user.id);
-                // Filter artworks into active and inactive
-                const activeArtworks = artworks.filter(art => art.isActive);
-                const historyArtworks = artworks.filter(art => !art.isActive);
+                const activeArtworks = artworks.filter(art => art.is_active);
+                const inactiveArtworks = artworks.filter(art => !art.is_active);
+                console.log("Active artworks:", activeArtworks); // Log active artworks
+                console.log("Inactive artworks:", inactiveArtworks); // Log inactive artworks
+
                 setFetchedArtworks(activeArtworks);
-                setInactiveArtworks(historyArtworks);
+                setInactiveArtworks(inactiveArtworks);
                 setCollections(collections);
             } catch (error) {
                 console.error("Failed to fetch data:", error);
@@ -43,11 +46,8 @@ function CollectionsPage() {
             if (selectedCollectionId !== 'all') {
                 const selectedCollection = collections.find(c => c.id === parseInt(selectedCollectionId));
                 if (selectedCollection && selectedCollection.artworks) {
-                    const artworkPromises = selectedCollection.artworks.map(artwork =>
-                        getSavedArtworksByUserId(artwork.artwork_objectID) // Assuming this function fetches individual artwork details
-                    );
-                    const artworks = await Promise.all(artworkPromises);
-                    setArtworksDetails(artworks);
+                    const filteredArtworks = fetchedArtworks.filter(artwork => selectedCollection.artworks.includes(artwork.objectID));
+                    setArtworksDetails(filteredArtworks);
                 }
             } else {
                 setArtworksDetails(fetchedArtworks);
@@ -74,7 +74,7 @@ function CollectionsPage() {
                         <div className="save-artwork-info">
                             <h3 className="save-artwork-title">{artwork.title}</h3>
                             <p className="save-artwork-gallery">Gallery: {artwork.galleryNumber}</p>
-                            <ArtworkActions artwork={artwork} isActive={artwork.isActive} />
+                            <ArtworkActions artwork={artwork} isActive={artwork.is_active} />
                         </div>
                     </div>
                 ))}
