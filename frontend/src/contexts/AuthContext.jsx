@@ -1,88 +1,64 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import {
-    getCollectionsByUserId,
-    markArtworkAsInactive,
-    getSavedArtworksByUserId
-} from '../services/apiService';
+import { getCollectionsByUserId, getSavedArtworksByUserId, saveArtwork } from '../services/apiService';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')));
-    const [savedArtworks, setSavedArtworks] = useState(() => {
-        const data = JSON.parse(localStorage.getItem('savedArtworks') || '[]');
-        return data;  // Use an array directly from storage
-    });
+    const [savedArtworks, setSavedArtworks] = useState([]);
     const [collections, setCollections] = useState([]);
 
-    useEffect(() => {
-        localStorage.setItem('savedArtworks', JSON.stringify(savedArtworks));
-        localStorage.setItem('collections', JSON.stringify(collections));
-    }, [savedArtworks, collections]);
-
+    // Fetching initial data
     useEffect(() => {
         if (user) {
-            getSavedArtworksByUserId(user.id)
-                .then(data => {
-                    if (data && data.artworks) {
-                        setSavedArtworks(data.artworks.map(art => ({
-                            objectID: art.objectID,
-                            galleryNumber: art.galleryNumber,
-                            isActive: true
-                        })));
-                    }
-                })
-                .catch(error => {
-                    console.error('Failed to fetch saved artworks:', error);
-                });
-
-            getCollectionsByUserId(user.id)
-                .then(response => {
-                    const fetchedCollections = response.collections || [];
-                    setCollections(fetchedCollections.map(collection => ({
-                        ...collection,
-                        artworks: collection.artworks.filter(art => art.isActive)
-                    })));
-                })
-                .catch(error => {
-                    console.error('Failed to fetch collections:', error);
-                });
+            refreshSavedArtworks();
+            refreshCollections();
         } else {
             setSavedArtworks([]);
             setCollections([]);
         }
     }, [user]);
 
-    const login = useCallback((userData) => {
-        localStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData);
-    }, []);
+    const refreshSavedArtworks = async () => {
+        try {
+            const saved = await getSavedArtworksByUserId(user.id);
+            setSavedArtworks(saved.map(art => ({ ...art, isActive: true })));
+        } catch (error) {
+            console.error('Failed to fetch saved artworks:', error);
+        }
+    };
 
-    const logout = useCallback(() => {
-        localStorage.clear();
-        setUser(null);
-        setSavedArtworks([]);
-        setCollections([]);
-    }, []);
+    const refreshCollections = async () => {
+        try {
+            const data = await getCollectionsByUserId(user.id);
+            setCollections(data.collections || []);
+        } catch (error) {
+            console.error('Failed to fetch collections:', error);
+        }
+    };
 
-    const saveArtworkContext = useCallback(({ objectID, galleryNumber }) => {
-        setSavedArtworks(prev => [...prev, { objectID, galleryNumber, isActive: true }]);
-    }, []);
+    const saveArtworkContext = useCallback(async (artworkData) => {
+        try {
+            await saveArtwork(artworkData, user.id);
+            setSavedArtworks(prev => [...prev, { ...artworkData, isActive: true }]);
+        } catch (error) {
+            console.error('Error saving artwork:', error);
+        }
+    }, [user.id]);
 
     const removeArtworkContext = useCallback((objectID) => {
-        setSavedArtworks(prev => prev.filter(art => art.objectID !== objectID));
+        setSavedArtworks(prev => prev.filter(art => art.objectID !== objectID || !art.isActive));
     }, []);
 
     return (
         <AuthContext.Provider value={{
             user,
             setUser,
-            login,
-            logout,
             savedArtworks,
             setSavedArtworks,
             collections,
             setCollections,
+            refreshCollections,
             saveArtworkContext,
             removeArtworkContext
         }}>

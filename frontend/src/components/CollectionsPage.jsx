@@ -25,10 +25,9 @@ function CollectionsPage() {
                 const artworks = await getSavedArtworksByUserId(user.id);
                 console.log("Fetched artworks:", artworks); // Log fetched data
                 const { collections } = await getCollectionsByUserId(user.id);
+                console.log("Fetched collections:", collections); // Log fetched collections
                 const activeArtworks = artworks.filter(art => art.is_active);
                 const inactiveArtworks = artworks.filter(art => !art.is_active);
-                console.log("Active artworks:", activeArtworks); // Log active artworks
-                console.log("Inactive artworks:", inactiveArtworks); // Log inactive artworks
 
                 setFetchedArtworks(activeArtworks);
                 setInactiveArtworks(inactiveArtworks);
@@ -43,15 +42,20 @@ function CollectionsPage() {
 
     useEffect(() => {
         const fetchArtworkDetails = async () => {
+            console.log("Selected Collection ID for filtering:", selectedCollectionId);
             if (selectedCollectionId !== 'all') {
                 const selectedCollection = collections.find(c => c.id === parseInt(selectedCollectionId));
+                console.log("Selected collection details:", selectedCollection);
                 if (selectedCollection && selectedCollection.artworks) {
-                    const filteredArtworks = fetchedArtworks.filter(artwork => selectedCollection.artworks.includes(artwork.objectID));
+                    const filteredArtworks = fetchedArtworks.filter(artwork =>
+                        selectedCollection.artworks.some(sa => sa.artwork_objectID === artwork.objectID)
+                    );
                     setArtworksDetails(filteredArtworks);
                 }
             } else {
                 setArtworksDetails(fetchedArtworks);
             }
+            console.log("Updated artworks details state:", artworksDetails);
         };
 
         fetchArtworkDetails();

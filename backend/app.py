@@ -99,26 +99,61 @@ def update_saved_artwork(object_id):
 # Collections 
 
 #Create collection and Add artwork to collection
+# @app.route('/api/collections', methods=['POST'])
+# def create_collection():
+#     json_data = request.get_json()
+#     user_id = json_data.get('user_id')
+#     name = json_data.get('name')
+#     artwork_objectID = json_data.get('artwork_objectID', None)
+
+#     user = User.query.get(user_id)
+#     if not user:
+#         return {'error': 'User not found'}, 404
+
+#     new_collection = Collection(name=name, user_id=user_id)
+#     db.session.add(new_collection)
+#     db.session.flush()  # Flush to assign an ID to new_collection without committing transaction
+
+#     if artwork_objectID:
+#         artwork = Artwork.query.filter_by(objectID=artwork_objectID).first()
+#         if not artwork:
+#             db.session.rollback()  # Roll back if the artwork doesn't exist
+#             return {'error': 'Artwork not found'}, 404
+#         new_artwork_in_collection = CollectionArtworks(
+#             collection_id=new_collection.id, 
+#             artwork_objectID=artwork.objectID, 
+#             is_active=True
+#         )
+#         db.session.add(new_artwork_in_collection)
+
+#     db.session.commit()
+
+#     return {'message': 'Collection created', 'collection': new_collection.to_dict()}, 201
 @app.route('/api/collections', methods=['POST'])
 def create_collection():
     json_data = request.get_json()
     user_id = json_data.get('user_id')
     name = json_data.get('name')
-    artwork_objectID = json_data.get('artwork_objectID', None)
+    
 
+    if not name:
+        return {'error': 'Collection name is required'}, 400
+    
     user = User.query.get(user_id)
     if not user:
         return {'error': 'User not found'}, 404
 
     new_collection = Collection(name=name, user_id=user_id)
     db.session.add(new_collection)
-    db.session.flush()  # Flush to assign an ID to new_collection without committing transaction
+    db.session.flush()
 
+    artwork_objectID = json_data.get('artwork_objectID', None)
     if artwork_objectID:
         artwork = Artwork.query.filter_by(objectID=artwork_objectID).first()
         if not artwork:
-            db.session.rollback()  # Roll back if the artwork doesn't exist
+            db.session.rollback()
             return {'error': 'Artwork not found'}, 404
+
         new_artwork_in_collection = CollectionArtworks(
             collection_id=new_collection.id, 
             artwork_objectID=artwork.objectID, 
@@ -128,7 +163,7 @@ def create_collection():
 
     db.session.commit()
 
-    return {'message': 'Collection created', 'collection': new_collection.to_dict()}, 201
+    return {'message': 'Collection created', 'collection': new_collection.to_dict()}
 
 
 @app.route('/api/collections/<int:user_id>', methods=['GET'])
@@ -142,7 +177,7 @@ def get_collections(user_id):
         collections_data = [collection.to_dict() for collection in collections]
         return {'collections': collections_data}, 200
     except Exception as e:
-        return {'error': 'An error occurred during serialization', 'details': str(e)}, 500
+        return {'error': 'error at serialization', 'details': str(e)}, 500
 
 #Delete Collection
 @app.route('/api/collections/<int:collection_id>', methods=['DELETE'])
@@ -174,6 +209,7 @@ def mark_artwork_inactive_in_collection(collection_artwork_id):
     db.session.commit()
     return {'message': 'Artwork marked as inactive in collection'}, 200
 
+## + artwork to collection - if collection doesn't exist, create it
 @app.route('/api/collections/add', methods=['POST'])
 def add_artwork_to_collection():
     json_data = request.get_json()
@@ -181,39 +217,40 @@ def add_artwork_to_collection():
     artwork_id = json_data.get('artworkId')
     user_id = json_data.get('userId')
 
-    # Check if the user exists
+    # Ensure user exists
     user = User.query.get(user_id)
     if not user:
         return {'error': 'User not found'}, 404
 
-    # Check if collection exists or create a new one
+    # Ensure the artwork exists
+    artwork = Artwork.query.filter_by(objectID=artwork_id).first()
+    if not artwork:
+        return {'error': 'Artwork not found'}, 404
+
+    # Check or create the collection
     collection = Collection.query.filter_by(name=collection_name, user_id=user_id).first()
     if not collection:
         collection = Collection(name=collection_name, user_id=user_id)
         db.session.add(collection)
-        db.session.flush()  # Flush to assign an ID to new_collection without committing transaction
+        db.session.flush()  # Get the new collection ID without committing
 
-    # Check if artwork exists
-    artwork = Artwork.query.filter_by(objectID=artwork_id).first()
-    if not artwork:
-        db.session.rollback()  # Roll back transaction if no artwork is found
-        return {'error': 'Artwork not found'}, 404
-
-    # Create or update the collection_artworks link
+    # Link artwork to collection, create if necessary
     collection_artwork = CollectionArtworks.query.filter_by(collection_id=collection.id, artwork_objectID=artwork_id).first()
-    if collection_artwork:
-        collection_artwork.is_active = True  # Reactivate the artwork in collection if it was inactive
-    else:
-        # Add new artwork to the collection
-        collection_artwork = CollectionArtworks(
-            collection_id=collection.id, 
-            artwork_objectID=artwork_id, 
-            is_active=True
-        )
+    if not collection_artwork:
+        collection_artwork = CollectionArtworks(collection_id=collection.id, artwork_objectID=artwork_id, is_active=True)
         db.session.add(collection_artwork)
 
+    # Check if the artwork is marked as saved (to_view), if not, save it
+    saved_artwork = ToView.query.filter_by(user_id=user_id, artwork_objectID=artwork_id).first()
+    if not saved_artwork:
+        saved_artwork = ToView(user_id=user_id, artwork_objectID=artwork_id, is_active=True)
+        db.session.add(saved_artwork)
+
+    # Commit changes
     db.session.commit()
-    return {'message': 'Artwork added to collection', 'collection': collection.to_dict()}, 201
+
+    return {'message': 'Artwork added to collection and marked as saved', 'collection': collection.to_dict()}
+
 
 
 #Scavenger Hunt - Request = random artworks / Post = user verify objectID

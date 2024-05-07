@@ -1,10 +1,12 @@
+About to rework the API Service - Saving old code here :
+
 const BASE_URL = 'http://localhost:5555/api';
 
 async function fetchWithErrors(url, options) {
     const response = await fetch(url, options);
     if (!response.ok) {
         const result = await response.json();
-        throw new Error(result.error || response.statusText || "global fetch error");
+        throw new Error(result.error || response.statusText || "An unexpected error occurred");
     }
     return response.json();
 }
@@ -56,7 +58,7 @@ export const getSavedArtworksByUserId = async (userId) => {
     return fetchWithErrors(url, { method: 'GET' });
 };
 
-//Add object to Collection
+
 export const addArtworkToCollection = async (collectionName, artworkId, userId) => {
     const url = `${BASE_URL}/collections/add`;
     const options = {
@@ -66,24 +68,14 @@ export const addArtworkToCollection = async (collectionName, artworkId, userId) 
         },
         body: JSON.stringify({
             collectionName: collectionName,
-            artworkId: artworkId,  // Ensure the key matches the backend expectation
+            artworkId: artworkId,
             userId: userId
         })
     };
-    try {
-        const response = await fetch(url, options);
-        if (!response.ok) {
-            throw new Error('Failed to add artwork to collection: ' + await response.text());
-        }
-        return await response.json(); // Ensure response is properly awaited
-    } catch (error) {
-        console.error('API call failed:', error);
-        throw error;  // Re-throw to handle it in the component
-    }
+    return fetchWithErrors(url, options);
 };
 
 
-//Crate a new Collection
 export const addCollection = async (collectionData) => {
     const url = `${BASE_URL}/collections`;
     const options = {
@@ -94,27 +86,16 @@ export const addCollection = async (collectionData) => {
         },
         body: JSON.stringify(collectionData)
     };
-    try {
-        const response = await fetch(url, options);
-        if (!response.ok) {
-            throw new Error('Failed to create collection: ' + await response.text());
-        }
-        return response; // Ensure that the response is a fetch Response object
-    } catch (error) {
-        console.error('API call failed:', error);
-        throw error;  // Re-throw to handle it in the component
+    const response = await fetch(url, options);
+    if (!response.ok) {
+        throw new Error('Failed to create collection: ' + await response.text());
     }
+    return response; 
 };
-
 
 export const getCollectionsByUserId = async (userId) => {
     const url = `${BASE_URL}/collections/${userId}`;
-    try {
-        const response = await fetchWithErrors(url, { method: 'GET' });
-        return response; 
-    } catch (error) {
-        console.error('Failed at fetch collections:', error);
-    }
+    return fetchWithErrors(url, { method: 'GET' });
 };
 
 export const deleteCollection = async (collectionId, userId) => {

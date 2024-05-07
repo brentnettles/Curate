@@ -13,10 +13,11 @@ function Navbar() {
 
     return (
         <div className="navbar">
-            <Link to="/">Map</Link>
-            <Link to="/search">Search Artworks</Link>
-            <Link to="/collections">Saved Collections</Link>  
-            <Link to="/discover">Discover</Link>  
+            <Link to="/">MAP</Link>
+            <Link to="/search">SEARCH</Link>
+            <Link to="/collections">SAVED COLLECTIONS</Link>  
+            <Link to="/discover">DISCOVER</Link>  
+            {/* <Link to="/landing">Landing</Link>   */}
             {user ? (
                 <button onClick={handleLogout} className="logout-button">Logout</button>
             ) : (

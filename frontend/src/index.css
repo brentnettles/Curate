@@ -3,7 +3,6 @@ body, h1, h2, h3, p, form, button, input {
   
   margin: 0;
   padding: 0;
-  
   box-sizing: border-box;
 }
 
@@ -19,16 +18,15 @@ body {
 
 /* Style for the navigation bar */
 .navbar {
-  background-color: #fff;
-  border-bottom: 2px solid #e0e0e0;
-  padding: 10px 20px;
-  padding-left: 250px;
+  /* background-color: #B10F2E; */
+  border-bottom: 1px solid #B10F2E;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  max-width: 90vw;
+  width: 100%; 
+  justify-content: center; 
+  margin: auto; 
 }
 
-/* Unified styling for links and buttons in the navbar */
 .navbar a, .navbar button {
   color: #333;
   text-decoration: none;
@@ -39,13 +37,12 @@ body {
   cursor: pointer;
   display: flex;
   align-items: center;
-  margin-right: 10px; /* Ensure consistent spacing */
+  margin-right: 10px; /* Manage spacing */
 }
 
-/* Specific style for the logout button to differentiate visually */
 .navbar button.logout-button {
-  background-color: #d94f4f;
-  color: white;
+  background-color: #DE7C5A;
+  color: #FDFFFF;
 }
 
 .navbar button.logout-button:hover {
