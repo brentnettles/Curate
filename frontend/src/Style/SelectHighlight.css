@@ -1,0 +1,56 @@
+
+
+
+
+.selection-controls {
+    position: fixed; 
+    top: 10%; 
+    margin-left: 20px;
+    margin-top: 15px;
+    /* transform: translateX(-50%); Center align */
+    width: 20vw;
+    z-index: 1000; 
+
+
+
+}
+
+.selection-controls button {
+    display: block;
+    margin: 10px auto; /* Centering button */
+    padding: 16px;
+    width: 90%; /* Adjust width to be inside the modal */
+    background-color: #B10F2E;
+    color: #f8f8f8;
+    border: none;
+    cursor: pointer;
+}
+
+.selection-controls button:hover {
+    background-color: #0056b3;
+}
+
+.selection-controls ul {
+    list-style-type: none; /* Remove bullet points */
+    padding: 0;
+    font-size: 1rem; /* Adjust font size if needed */
+}
+
+.selection-controls li {
+    cursor: pointer;
+    padding: 10px;
+    background-color: #f0f0f0;
+    margin: 5px 0;
+    transition: background-color 0.3s;
+}
+
+.selection-controls li:hover {
+    background-color: #bebebe92;
+}
+
+.selection-controls button.full-width {
+    width: 100%;
+    text-align: left;
+    background: none;
+    color: black;
+}

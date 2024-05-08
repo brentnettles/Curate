@@ -312,6 +312,25 @@ def verify_artwork():
         print(f"Object ID mismatch. Expected: {expected_object_id}, Received: {user_input_id}")
         return {'error': 'ObjectID not confirmed', 'found': False}, 400
 
+@app.route('/api/highlighted-galleries')
+def get_highlighted_galleries():
+    user_id = request.args.get('user_id')
+    collection_id = request.args.get('collection_id', type=int)
+
+    if not user_id:
+        return {'error': 'User ID is required'}, 400
+
+    query = db.session.query(Artwork.galleryNumber).\
+        join(ToView, ToView.artwork_objectID == Artwork.objectID).\
+        filter(ToView.user_id == user_id, ToView.is_active == True)
+
+    if collection_id:
+        query = query.join(CollectionArtworks, CollectionArtworks.artwork_objectID == Artwork.objectID).\
+                      filter(CollectionArtworks.collection_id == collection_id, CollectionArtworks.is_active == True)
+
+    gallery_numbers = query.distinct().all()
+
+    return {'highlighted_galleries': [g[0] for g in gallery_numbers]}, 200
 
 #Save Scavenger Hunt as a collection w/ todays date 
 @app.route('/api/save-scavenger-hunt', methods=['POST'])
@@ -343,158 +362,4 @@ def save_scavenger_hunt():
 
     db.session.commit()
     return {'message': 'Scavenger hunt saved as a collection', 'collection_id': new_collection.id}, 201
-
-
-
-
-
-
-
-
-
-
-
-
-
-# @app.route('/api/user-artworks/<int:user_id>', methods=['GET'])
-# def get_user_artworks(user_id):
-#     user = User.query.get(user_id)
-#     if not user:
-#         return Response(json.dumps({'error': 'User not found'}), mimetype='application/json'), 404
-
-#     to_views = ToView.query.filter_by(user_id=user.id, is_active=True).all()
-#     print(f"Found {len(to_views)} active views for user ID {user_id}")
-
-#     artworks = []
-#     for view in to_views:
-#         artwork = Artwork.query.get(view.artwork_objectID)
-#         if artwork:
-#             artworks.append({
-#                 'objectID': artwork.objectID,
-#                 'title': artwork.title,
-#                 'galleryNumber': artwork.galleryNumber,
-#                 'artistName': artwork.artistName,
-#                 'primaryImageSmall': artwork.primaryImageSmall
-#             })
-#         else:
-#             print(f"Artwork with objectID {view.artwork_objectID} not found")
-
-#     if artworks:
-#         return Response(json.dumps({'artworks': artworks}), mimetype='application/json'), 200
-#     else:
-#         return Response(json.dumps({'artworks': [], 'message': 'No artworks found'}), mimetype='application/json'), 200
-
-
-
-# # Modified to include setting is_active flag
-# @app.route('/api/user-to-view', methods=['POST'])
-# def user_to_view():
-#     json_data = request.get_json()
-#     print("Received JSON:", json_data)  # Debugging output
-
-#     user_id = json_data.get('user_id')
-#     objectID = json_data.get('objectID')
-
-#     if not user_id or not objectID:
-#         return Response(json.dumps({'error': 'Missing user_id or objectID'}), mimetype='application/json'), 400
-
-#     user = User.query.get(user_id)
-#     if not user:
-#         return Response(json.dumps({'error': 'User not found'}), mimetype='application/json'), 404
-
-#     artwork = Artwork.query.get(objectID)
-#     if not artwork:
-#         return Response(json.dumps({'error': 'Artwork not found'}), mimetype='application/json'), 404
-
-#     existing_view = ToView.query.filter_by(user_id=user.id, artwork_objectID=artwork.objectID, is_active=True).first()
-#     if existing_view:
-#         return Response(json.dumps({'message': 'Artwork already saved'}), mimetype='application/json'), 200
-
-#     new_to_view = ToView(user_id=user.id, artwork_objectID=artwork.objectID, is_active=True)
-#     db.session.add(new_to_view)
-#     db.session.commit()
-
-#     print("New view added:", new_to_view)  # Debugging output
-#     return Response(json.dumps({'message': 'Artwork saved successfully'}), mimetype='application/json'), 201
-
-
-# # Add endpoint to deactivate a saved view
-# @app.route('/api/user-to-view/<int:objectID>', methods=['DELETE'])
-# def delete_user_artwork(objectID):
-#     user_id = request.headers.get('User-ID')
-#     to_view = ToView.query.filter_by(artwork_objectID=objectID, user_id=user_id).first()
-#     if not to_view:
-#         return {'error': 'Artwork not found or not associated with user'}, 404
-
-#     to_view.is_active = False  # Mark as inactive instead of deleting
-#     db.session.commit()
-#     return {'message': 'Artwork moved to history'}, 200
-
-# # Existing collections management adjusted for error handling and cleanup
-# @app.route('/api/collections/<username>', methods=['GET'])
-# def get_user_collections(username):
-#     user = User.query.filter_by(username=username).first()
-#     if not user:
-#         return {'error': 'User not found'}, 404
-
-#     collections = [collection.to_dict() for collection in user.collections]
-#     return {'collections': collections}, 200
-
-# @app.route('/api/collections', methods=['POST'])
-# def create_collection():
-#     json_data = request.get_json()
-#     user = User.query.filter_by(username=json_data.get('username')).first()
-#     if not user:
-#         return {'error': 'User not found'}, 404
-
-#     collection = Collection(name=json_data['name'], user_id=user.id)
-#     db.session.add(collection)
-#     db.session.commit()
-
-#     # Optionally add artwork to new collection if provided
-#     if json_data.get('objectID'):
-#         artwork = Artwork.query.filter_by(objectID=json_data.get('objectID')).first()
-#         if artwork:
-#             new_artwork_in_collection = CollectionArtworks(collection_id=collection.id, artwork_objectID=artwork.objectID, is_active=True)
-#             db.session.add(new_artwork_in_collection)
-#             db.session.commit()
-
-#     return {'id': collection.id, 'name': collection.name, 'user_id': user.id}, 201
-
-# # Detailed management of artworks in collections
-# @app.route('/api/collections/<int:collection_id>/artworks', methods=['POST', 'DELETE'])
-# def collection_artworks(collection_id):
-#     collection = Collection.query.get(collection_id)
-#     if not collection:
-#         return {'error': 'Collection not found'}, 404
-
-#     json_data = request.get_json()
-#     artwork = Artwork.query.get(json_data['artwork_id'])
-#     if not artwork:
-#         return {'error': 'Artwork not found'}, 404
-
-#     if request.method == 'POST':
-#         # Logic to add artwork to collection, check if already added
-#         return {'message': 'Updated collection with artwork'}, 200
-#     elif request.method == 'DELETE':
-#         # Logic to remove artwork from collection
-#         return {'message': 'Artwork removed from collection'}, 200
-
-# # Simplify error handling and manage collections with DELETE and PATCH
-# @app.route('/api/collections/<int:collection_id>', methods=['DELETE', 'PATCH'])
-# def manage_collection(collection_id):
-#     collection = Collection.query.get(collection_id)
-#     if not collection:
-#         return {'error': 'Collection not found'}, 404
-
-#     if request.method == 'DELETE':
-#         db.session.delete(collection)
-#         db.session.commit()
-#         return {}, 204
-#     elif request.method == 'PATCH':
-#         json_data = request.get_json()
-#         for key, value in json_data.items():
-#             setattr(collection, key, value)
-#         db.session.commit()
-#         return collection.to_dict(), 200
 

@@ -89,6 +89,7 @@ function CollectionsPage() {
         setIsListVisible(false);
     };
     
+    
     const handleDeleteCollection = async (collectionId) => {
         try {
             await deleteCollection(collectionId, user.id);

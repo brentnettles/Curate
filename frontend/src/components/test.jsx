@@ -5,38 +5,29 @@ import '../Style/Map.css';
 import ArtworkList from './ArtworkList';
 import { useAuth } from '../contexts/AuthContext';
 import { getHighlightedGalleries } from '../services/apiService';
-import SelectionControls from './SelectHighlight';
+import SelectionControls from './SelectHighlight';  // Make sure the path is correct
 
 function Map_visual() {
     const svgRef = useRef();
     const [selectedGallery, setSelectedGallery] = useState(null);
     const [highlightMode, setHighlightMode] = useState('all');
-    const { user, collections } = useAuth();
+    const { user, collections } = useAuth();  // Assuming collections are part of auth context
     const zoom = useRef(d3.zoom().scaleExtent([1, 8]));
     const [highlightedGalleries, setHighlightedGalleries] = useState(new Set());
 
-    // useEffect(() => {
-    //     fetch("/MetMap.svg")
-    //         .then(res => res.text())
-    //         .then(svg => {
-    //             svgRef.current.innerHTML = svg;
-    //             const svgElement = svgRef.current.querySelector('svg');
-    //             enhanceSVG(svgElement);
-    //             highlightSavedGalleries(svgElement);
-    //         });
-    // }, [highlightedGalleries]);
 
-    useEffect(() => {
-        // Only fetch and set up the SVG once
-        fetch("/MetMap.svg")
-            .then(res => res.text())
-            .then(svg => {
-                svgRef.current.innerHTML = svg;
-                const svgElement = svgRef.current.querySelector('svg');
-                enhanceSVG(svgElement); // Apply zoom and interaction handlers
-            });
-    }, []);
+    const highlightSavedGalleries = (svgElement) => {
+        const svg = d3.select(svgElement);
+        const galleriesLayer = svg.select('#Floor_1_Galleries');
 
+        galleriesLayer.selectAll('rect').each(function () {
+            const rect = d3.select(this);
+            const id = rect.attr('id').replace(/[_]/g, '');
+            const isHighlighted = highlightedGalleries.has(id);
+            setGalleryFill(rect, isHighlighted);
+        });
+    };
+    
     useEffect(() => {
         const fetchGalleries = async () => {
             try {
@@ -53,48 +44,30 @@ function Map_visual() {
     }, [user.id, highlightMode, selectedGallery]);
     
 
-    // const enhanceSVG = (svgElement) => {
-    //     const svg = d3.select(svgElement);
-    //     zoom.current.on('zoom', (event) => {
-    //         svg.select('#Layer_1').attr('transform', event.transform);
-    //         svg.select('#Floor_1_Galleries').attr('transform', event.transform);
-    //     });
-    //     svg.call(zoom.current);
-    //     svg.call(zoom.current.transform, d3.zoomIdentity);
-    //     setupInteractions(svg);
-    // };
+    useEffect(() => {
+        fetch("/MetMap.svg")
+            .then(res => res.text())
+            .then(svg => {
+                svgRef.current.innerHTML = svg;
+                const svgElement = svgRef.current.querySelector('svg');
+                enhanceSVG(svgElement);
+                highlightSavedGalleries(svgElement);
+            });
+    }, [highlightedGalleries]); // Dependency on highlightedGalleries to force re-render
 
     const enhanceSVG = (svgElement) => {
         const svg = d3.select(svgElement);
         zoom.current.on('zoom', (event) => {
-            svg.selectAll('#Layer_1, #Floor_1_Galleries').attr('transform', event.transform);
+            svg.select('#Layer_1').attr('transform', event.transform);
+            svg.select('#Floor_1_Galleries').attr('transform', event.transform);
         });
         svg.call(zoom.current);
+        svg.call(zoom.current.transform, d3.zoomIdentity);
         setupInteractions(svg);
     };
 
-    useEffect(() => {
-        const svgElement = svgRef.current.querySelector('svg');
-        if (svgElement) {
-            highlightSavedGalleries(svgElement);
-        }
-    }, [highlightedGalleries]);
-
-    
-    const setGalleryFill = (rect, isHighlighted) => {
-        rect.transition().duration(150).style('fill', isHighlighted ? 'rgba(255, 0, 0, 0.5)' : '');
-    };
-
-    const highlightSavedGalleries = (svgElement) => {
-        const svg = d3.select(svgElement);
-        const galleriesLayer = svg.select('#Floor_1_Galleries');
-
-        galleriesLayer.selectAll('rect').each(function() {
-            const rect = d3.select(this);
-            const id = rect.attr('id').replace(/[_]/g, '');
-            const isHighlighted = highlightedGalleries.has(id);
-            setGalleryFill(rect, isHighlighted);
-        });
+    const setGalleryFill = (rect, isSaved) => {
+        rect.transition().duration(150).style('fill', isSaved ? 'rgba(255, 0, 0, 0.2)' : '');
     };
 
     const setupInteractions = (svg) => {
@@ -109,12 +82,10 @@ function Map_visual() {
                 .style('cursor', 'pointer')
                 .on('click', () => setSelectedGallery(id))
                 .on('mouseover', () => {
-                    const isHighlighted = highlightedGalleries.has(id);
-                    rect.transition().duration(150).style('fill', isHighlighted ? 'rgba(255, 0, 0, 0.5)' : 'salmon');
+                    rect.transition().duration(150).style('fill', highlightedGalleries.has(id) ? 'rgba(255, 0, 0, 0.5)' : 'salmon');
                 })
                 .on('mouseout', () => {
-                    const isHighlighted = highlightedGalleries.has(id);
-                    setGalleryFill(rect, isHighlighted);
+                    setGalleryFill(rect, highlightedGalleries.has(id));
                 });
 
             group.appendChild(rect.node());
@@ -135,21 +106,19 @@ function Map_visual() {
     };
 
     return (
-        <>
-        <div className='SelectHighlight'>
-            <SelectionControls
-                    setHighlightMode={setHighlightMode}
-                    setSelectedGallery={setSelectedGallery}
-                    collections={collections}
-                />
-        </div>
         <div className="main-container">
-                
             <div className="floorplan-container" style={{ position: 'relative' }}>
                 <div ref={svgRef} className="floorplan-svg-container" />
+                <SelectionControls
+                    setHighlightMode={setHighlightMode}
+                    setSelectedGallery={setSelectedGallery}
+                    collections={collections}  // Ensure collections are fetched or passed down appropriately
+                />
                 <button
                     id="recenter-button"
-                    onClick={recenterSVG}
+                    onClick={() => {
+                        // Logic to re-center the SVG if needed
+                    }}
                     style={{
                         position: 'absolute',
                         right: '10px',
@@ -169,7 +138,6 @@ function Map_visual() {
                 </div>
             </div>
         </div>
-        </>
     );
 }
 

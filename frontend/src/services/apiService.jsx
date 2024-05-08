@@ -130,6 +130,16 @@ export const getArtworksByCollectionId = async (collectionId) => {
 };
 
 
+export const getHighlightedGalleries = async (userId, collectionId = null) => {
+    const url = new URL(`${BASE_URL}/highlighted-galleries`);
+    url.searchParams.append('user_id', userId);
+    if (collectionId !== null) {
+        url.searchParams.append('collection_id', collectionId);
+    }
+
+    return fetchWithErrors(url.toString(), { method: 'GET' });
+};
+
 export const deleteCollection = async (collectionId, userId) => {
     const url = `${BASE_URL}/collections/${collectionId}`;
     const options = {
