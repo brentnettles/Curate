@@ -59,6 +59,24 @@ function CollectionsPage() {
         fetchData();  // Refresh data to reflect changes in the UI
     };
 
+    const updateArtworkStatus = (artworkId, isActive) => {
+        // Update fetchedArtworks to reflect the change
+        const updatedArtworks = fetchedArtworks.map(artwork =>
+            artwork.objectID === artworkId ? { ...artwork, is_active: isActive } : artwork
+        );
+        setFetchedArtworks(updatedArtworks);
+
+        // Filter inactive artworks again
+        setInactiveArtworks(updatedArtworks.filter(art => !art.is_active));
+
+        // Optionally, update artworksDetails if needed
+        if (selectedCollectionId !== 'all') {
+            setArtworksDetails(updatedArtworks.filter(art => art.is_active && selectedCollectionId === art.collectionId));
+        } else {
+            setArtworksDetails(updatedArtworks.filter(art => art.is_active));
+        }
+    };
+
     const toggleListVisibility = () => {
         setIsListVisible(!isListVisible); // Toggle the visibility state
     };
@@ -88,16 +106,16 @@ function CollectionsPage() {
             </ul>
             <h1 className='selected-header'>{selectedCollectionId === 'all' ? 'ALL SAVED ARTWORKS' : collections.find(c => c.id === parseInt(selectedCollectionId))?.name || 'Filtered Artworks'}</h1>
             <div className="save-artwork-list">
-                {artworksDetails.map((artwork, index) => (
-                    <div key={artwork.objectID || index} className="save-artwork-item">
-                        <img src={artwork.primaryImageSmall} alt={artwork.title} onClick={() => viewArtworkDetail(artwork)} className="save-artwork-image" />
-                        <div className="save-artwork-info">
-                            <h3 className="save-artwork-title">{artwork.title}</h3>
-                            <p className="save-artwork-gallery">Gallery: {artwork.galleryNumber}</p>
-                            <ArtworkActions artwork={artwork} isActive={artwork.is_active} onUpdate={handleUpdate} />
-                        </div>
-                    </div>
-                ))}
+            {artworksDetails.map((artwork, index) => (
+            <div key={artwork.objectID || index} className="save-artwork-item">
+                <img src={artwork.primaryImageSmall} alt={artwork.title} onClick={() => viewArtworkDetail(artwork)} className="save-artwork-image" />
+                <div className="save-artwork-info">
+                    <h3 className="save-artwork-title">{artwork.title}</h3>
+                    <p className="save-artwork-gallery">Gallery: {artwork.galleryNumber}</p>
+                    <ArtworkActions artwork={artwork} isActive={artwork.is_active} onUpdate={handleUpdate} onStatusChange={updateArtworkStatus} />
+                </div>
+            </div>
+        ))}
             </div>
             <div className="separator-history"></div>
             <h2 className='saved-header'>SAVED HISTORY</h2>

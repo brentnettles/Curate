@@ -18,15 +18,15 @@ function Navbar() {
                 <img src={logo} alt="Company Logo" />
             </div>
             <div className="navbar-items">
-                <NavLink to="/" className="nav-link" activeClassName="active-link">MAP</NavLink>
-                <NavLink to="/search" className="nav-link" activeClassName="active-link">SEARCH</NavLink>
-                <NavLink to="/collections" className="nav-link" activeClassName="active-link">SAVED COLLECTIONS</NavLink>
-                <NavLink to="/discover" className="nav-link" activeClassName="active-link">DISCOVER</NavLink>
+                <NavLink to="/" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>MAP</NavLink>
+                <NavLink to="/search" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>SEARCH</NavLink>
+                <NavLink to="/collections" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>SAVED COLLECTIONS</NavLink>
+                <NavLink to="/discover" className={({ isActive }) => isActive ? "nav-link active-link" : "nav-link"}>DISCOVER</NavLink>
             </div>
             {user ? (
                 <button onClick={handleLogout} className="logout-button">Logout</button>
             ) : (
-                <NavLink to="/login" className="nav-link login-link">Login</NavLink>
+                <NavLink to="/login" className={({ isActive }) => isActive ? "nav-link login-link active-link" : "nav-link login-link"}>Login</NavLink>
             )}
         </div>
     );

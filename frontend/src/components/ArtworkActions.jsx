@@ -5,8 +5,8 @@ import { saveArtwork, markArtworkAsInactive } from '../services/apiService';
 import ManageCollections from './ManageCollections';
 import '../Style/ArtworkActions.css';
 
-const ArtworkActions = ({ artwork }) => {
-  const { user, savedArtworks, saveArtworkContext, removeArtworkContext } = useAuth();
+const ArtworkActions = ({ artwork, onStatusChange }) => {
+  const { user, savedArtworks, saveArtworkContext } = useAuth();
   const navigate = useNavigate();
   const [showManageCollections, setShowManageCollections] = useState(false);
 
@@ -18,31 +18,21 @@ const ArtworkActions = ({ artwork }) => {
   };
 
   const handleSave = async () => {
-    if (!user) {
-      alert("Please log in to save artworks.");
-      return;
-    }
     const artworkData = { objectID: artwork.objectID, galleryNumber: artwork.galleryNumber };
-    try {
-      await saveArtwork(artworkData, user.id);
-      saveArtworkContext(artworkData);
-      console.log("Artwork saved successfully:", artworkData);
-    } catch (error) {
-      console.error('Error saving artwork:', error);
-    }
-  };
+    await saveArtwork(artworkData, user.id);
+    saveArtworkContext(artworkData);
+    console.log("Artwork saved successfully:", artworkData);
+};
 
+  // Remove artwork from saved list and mark as inactive 
+  //(is_active: false) to create the Saved History
   const handleRemove = async () => {
     console.log('Remove button clicked');
     console.log('Artwork and objectID are defined:', artwork.objectID);
-    try {
-      await markArtworkAsInactive(artwork.objectID, user.id);
-      removeArtworkContext(artwork.objectID);
-      console.log('Artwork marked as inactive');
-    } catch (error) {
-      console.error('Error updating artwork status:', error);
-    }
-  };
+    await markArtworkAsInactive(artwork.objectID, user.id);
+    console.log('Artwork marked as inactive');
+    onStatusChange(artwork.objectID, false);
+};
 
   return (
     <div className="artwork-actions">
