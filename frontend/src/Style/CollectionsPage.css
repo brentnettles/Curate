@@ -43,7 +43,7 @@
     border: 1px solid #ccc;
     padding: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
+    transition: transform 0.7s ease;
     overflow: hidden;
     justify-content: space-between;
 }
@@ -107,7 +107,7 @@
     background-color: #b10f2dd0;
     /* box-shadow: 0 4px 8px rgba(0,0,0,0.1);  */
     /* overflow: hidden; */
-    transition: max-height 0.5s ease, opacity 0.5s ease; /* Smooth transition for max-height and opacity */
+    transition: max-height 0.7s ease, opacity 1.7s ease; /* Smooth transition for max-height and opacity */
     /* max-height: 0;  */
     visibility: hidden; 
     z-index: 100; 
@@ -121,14 +121,14 @@
     color: #F8F8F8;
     opacity: 1; 
     visibility: visible; 
-    transition: max-height 0.5s ease, opacity 0.5s ease; 
+    transition: max-height 1.7s ease, opacity 1.7s ease; 
 }
 
 .collection-selector li {
     padding: 10px;
     cursor: pointer;
     background-color: #b10f2d7a; /* Default background color */
-    transition: background-color 0.3s ease; /* Smooth transition for background color change */
+    transition: background-color 0.7s ease; /* Smooth transition for background color change */
 }
 
 .collection-selector li:hover {

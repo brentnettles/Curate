@@ -129,6 +129,17 @@ def update_saved_artwork(object_id):
 #     db.session.commit()
 
 #     return {'message': 'Collection created', 'collection': new_collection.to_dict()}, 201
+@app.route('/api/collections/<int:collection_id>/artworks')
+def get_artworks_by_collection(collection_id):
+    collection = Collection.query.get(collection_id)
+    if not collection:
+        return {'error': 'Collection not found'}, 404
+
+    artworks = [artwork.artwork.to_dict() for artwork in collection.artworks if artwork.is_active]
+    return {'collection': collection.name, 'artworks': artworks}, 200
+
+
+    
 @app.route('/api/collections', methods=['POST'])
 def create_collection():
     json_data = request.get_json()

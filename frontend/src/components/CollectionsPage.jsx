@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getSavedArtworksByUserId, getCollectionsByUserId } from '../services/apiService';
+import { getSavedArtworksByUserId, getCollectionsByUserId, getArtworksByCollectionId } from '../services/apiService';
 import ArtworkActions from './ArtworkActions';
 import '../Style/CollectionsPage.css';
 
@@ -30,25 +30,30 @@ function CollectionsPage() {
             setFetchedArtworks(artworks);
             setInactiveArtworks(artworks.filter(art => !art.is_active));
             setCollections(collections);
-            updateArtworksDetails(artworks);
+            if (selectedCollectionId === 'all') {
+                setArtworksDetails(artworks.filter(art => art.is_active));
+            }
         } catch (error) {
             console.error("Failed to fetch data:", error);
         }
     };
 
-    const updateArtworksDetails = (artworks) => {
+    const updateArtworksDetails = async () => {
         if (selectedCollectionId !== 'all') {
-            const selectedCollection = collections.find(c => c.id === parseInt(selectedCollectionId));
-            if (selectedCollection && selectedCollection.artworks) {
-                const filteredArtworks = artworks.filter(artwork =>
-                    selectedCollection.artworks.some(sa => sa.artwork_objectID === artwork.objectID)
-                );
-                setArtworksDetails(filteredArtworks);
+            try {
+                const data = await getArtworksByCollectionId(selectedCollectionId);
+                setArtworksDetails(data.artworks);
+            } catch (error) {
+                console.error("Failed to fetch artworks for the collection:", error);
             }
         } else {
-            setArtworksDetails(artworks.filter(art => art.is_active));
+            setArtworksDetails(fetchedArtworks.filter(art => art.is_active));
         }
     };
+
+    useEffect(() => {
+        updateArtworksDetails();
+    }, [selectedCollectionId]);
 
     const handleUpdate = () => {
         fetchData();  // Refresh data to reflect changes in the UI
@@ -68,20 +73,19 @@ function CollectionsPage() {
     
     return (
         <div className="collections-page">
-             <button onClick={toggleListVisibility} className="toggle-list-button">
+            <button onClick={toggleListVisibility} className="toggle-list-button">
             {isListVisible ? '∆' : 'SELECT COLLECTION'}
-        </button>
-        <ul className={`collection-selector ${isListVisible ? 'active' : ''}`} onMouseLeave={handleMouseLeave}>
-            <li onClick={() => setSelectedCollectionId('all')}>
-                All Collections
-            </li>
-            {collections.map((collection) => (
-                <li key={collection.id} onClick={() => setSelectedCollectionId(String(collection.id))}>
-                    {collection.name}
+            </button>
+            <ul className={`collection-selector ${isListVisible ? 'active' : ''}`} onMouseLeave={handleMouseLeave}>
+                <li onClick={() => setSelectedCollectionId('all')}>
+                    All Collections
                 </li>
-            ))}
-        </ul>
-
+                {collections.map((collection) => (
+                    <li key={collection.id} onClick={() => setSelectedCollectionId(String(collection.id))}>
+                        {collection.name}
+                    </li>
+                ))}
+            </ul>
             <h1 className='selected-header'>{selectedCollectionId === 'all' ? 'ALL SAVED ARTWORKS' : collections.find(c => c.id === parseInt(selectedCollectionId))?.name || 'Filtered Artworks'}</h1>
             <div className="save-artwork-list">
                 {artworksDetails.map((artwork, index) => (
@@ -95,17 +99,14 @@ function CollectionsPage() {
                     </div>
                 ))}
             </div>
-            <div class="separator-history"></div>
+            <div className="separator-history"></div>
             <h2 className='saved-header'>SAVED HISTORY</h2>
-            <div class="separator-history"></div>
+            <div className="separator-history"></div>
             <div className="history-list-container">
                 {inactiveArtworks.map((artwork, index) => (
                     <div key={artwork.objectID || index} className="history-artwork-item">
                         <div className="history-artwork-image-container">
                             <img src={artwork.primaryImageSmall} alt={artwork.title} onClick={() => viewArtworkDetail(artwork)} className="history-artwork-image" />
-                        </div>
-                        <div className="history-artwork-info">
-                            {/* <ArtworkActions artwork={artwork} isActive={false} onUpdate={handleUpdate} /> */}
                         </div>
                     </div>
                 ))}
@@ -115,28 +116,3 @@ function CollectionsPage() {
 }
 
 export default CollectionsPage;
-
-
-
-
-
-// const toggleListVisibility = () => {
-//     setIsListVisible(!isListVisible); // Toggle the visibility state
-// };
-
-// return (
-//     <div className="collections-page">
-//         <button onClick={toggleListVisibility} className="toggle-list-button">
-//             {isListVisible ? 'Hide Collections' : 'Show Collections'}
-//         </button>
-//         <ul className={`collection-selector ${isListVisible ? 'active' : ''}`}>
-//             <li className={selectedCollectionId === 'all' ? 'active' : ''} onClick={() => setSelectedCollectionId('all')}>
-//                 All Collections
-//             </li>
-//             {collections.map((collection) => (
-//                 <li key={collection.id} className={selectedCollectionId === String(collection.id) ? 'active' : ''}
-//                     onClick={() => setSelectedCollectionId(String(collection.id))}>
-//                     {collection.name}
-//                 </li>
-//             ))}
-//         </ul>

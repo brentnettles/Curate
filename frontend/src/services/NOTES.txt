@@ -1,133 +1,23 @@
 About to rework the API Service - Saving old code here :
 
-const BASE_URL = 'http://localhost:5555/api';
+Database Overview : 
 
-async function fetchWithErrors(url, options) {
-    const response = await fetch(url, options);
-    if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error || response.statusText || "An unexpected error occurred");
-    }
-    return response.json();
-}
+User Model:
+Well-linked with ToView and Collection entities, allowing for easy navigation through the relationships.
+Good use of serialization rules to prevent circular references.
 
-// ARTWORK API REQUESTS
-export const getArtworksByGalleryNumber = async (galleryNumber) => {
-    const url = `${BASE_URL}/artworks/${galleryNumber}`;
-    return fetchWithErrors(url, { method: 'GET' });
-};
+Artwork Model:
+Contains detailed attributes which are crucial for filtering and displaying artworks.
+The galleryNumber is indexed, which is beneficial as it will speed up queries filtered by this column—important for your frontend usage.
+Relationships with ToView and CollectionArtworks are set to manage multiple views and association with collections.
 
-export const getArtworkById = async (objectID) => {
-    const url = `${BASE_URL}/artworks/by-id/${objectID}`;
-    return fetchWithErrors(url, { method: 'GET' });
-};
+ToView Model:
+Tracks whether the artwork is currently active or historical which is useful for features like viewing history or a watchlist.
 
-export const saveArtwork = async (artworkData, userId) => {
-    const url = `${BASE_URL}/saved-artworks`;
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            user_id: userId,
-            object_id: artworkData.objectID
-        })
-    };
-    return fetchWithErrors(url, options);
-};
+Collection and CollectionArtworks Models:
+CollectionArtworks acts as a junction table for many-to-many relationships between Artwork and Collection, which is a typical and effective way to handle such relationships in SQL databases.
+Includes an is_active field to manage active status within the collection, allowing for temporary removal or archival without deletion.
 
-export const markArtworkAsInactive = async (objectID, userId) => {
-    const url = `${BASE_URL}/saved-artworks/${objectID}`;
-    const options = {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-            'User-ID': userId 
-        },
-        body: JSON.stringify({ isActive: false }) 
-    };
-    return fetchWithErrors(url, options);
-};
-
-// COLLECTION API REQUESTS
-
-// AllSaved 
-export const getSavedArtworksByUserId = async (userId) => {
-    const url = `${BASE_URL}/saved-artworks/${userId}`;
-    return fetchWithErrors(url, { method: 'GET' });
-};
-
-
-export const addArtworkToCollection = async (collectionName, artworkId, userId) => {
-    const url = `${BASE_URL}/collections/add`;
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            collectionName: collectionName,
-            artworkId: artworkId,
-            userId: userId
-        })
-    };
-    return fetchWithErrors(url, options);
-};
-
-
-export const addCollection = async (collectionData) => {
-    const url = `${BASE_URL}/collections`;
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'User-ID': collectionData.user_id 
-        },
-        body: JSON.stringify(collectionData)
-    };
-    const response = await fetch(url, options);
-    if (!response.ok) {
-        throw new Error('Failed to create collection: ' + await response.text());
-    }
-    return response; 
-};
-
-export const getCollectionsByUserId = async (userId) => {
-    const url = `${BASE_URL}/collections/${userId}`;
-    return fetchWithErrors(url, { method: 'GET' });
-};
-
-export const deleteCollection = async (collectionId, userId) => {
-    const url = `${BASE_URL}/collections/${collectionId}`;
-    const options = {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'User-ID': userId
-        }
-    };
-    return fetchWithErrors(url, options);
-};
-
-// SCAVENGER HUNT API REQUESTS
-export const fetchScavengerHunt = async () => {
-    const url = `${BASE_URL}/scavenger-hunt`;
-    return fetchWithErrors(url, { method: 'GET' });
-};
-
-export const saveScavengerHuntAsCollection = async (userId, objectIds) => {
-    const url = `${BASE_URL}/save-scavenger-hunt`;
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'User-ID': userId
-        },
-        body: JSON.stringify({ user_id: userId, object_ids: objectIds })
-    };
-    return fetchWithErrors(url, options);
-};
 
 
 COLORS : 

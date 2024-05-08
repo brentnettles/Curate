@@ -106,7 +106,7 @@ export const addCollection = async (collectionData) => {
     }
 };
 
-
+//Get all Collections of User
 export const getCollectionsByUserId = async (userId) => {
     const url = `${BASE_URL}/collections/${userId}`;
     try {
@@ -116,6 +116,19 @@ export const getCollectionsByUserId = async (userId) => {
         console.error('Failed at fetch collections:', error);
     }
 };
+
+//Get all Artworks of Collection ID
+export const getArtworksByCollectionId = async (collectionId) => {
+    const url = `${BASE_URL}/collections/${collectionId}/artworks`;
+    try {
+        const response = await fetchWithErrors(url, { method: 'GET' });
+        return response;  // Assuming fetchWithErrors already handles JSON parsing
+    } catch (error) {
+        console.error('Failed to fetch artworks for collection:', error);
+        throw error;  // Re-throw to allow the caller to handle it
+    }
+};
+
 
 export const deleteCollection = async (collectionId, userId) => {
     const url = `${BASE_URL}/collections/${collectionId}`;
