@@ -128,3 +128,11 @@ export const saveScavengerHuntAsCollection = async (userId, objectIds) => {
     };
     return fetchWithErrors(url, options);
 };
+
+
+COLORS : 
+F8F8F8
+B10F2E
+570000
+280000
+DE7C5A

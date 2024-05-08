@@ -1,143 +1,206 @@
-.save-artwork-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
-}
-.saved-history {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
+/* Container and Positioning */
+.collections-container {
+    position: relative;
+    width: 300px;
+    margin: 20px auto;
 }
 
-.save-artwork-item {
+/* Header Styles */
+.selected-header, .saved-header {
+    color: #B10F2E;
+    padding-left: 75px;
+}
+.selected-header {
+    font-size: 24px;
+    font-weight: bold;
+}
+.saved-header {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+/* Separator Style */
+.separator-history {
+    border-bottom: 1px solid #ccc;
+    margin: 5px 0;
+}
+
+/* Artwork List Layout */
+.save-artwork-list, .saved-history {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    overflow: visible;
+}
+
+/* Artwork Item Styles */
+.save-artwork-item, .save-artwork-item-history {
     display: flex;
     flex-direction: column;
     align-items: center;
     border: 1px solid #ccc;
     padding: 10px;
-    width: 20vw;  
-    height: 30vh;  /* Fixed height */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     transition: transform 0.3s ease;
-    overflow: hidden; 
-    justify-content: space-between; 
+    overflow: hidden;
+    justify-content: space-between;
+}
+.save-artwork-item {
+    width: 22vw;
+    height: 40vh;
 }
 .save-artwork-item-history {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid #ccc;
-    padding: 10px;
-    width: 10vw;  
-    height: 20vh;  /* Fixed height */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-    overflow: hidden; 
-    justify-content: space-between; 
+    width: 10vw;
+    height: 20vh;
 }
 
-.save-artwork-item:hover {
-    transform: scale(1.05);
-}
-
+/* Artwork Information Styles */
 .save-artwork-info {
-    font-size: 0.75rem; 
-    width: 80%;  
+    font-size: 0.75rem;
+    color: #666;
+    width: 90%;
+    /* padding-top: 4px; */
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Artwork Image Styles */
+.save-artwork-image {
+    max-height: 25vh;
+    width: auto;
+    cursor: pointer;
+}
+
+/* Titles and Gallery Information */
+.save-artwork-title, .save-artwork-gallery {
+    font-size: 0.75rem;
+    text-align: center;
+    width: 100%;
+}
+.save-artwork-title {
+    font-weight: bold;
+}
+
+/* Action Button Layout */
+.artwork-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 5px 0;
+}
+
+/* .collection-selector {
+    background-image: url('/src/buttons/add.png');
+  } */
+
+/* Collection Selector Styles */
+.collection-selector {
+    list-style-type: none;
+    width: 160px;
+    position: absolute; 
+    /* margin-left: 175px;  */
+    /* transform: translateX(-50%); */
+    background-color: #b10f2dd0;
+    /* box-shadow: 0 4px 8px rgba(0,0,0,0.1);  */
+    /* overflow: hidden; */
+    transition: max-height 0.5s ease, opacity 0.5s ease; /* Smooth transition for max-height and opacity */
+    /* max-height: 0;  */
+    visibility: hidden; 
+    z-index: 100; 
+}
+
+.collection-selector.active {
+    max-height: 500px; 
+    font-size: 1.25rem;
+    margin-left: 20px;
+    margin-top: -10px;
+    color: #F8F8F8;
+    opacity: 1; 
+    visibility: visible; 
+    transition: max-height 0.5s ease, opacity 0.5s ease; 
+}
+
+.collection-selector li {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #b10f2d7a; /* Default background color */
+    transition: background-color 0.3s ease; /* Smooth transition for background color change */
+}
+
+.collection-selector li:hover {
+    background-color: #b10f2dd0; /* Change background color on hover */
+    color: #FFFFFF; /* Optional: change text color on hover for better readability */
+}
+
+.collection-selector li.active {
+    background-color: #B10F2E; /* Darker background for the active item */
+    color: #FFFFFF; /* Light text color for better contrast */
+}
+
+/* Toggle Button Style */
+.toggle-list-button {
+    display: block;
+    margin: 10px;
+    padding: 16px 16px;
+    margin-left: 20px;
+    width: 200px;
+    /* margin-top: 25px; */
+    background-color: #B10F2E;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.toggle-list-button:hover {
+    background-color: #570000;
+}
+
+/* History Artwork Styles */
+.history-list-container {
+    display: flex;
+    
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 20px;
+    margin-top: 10px;
+    background-color: #f0f0f0;
+    align-items: center;
+}
+.history-artwork-item {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px;
+    background-color: #bebebe92;
+    max-height: 200px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    width: 200px;
+}
+.history-artwork-image-container {
+    width: 100%;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+.history-artwork-image {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+}
+.history-artwork-info {
+    width: 100%;
+    text-align: center;
     padding-top: 10px;
 }
-
-.save-artwork-image {
-    max-height: 16vh;  
-    width: 100%;  
-    object-fit: contain; 
-    cursor: pointer;
-}
-
-.save-artwork-title {
-    font-size: 0.55rem; 
-    /* font-weight: bold;   */
-    text-align: center;
-    width: 100%;  
-}
-
-.save-artwork-gallery {
-    font-size: 0.75rem;  
-    color: #666;
-    text-align: center;
-}
-
-.artwork-actions {
-    width: 100%;  
-    display: flex;
-    justify-content: center;  
-    padding: 5px 0;  
-}
-
-/* .collections-selector {
-    margin: 20px 0;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    list-style: none;
-    width: 250px; 
-    max-height: 200px; 
-    overflow-y: auto; 
-    position: relative; 
-} */
-
-.collections-selector {
-    list-style-type: none;
-    width: 250px;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out, visibility 0.3s ease-out;
-    max-height: 0;  /* Start with max-height as 0 to hide content */
-    visibility: hidden;
-}
-
-.collections-selector.active {
-    max-height: 500px;  
-    visibility: visible;
-}
-
-.collections-selector li {
-    padding: 8px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background-color 0.2s;
-}
-
-.collections-selector li:hover {
-    background-color: #e6e6e6;
-}
-
-.collections-selector li.active {
-    font-weight: bold;
-    background-color: #dedede;
-}
-
-.collections-selector button {
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: red;
-    font-size: 1rem;
-}
-
-
-.collections-selector button {
-    line-height: 1;
-    padding: 0 5px;
+.history-artwork-title, .history-artwork-gallery {
+    font-size: 0.8rem;
+    color: #494848;
 }

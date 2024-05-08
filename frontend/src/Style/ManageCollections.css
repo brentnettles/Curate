@@ -1,17 +1,18 @@
 .manage-collections-modal {
- position: fixed;
- top: 0;
- left: 0;
- width: 100vw;
- height: 100vh;
- display: flex;
- justify-content: center;
- align-items: center;
- background-color: rgba(0, 0, 0, 0.5); 
- z-index: 1050; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5); 
+  z-index: 2000; 
 }
-.manage-collections-content {
 
+.manage-collections-content {
+  transition: border 0.3s ease;
   background-color: #fff;
   width: 50vw;
   max-width: 600px;
@@ -21,7 +22,11 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  overflow:scroll; 
+  overflow: auto; 
+}
+
+.manage-collections-content:hover {
+  border: 1px solid red; /* Visual feedback to check if hover is causing flickers */
 }
 
 .collection-item {
@@ -47,14 +52,14 @@
   background-color: #eae1de;
 }
 
-/* .close-button {
+.close-button {
   background-color: transparent;
   border: none;
   cursor: pointer;
   position: absolute;
   top: 10px;
   right: 10px;
-} */
+} 
 
 .close-collection-button {
   background-image: url('/src/buttons/close.png'); 
@@ -114,41 +119,5 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.2) inset; 
 }
 
+/*----------------*/
 
-/*
-.manage-collections-content {
-  background-color: #fff;
-  width: 50vw;
-  max-width: 600px;
-  max-height: 80vh;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto; 
-}
-
-.collection-list {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 20px; 
-}
-
-.collection-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #f0f0f0;
-  padding: 5px 10px;
-  border-radius: 5px;
-}
-
-.toggle-button {
-  font-size: 16px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #333;
-} */

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 function Navbar() {
@@ -11,17 +11,23 @@ function Navbar() {
         navigate('/');
     };
 
+    // Function to determine the class name based on active state
+    const getNavLinkClass = ({ isActive }) => {
+        return isActive ? "nav-link active-link" : "nav-link";
+    };
+
     return (
         <div className="navbar">
-            <Link to="/">MAP</Link>
-            <Link to="/search">SEARCH</Link>
-            <Link to="/collections">SAVED COLLECTIONS</Link>  
-            <Link to="/discover">DISCOVER</Link>  
-            {/* <Link to="/landing">Landing</Link>   */}
+            <div className="navbar-items">
+                <NavLink to="/" className={getNavLinkClass}>MAP</NavLink>
+                <NavLink to="/search" className={getNavLinkClass}>SEARCH</NavLink>
+                <NavLink to="/collections" className={getNavLinkClass}>SAVED COLLECTIONS</NavLink>
+                <NavLink to="/discover" className={getNavLinkClass}>DISCOVER</NavLink>
+            </div>
             {user ? (
                 <button onClick={handleLogout} className="logout-button">Logout</button>
             ) : (
-                <Link to="/login">Login</Link>
+                <NavLink to="/login" className={getNavLinkClass}>Login</NavLink>
             )}
         </div>
     );
