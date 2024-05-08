@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 function Map_visual() {
     const svgRef = useRef();
     const [selectedGallery, setSelectedGallery] = useState(null);
+    const [highlightMode, setHighlightMode] = useState('all');
     const { user, savedArtworks } = useAuth();
     const zoom = useRef(d3.zoom().scaleExtent([1, 8]));
 
@@ -33,12 +34,17 @@ function Map_visual() {
     }, [updateTrigger]); // Dependency on updateTrigger to force re-render
 
     useEffect(() => {
-        const svgElement = svgRef.current.querySelector('svg');
-        if (svgElement && savedArtworks) {
-            console.log("Highlighting saved galleries with updated artworks:", savedArtworks);
+    const svgElement = svgRef.current.querySelector('svg');
+    if (svgElement) {
+        if (highlightMode === 'all') {
             highlightSavedGalleries(svgElement, savedArtworks);
+        } else {
+            // Assuming you fetch and store collection-specific artworks somewhere in state
+            const collectionArtworks = collections.find(col => col.id === highlightMode).artworks;
+            highlightSavedGalleries(svgElement, collectionArtworks);
         }
-    }, [savedArtworks]);
+    }
+}, [savedArtworks, highlightMode]);
 
     const enhanceSVG = (svgElement) => {
         const svg = d3.select(svgElement);
@@ -89,18 +95,22 @@ function Map_visual() {
     
    
 
-    const highlightSavedGalleries = (svgElement, savedArtworks) => {
+    const highlightSavedGalleries = (svgElement, artworks) => {
         const svg = d3.select(svgElement);
         const galleriesLayer = svg.select('#Floor_1_Galleries');
     
-        const savedGalleryNumbers = new Set(Object.values(savedArtworks).map(art => art.galleryNumber));
+        // Filter only active artworks
+        const activeArtworks = artworks.filter(art => art.isActive);
+        const savedGalleryNumbers = new Set(activeArtworks.map(art => art.galleryNumber));
+    
         galleriesLayer.selectAll('rect').each(function() {
             const rect = d3.select(this);
             const id = rect.attr('id').replace(/[_]/g, '');
             const isSaved = savedGalleryNumbers.has(id);
-            setGalleryFill(rect, isSaved); // Centralize fill logic here as well
+            setGalleryFill(rect, isSaved);
         });
     };
+    
     
 
 

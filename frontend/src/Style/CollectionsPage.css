@@ -43,14 +43,20 @@
     border: 1px solid #ccc;
     padding: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: transform 0.7s ease;
+    transition: transform 0.7s ease, box-shadow 0.7s ease; 
     overflow: hidden;
     justify-content: space-between;
+    cursor: pointer; 
 }
 .save-artwork-item {
     width: 22vw;
     height: 40vh;
 }
+
+/* .save-artwork-item:hover {
+    transform: scale(1.05); 
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2); 
+} */
 .save-artwork-item-history {
     width: 10vw;
     height: 20vh;
@@ -107,7 +113,7 @@
     background-color: #b10f2dd0;
     /* box-shadow: 0 4px 8px rgba(0,0,0,0.1);  */
     /* overflow: hidden; */
-    transition: max-height 0.7s ease, opacity 1.7s ease; /* Smooth transition for max-height and opacity */
+    transition: max-height 0.7s ease, opacity 1.7s ease; 
     /* max-height: 0;  */
     visibility: hidden; 
     z-index: 100; 
@@ -127,18 +133,18 @@
 .collection-selector li {
     padding: 10px;
     cursor: pointer;
-    background-color: #b10f2d7a; /* Default background color */
-    transition: background-color 0.7s ease; /* Smooth transition for background color change */
+    background-color: #b10f2d7a; 
+    transition: background-color 0.7s ease; 
 }
 
 .collection-selector li:hover {
-    background-color: #b10f2dd0; /* Change background color on hover */
-    color: #FFFFFF; /* Optional: change text color on hover for better readability */
+    background-color: #b10f2dd0; 
+    color: #FFFFFF; 
 }
 
 .collection-selector li.active {
-    background-color: #B10F2E; /* Darker background for the active item */
-    color: #FFFFFF; /* Light text color for better contrast */
+    background-color: #B10F2E; 
+    color: #FFFFFF; 
 }
 
 /* Toggle Button Style */
@@ -181,6 +187,14 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 10px;
     width: 200px;
+    transition: border 0.3s ease, box-shadow 0.3s ease;  
+    cursor: default;
+}
+
+.history-artwork-item:hover {
+    cursor: pointer; 
+    border: 2px solid #b10f2e; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
 .history-artwork-image-container {
     width: 100%;
@@ -203,4 +217,17 @@
 .history-artwork-title, .history-artwork-gallery {
     font-size: 0.8rem;
     color: #494848;
+}
+
+.delete-collection-button {
+    margin-left: 10px;
+    background-color: #b10f2e;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.delete-collection-button:hover {
+    background-color: #ff1e1e;
 }
