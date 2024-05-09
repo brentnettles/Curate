@@ -15,6 +15,7 @@ function Map_visual() {
     const zoom = useRef(d3.zoom().scaleExtent([1, 8]));
     const [highlightedGalleries, setHighlightedGalleries] = useState(new Set());
 
+   
     // useEffect(() => {
     //     fetch("/MetMap.svg")
     //         .then(res => res.text())
@@ -26,32 +27,59 @@ function Map_visual() {
     //         });
     // }, [highlightedGalleries]);
 
-    useEffect(() => {
-        // Only fetch and set up the SVG once
-        fetch("/MetMap.svg")
-            .then(res => res.text())
-            .then(svg => {
-                svgRef.current.innerHTML = svg;
-                const svgElement = svgRef.current.querySelector('svg');
-                enhanceSVG(svgElement); // Apply zoom and interaction handlers
-            });
-    }, []);
+    // useEffect(() => {
+    //     // Only fetch and set up the SVG once
+    //     fetch("/MetMap.svg")
+    //         .then(res => res.text())
+    //         .then(svg => {
+    //             svgRef.current.innerHTML = svg;
+    //             const svgElement = svgRef.current.querySelector('svg');
+    //             enhanceSVG(svgElement); // Apply zoom and interaction handlers
+    //         });
+    // }, []);
 
     useEffect(() => {
-        const fetchGalleries = async () => {
-            try {
-                // Check if highlightMode is set to use collections
-                const collectionId = highlightMode === 'collection' ? selectedGallery : null;
-                const response = await getHighlightedGalleries(user.id, collectionId);
-                setHighlightedGalleries(new Set(response.highlighted_galleries));
-            } catch (error) {
-                console.error("Error fetching highlighted galleries:", error);
-            }
-        };
+        if (user) {
+            // Only fetch and set up the SVG if there's a logged-in user
+            fetch("/MetMap.svg")
+                .then(res => res.text())
+                .then(svg => {
+                    svgRef.current.innerHTML = svg;
+                    const svgElement = svgRef.current.querySelector('svg');
+                    enhanceSVG(svgElement);
+                });
+        }
+    }, [user]);
+
+    // useEffect(() => {
+    //     const fetchGalleries = async () => {
+    //         try {
+    //             // Check if highlightMode is set to use collections
+    //             const collectionId = highlightMode === 'collection' ? selectedGallery : null;
+    //             const response = await getHighlightedGalleries(user.id, collectionId);
+    //             setHighlightedGalleries(new Set(response.highlighted_galleries));
+    //         } catch (error) {
+    //             console.error("Error fetching highlighted galleries:", error);
+    //         }
+    //     };
     
-        fetchGalleries();
-    }, [user.id, highlightMode, selectedGallery]);
-    
+    //     fetchGalleries();
+    // }, [user.id, highlightMode, selectedGallery]);
+    useEffect(() => {
+        if (user) {
+            const fetchGalleries = async () => {
+                try {
+                    const collectionId = highlightMode === 'collection' ? selectedGallery : null;
+                    const response = await getHighlightedGalleries(user.id, collectionId);
+                    setHighlightedGalleries(new Set(response.highlighted_galleries));
+                } catch (error) {
+                    console.error("Error fetching highlighted galleries:", error);
+                }
+            };
+        
+            fetchGalleries();
+        }
+    }, [user, highlightMode, selectedGallery]);
 
     // const enhanceSVG = (svgElement) => {
     //     const svg = d3.select(svgElement);

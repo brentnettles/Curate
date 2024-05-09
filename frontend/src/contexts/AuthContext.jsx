@@ -11,49 +11,94 @@ export const AuthProvider = ({ children }) => {
     // Fetching initial data
     useEffect(() => {
         if (user) {
-            refreshSavedArtworks();
-            refreshCollections();
+            getSavedArtworksByUserId(user.id)
+                .then(data => {
+                    if (data && data.artworks) {
+                        setSavedArtworks(data.artworks.map(art => ({
+                            objectID: art.objectID,
+                            galleryNumber: art.galleryNumber,
+                            isActive: true
+                        })));
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to fetch saved artworks:', error);
+                });
+
+            getCollectionsByUserId(user.id)
+                .then(response => {
+                    const fetchedCollections = response.collections || [];
+                    setCollections(fetchedCollections.map(collection => ({
+                        ...collection,
+                        artworks: collection.artworks.filter(art => art.isActive)
+                    })));
+                })
+                .catch(error => {
+                    console.error('Failed to fetch collections:', error);
+                });
         } else {
             setSavedArtworks([]);
             setCollections([]);
         }
     }, [user]);
 
+    const login = useCallback((userData) => {
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+    }, []);
+
+    const logout = useCallback(() => {
+        localStorage.clear();
+        setUser(null);
+        setSavedArtworks([]);
+        setCollections([]);
+    }, []);
+
     const refreshSavedArtworks = async () => {
-        try {
-            const saved = await getSavedArtworksByUserId(user.id);
-            setSavedArtworks(saved.map(art => ({ ...art, isActive: true })));
-        } catch (error) {
-            console.error('Failed to fetch saved artworks:', error);
+        if (user && user.id) {
+            try {
+                const saved = await getSavedArtworksByUserId(user.id);
+                setSavedArtworks(saved.map(art => ({ ...art, isActive: true })));
+            } catch (error) {
+                console.error('Failed to fetch saved artworks:', error);
+            }
         }
     };
 
     const refreshCollections = async () => {
-        try {
-            const data = await getCollectionsByUserId(user.id);
-            setCollections(data.collections || []);
-        } catch (error) {
-            console.error('Failed to fetch collections:', error);
+        if (user && user.id) {
+            try {
+                const data = await getCollectionsByUserId(user.id);
+                setCollections(data.collections || []);
+            } catch (error) {
+                console.error('Failed to fetch collections:', error);
+            }
         }
     };
 
     const saveArtworkContext = useCallback(async (artworkData) => {
-        try {
-            await saveArtwork(artworkData, user.id);
-            setSavedArtworks(prev => [...prev, { ...artworkData, isActive: true }]);
-        } catch (error) {
-            console.error('Error saving artwork:', error);
+        if (user && user.id) {
+            try {
+                await saveArtwork(artworkData, user.id);
+                setSavedArtworks(prev => [...prev, { ...artworkData, isActive: true }]);
+            } catch (error) {
+                console.error('Error saving artwork:', error);
+            }
         }
-    }, [user.id]);
+    }, [user?.id]);
 
     const removeArtworkContext = useCallback((objectID) => {
         setSavedArtworks(prev => prev.filter(art => art.objectID !== objectID || !art.isActive));
     }, []);
 
+   
+
     return (
         <AuthContext.Provider value={{
             user,
             setUser,
+            login,
+            logout,
             savedArtworks,
             setSavedArtworks,
             collections,

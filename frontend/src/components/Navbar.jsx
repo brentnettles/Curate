@@ -7,11 +7,14 @@ function Navbar() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        console.log("Logging out...");
+        await logout();
+        console.log("Logged out, navigating to home...");
         navigate('/');
     };
 
+    
     return (
         <div className="navbar">
             <div className="navbar-logo">

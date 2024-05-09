@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchScavengerHunt, saveScavengerHuntAsCollection } from '../services/apiService';
-import '../Style/Scavenger.css';
+import '../Style/discover.css';
 
 function Discover() {
     const { user } = useAuth(); // Use user from context
