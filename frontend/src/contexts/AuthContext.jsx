@@ -65,6 +65,10 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const handleGetCollections = async () => {
+        await refreshCollections();
+    };
+
     const refreshCollections = async () => {
         if (user && user.id) {
             try {
@@ -103,9 +107,11 @@ export const AuthProvider = ({ children }) => {
             setSavedArtworks,
             collections,
             setCollections,
+            refreshSavedArtworks,
             refreshCollections,
             saveArtworkContext,
-            removeArtworkContext
+            removeArtworkContext,
+            handleGetCollections
         }}>
             {children}
         </AuthContext.Provider>
