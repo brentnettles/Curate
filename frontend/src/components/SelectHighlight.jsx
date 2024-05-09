@@ -19,7 +19,7 @@ function SelectionControls({ setHighlightMode, setSelectedGallery, collections }
     return (
         <div className="selection-controls">
             <button onClick={toggleCollections}>
-                {showCollections ? "Show All Galleries" : "Map by Collection"}
+                {showCollections ? "Show All Galleries" : "CURATED MAPS"}
             </button>
             {showCollections && (
                 <ul>

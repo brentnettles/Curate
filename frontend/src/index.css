@@ -1,6 +1,8 @@
+/* Google Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:200&display=swap');
+
 /* Reset some basic elements */
 body, h1, h2, h3, p, form, button, input {
-  
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -8,8 +10,7 @@ body, h1, h2, h3, p, form, button, input {
 
 /* Apply a basic font and background to the whole page */
 body {
-  font-family: 'Rubik', sans-serif;
-  /* font-size: 1.7em; */
+  font-family: 'Poppins', sans-serif; /* Ensuring Poppins is the global font */
   background-color: #f4f4f4;
   height: 100vh;
   color: #333;
@@ -17,13 +18,12 @@ body {
   padding: 20px;
 }
 
-/* Style for the navigation bar */
-/* Style for the navigation bar */
+/* Remaining styles unchanged */
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Adjusted for better spacing */
-  padding: 0 20px; /* Padding for some space around items */
+  justify-content: space-between;
+  padding: 0 20px;
   max-width: 90vw;
   width: 100%;
   margin: auto;
@@ -31,8 +31,8 @@ body {
 }
 
 .navbar-logo img {
-  height: 100px; /* Adjust size as needed */
-  width: auto; /* Maintain aspect ratio */
+  height: 100px;
+  width: auto;
 }
 
 .navbar-items {
@@ -40,7 +40,7 @@ body {
   font-size: 1.25em;
   justify-content: center;
   align-items: center;
-  flex-grow: 1; /* Allows the navbar items to take up fill all space except logo and logout */
+  flex-grow: 1;
 }
 
 .nav-link, .logout-button {

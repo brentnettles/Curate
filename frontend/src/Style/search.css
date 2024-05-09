@@ -1,8 +1,8 @@
 /* src/Style/search.css */
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+
+    background-color:#f8f8f8;
 }
 
 .search-container {
@@ -18,7 +18,7 @@ body {
     max-width: 960px;
     margin-bottom: 20px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+
     overflow: hidden;  /* Ensures inner elements do not break the rounded corners */
     background-color: #fff;
 }
@@ -32,14 +32,15 @@ body {
 
 .search-button {
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: #B10F2E;
     color: white;
     border: none;
     cursor: pointer;
 }
 
 .search-button:hover {
-    background-color: #45a049;
+    background-color: #ccc;
+    color: #B10F2E;
 }
 
 .filter-row {

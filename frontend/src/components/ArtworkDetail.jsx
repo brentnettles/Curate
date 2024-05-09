@@ -14,7 +14,6 @@ function ArtworkDetail() {
     return <div>No artwork data available.</div>;
   }
 
-
   const additionalImages = Array.isArray(artwork.additionalImages) ? artwork.additionalImages : JSON.parse(artwork.additionalImages || '[]');
 
   // State to manage the displayed primary image
@@ -27,16 +26,8 @@ function ArtworkDetail() {
   return (
     <div className="artwork-detail">
       <div className="artwork-images">
-        <div className="artwork-main-image" style={{ position: 'relative', height: '65vh' }}>
-          <button className="back-button" onClick={() => navigate(-1)} style={{
-            position: 'absolute', 
-            left: '10px', 
-            top: '10px', 
-            backgroundImage: `url(${backIcon})`,
-            backgroundSize: 'cover'
-          }}>
-
-          </button>
+        <div className="artwork-main-image">
+          <button className="back-button" onClick={() => navigate(-1)}></button>
           <img src={currentPrimaryImage} alt={artwork.title} className="artwork-detail-image"/>
         </div>
         <div className="artwork-additional-images">
@@ -47,14 +38,13 @@ function ArtworkDetail() {
       </div>
       <div className="artwork-info">
         <h2>{artwork.title}</h2>
-        <p><strong>Department:</strong> {artwork.department}</p>
         <p><strong>Title:</strong> {artwork.title}</p>
         <p><strong>Artist:</strong> {artwork.artistDisplayName}</p>
         <p><strong>Artist Bio:</strong> {artwork.artistDisplayBio}</p>
+        <p><strong>Department:</strong> {artwork.department}</p>
       </div>
     </div>
   );
 }
 
 export default ArtworkDetail;
- 

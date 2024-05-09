@@ -3,12 +3,11 @@
 
 
 .selection-controls {
-    position: fixed; 
-    top: 10%; 
+    position: absolute; 
+    top: 17%; 
     margin-left: 20px;
-    margin-top: 15px;
     /* transform: translateX(-50%); Center align */
-    width: 20vw;
+    width: 300px;
     z-index: 1000; 
 
 
@@ -17,17 +16,18 @@
 
 .selection-controls button {
     display: block;
-    margin: 10px auto; /* Centering button */
+    margin: 10px auto; 
     padding: 16px;
-    width: 90%; /* Adjust width to be inside the modal */
+    width: 90%; 
     background-color: #B10F2E;
-    color: #f8f8f8;
+    color: white;
     border: none;
     cursor: pointer;
 }
 
 .selection-controls button:hover {
-    background-color: #0056b3;
+    background-color: #b10f2d7d;
+    
 }
 
 .selection-controls ul {
@@ -45,7 +45,7 @@
 }
 
 .selection-controls li:hover {
-    background-color: #bebebe92;
+    background-color: #e0e0e0;
 }
 
 .selection-controls button.full-width {

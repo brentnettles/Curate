@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getArtworksByGalleryNumber } from '../services/apiService';
 import ArtworkActions from './ArtworkActions';
-import { useAuth } from '../contexts/AuthContext'; // Import useAuth
+import { useAuth } from '../contexts/AuthContext';
 import '../Style/ArtworkList.css';
 
 function ArtworkList({ galleryNumber }) {
-    const { savedArtworks } = useAuth(); // Use savedArtworks from context
+    const { savedArtworks } = useAuth();
     const navigate = useNavigate();
     const [artworks, setArtworks] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const containerRef = useRef(null); // Create a ref for the component
 
     useEffect(() => {
         if (galleryNumber) {
@@ -40,12 +41,29 @@ function ArtworkList({ galleryNumber }) {
         }
     }, [galleryNumber]);
 
-    const viewArtworkDetail = (artwork) => {
-        navigate(`/artwork/${artwork.objectID}`, { state: { artwork } });
-    };
-
+    // Function to close the component
     const handleClose = () => {
         setIsVisible(false);
+    };
+
+    // Click outside handler / useEffect clutch 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                handleClose(); // Close the component if clicked outside
+            }
+        };
+
+        if (isVisible) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isVisible]);
+
+    const viewArtworkDetail = (artwork) => {
+        navigate(`/artwork/${artwork.objectID}`, { state: { artwork } });
     };
 
     if (!isVisible) {
@@ -53,7 +71,7 @@ function ArtworkList({ galleryNumber }) {
     }
 
     return (
-        <div className={`artwork-list-container ${isVisible ? 'showArt' : 'hideArt'}`}>
+        <div ref={containerRef} className={`artwork-list-container ${isVisible ? 'showArt' : 'hideArt'}`}>
             <div className="button-container">
                 <button className="close-button" onClick={handleClose}></button>
             </div>

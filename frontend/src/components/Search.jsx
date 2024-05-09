@@ -1,80 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../Style/search.css';
-import departments from '../departments.json'; 
+import departmentsData from '../departments.json'; 
+import { searchArtworks } from '../services/MetAPI';
 
 function Search() {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [isHighlight, setIsHighlight] = useState(false);
-    const [isOnView, setIsOnView] = useState(false);
-    const [departmentId, setDepartmentId] = useState('');
+    const [queryParams, setQueryParams] = useState({
+        searchTerm: '',
+        isHighlight: false,
+        isOnView: false,
+        departmentId: '',
+        searchType: 'artistCulture'
+    });
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [fetchLimit, setFetchLimit] = useState(25);
-    const [searchType, setSearchType] = useState('artistCulture');
+    const [fetchLimit, setFetchLimit] = useState(10);
 
-    useEffect(() => {
-        fetchResults();  
-    }, []);
+    const departments = departmentsData.departments;
 
-    const handleSearch = async (event) => {
-        event.preventDefault();
-        await fetchResults();
-    };
-
-    const handleFilterChange = () => {
-        setFetchLimit(25); 
-        fetchResults();
-    };
-
-    const handleSeeMore = async () => {
-        setFetchLimit(prevLimit => prevLimit + 12);
-        fetchResults();
-    };
-
-    const fetchResults = async () => {
+    const fetchArtworks = async (params, limit) => {
+        console.log('Fetching parameters:', params, 'Limit:', limit);
         setLoading(true);
-        const baseUrl = 'https://collectionapi.metmuseum.org/public/collection/v1/search';
-        const url = new URL(baseUrl);
-        if (searchType === 'medium') {
-            url.searchParams.append('medium', searchTerm);
-        } else {
-            url.searchParams.append('q', searchTerm);
-            if (isHighlight) url.searchParams.append('isHighlight', 'true');
-            if (isOnView) url.searchParams.append('isOnView', 'true');
-            if (departmentId) url.searchParams.append('departmentId', departmentId);
-        }
-
         try {
-            const response = await fetch(url);
-            const data = await response.json();
-            if (data.objectIDs && data.objectIDs.length) {
-                const objectIDs = data.objectIDs.slice(0, fetchLimit);
-                const details = await Promise.all(
-                    objectIDs.map(id =>
-                        fetch(`https://collectionapi.metmuseum.org/public/collection/v1/objects/${id}`)
-                        .then(response => response.json())
-                    )
-                );
-
-                const filteredDetails = details.filter(item => item.primaryImageSmall);
-                setResults(filteredDetails);
-            } else {
-                setResults([]);
-            }
+            const newResults = await searchArtworks(params, limit);
+            console.log('Fetched data:', newResults);
+            setResults(newResults);
         } catch (error) {
-            console.error('Failed to fetch artworks:', error);
+            console.error('Error fetching artworks:', error);
             setResults([]);
         } finally {
             setLoading(false);
         }
     };
 
+    const handleSearch = (event) => {
+        event.preventDefault();
+        fetchArtworks(queryParams, fetchLimit);
+    };
+
+    const handleFilterChange = (newParams) => {
+        setQueryParams(prev => {
+            const updatedParams = { ...prev, ...newParams };
+            console.log('Updated query parameters:', updatedParams);
+            return updatedParams;
+        });
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            fetchArtworks(queryParams, fetchLimit);
+        }
+    };
+
+    const handleSeeMore = () => {
+        setFetchLimit(prev => prev + 10);
+    };
+
     return (
         <div className="search-container">
             <form onSubmit={handleSearch} className="search-form">
                 <select
-                    value={searchType}
-                    onChange={e => { setSearchType(e.target.value); handleFilterChange(); }}
+                    value={queryParams.searchType}
+                    onChange={(e) => handleFilterChange({ searchType: e.target.value })}
                     className="search-type-select"
                 >
                     <option value="artistCulture">Search by Artist / Culture</option>
@@ -82,23 +68,22 @@ function Search() {
                 </select>
                 <input
                     type="text"
-                    placeholder={searchType === 'medium' ? 'Enter Medium' : 'Search...'}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
+                    placeholder={queryParams.searchType === 'medium' ? 'Enter Medium' : 'Search...'}
+                    value={queryParams.searchTerm}
+                    onChange={(e) => handleFilterChange({ searchTerm: e.target.value })}
+                    onKeyDown={handleKeyDown}
                     className="search-input"
                 />
                 <button type="submit" className="search-button">Search</button>
             </form>
             <div className="filter-row">
                 <select
-                    value={departmentId}
-                    onChange={(e) => { setDepartmentId(e.target.value); handleFilterChange(); }}
+                    value={queryParams.departmentId}
+                    onChange={(e) => handleFilterChange({ departmentId: e.target.value })}
                     className="filter-department-select"
-                    disabled={searchType === 'medium'}
                 >
                     <option value="">Filter by Department</option>
-                    {departments.departments.map((dept) => (
+                    {departments.map(dept => (
                         <option key={dept.departmentId} value={dept.departmentId}>
                             {dept.displayName}
                         </option>
@@ -107,29 +92,28 @@ function Search() {
                 <label className="filter-highlight-checkbox">
                     <input
                         type="checkbox"
-                        checked={isHighlight}
-                        onChange={(e) => { setIsHighlight(e.target.checked); handleFilterChange(); }}
-                        disabled={searchType === 'medium'}
+                        checked={queryParams.isHighlight}
+                        onChange={(e) => handleFilterChange({ isHighlight: e.target.checked })}
                     />
                     Filter by is Highlight
                 </label>
                 <label className="filter-onview-checkbox">
                     <input
                         type="checkbox"
-                        checked={isOnView}
-                        onChange={(e) => { setIsOnView(e.target.checked); handleFilterChange(); }}
-                        disabled={searchType === 'medium'}
+                        checked={queryParams.isOnView}
+                        onChange={(e) => handleFilterChange({ isOnView: e.target.checked })}
                     />
                     Filter by is On View
                 </label>
             </div>
             {loading ? <div className="loader"></div> : (
                 <div className="results">
-                    {results.map((item) => (
+                    {results.map(item => (
                         <div key={item.objectID} className="result-item">
                             <img src={item.primaryImageSmall} alt={item.title} className="artwork-image" />
-                            <h3>{item.title}</h3>
-                            <p>{item.artistDisplayName}</p>
+                            <h3 className='search-title'>{item.title}</h3>
+                            <p className='search-Gallery-num'>Gallery {item.GalleryNumber}</p>
+                            <p className='search-ArtistName'>{item.artistDisplayName}</p>
                         </div>
                     ))}
                 </div>
