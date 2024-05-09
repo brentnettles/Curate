@@ -134,12 +134,12 @@
 
 .collection-selector li:hover {
     background-color: #b10f2dd0; 
-    color: #FFFFFF; 
+    color: #f8f8f8; 
 }
 
 .collection-selector li.active {
     background-color: #B10F2E; 
-    color: #FFFFFF; 
+    color: #F8f8f8; 
 }
 
 /* Toggle Button Style */
@@ -152,7 +152,7 @@
     width: 20vw;
     /* margin-top: 25px; */
     background-color: #B10F2E;
-    color: white;
+    color: #f8f8f8;
     border: none;
     cursor: pointer;
 }

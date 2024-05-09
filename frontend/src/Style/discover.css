@@ -7,21 +7,6 @@
     padding: 20px;
 }
 
-/* Specific item styling for scavenger hunt */
-/* .scavenger-artwork-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    padding: 10px;
-    width: 25vw;
-    height: 30vh;
-
-    transition: transform 0.3s ease;
-    overflow: hidden;
-    justify-content: space-between;
-} */
-
 .scavenger-artwork-item:hover {
     transform: scale(1.05);
     border-color: #0056b3; /* Darker blue on hover */
@@ -39,7 +24,7 @@
 
 .scavenger-artwork-image {
     max-height: 18vh;
-    width: 100%;
+    width: auto;
     object-fit: contain;
     cursor: pointer;
 }
@@ -56,10 +41,25 @@
     text-align: center;
 }
 
-/* Specific actions area for scavenger items */
-.scavenger-artwork-actions {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: 5px 0;
+.scavenger-found {
+    background-color: #B10F2E; /* Change the background when found */
+    color: #f8f8f8;
+}
+
+.scavenger-found .scavenger-artwork-title {
+    color: #f8f8f8;
+}
+
+.scavenger-generate-hunt-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #B10F2E;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.scavenger-generate-hunt-button:hover {
+    background-color: #003d82;
 }
