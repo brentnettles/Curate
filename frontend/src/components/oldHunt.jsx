@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchScavengerHunt, saveScavengerHuntAsCollection } from '../services/apiService';
-import '../Style/Discover.css';
+
 
 function Discover() {
-    const { user } = useAuth();
+    const { user } = useAuth(); // Use user from context
     const [artworks, setArtworks] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [allFound, setAllFound] = useState(false);
-    const [buttonText, setButtonText] = useState('Save All as Collection'); // New state for dynamic button text
 
     useEffect(() => {
         const savedHunt = localStorage.getItem('scavengerHunt');
@@ -25,33 +24,21 @@ function Discover() {
         try {
             const response = await fetchScavengerHunt();
             const data = response.artworks;
-            console.log("Fetched artworks data:", data);
             const initializedArtworks = data.map(art => ({ ...art, found: false }));
             setArtworks(initializedArtworks);
-            localStorage.setItem('scavengerHunt', JSON.stringify(initializedArtworks));
+            localStorage.setItem('scavengerHunt', JSON.stringify(initializedArtworks)); // Save to localStorage
             setAllFound(false);
             setError('');
+            console.log("Scavenger Hunt artworks loaded:", initializedArtworks.map(art => ({
+                objectID: art.objectID, 
+                title: art.title, 
+                found: art.found 
+            })));
         } catch (err) {
             console.error('Failed to fetch artworks:', err);
             setError('Failed to load artworks. Please try again later.');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleSaveAsCollection = async () => {
-        if (user && user.id) {
-            const foundArtworks = artworks.filter(art => art.found).map(art => art.objectID);
-            try {
-                await saveScavengerHuntAsCollection(user.id, foundArtworks);
-                console.log("Collection saved successfully!");
-                setButtonText('NEW COLLECTION SAVED');  // Change button text upon successful save
-            } catch (error) {
-                console.error('Failed to save collection:', error);
-                setError('Failed to create collection!');
-            }
-        } else {
-            setError('User must be logged in to save a collection.');
         }
     };
 
@@ -62,6 +49,7 @@ function Discover() {
     };
 
     const handleSubmitGuess = async (userGuess, artworkObjectID) => {
+        console.log("Submitting guess:", userGuess, "for artwork ID:", artworkObjectID);  // Debug log
         try {
             const response = await fetch('http://localhost:5555/api/verify-artwork', {
                 method: 'POST',
@@ -69,58 +57,73 @@ function Discover() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    userInputId: userGuess,
-                    objectId: artworkObjectID
+                    userInputId: userGuess, // Ensure this matches the server's expected key
+                    objectId: artworkObjectID  // Ensure this matches the server's expected key
                 })
             });
             const result = await response.json();
+            console.log("Server response:", result);  // Debug log
             if (response.ok && result.found) {
+
                 markAsFound(artworkObjectID);
             } else {
                 throw new Error(result.error || "Failed to verify the artwork.");
             }
         } catch (error) {
             console.error('Error verifying artwork:', error);
+
         }
     };
 
     const markAsFound = (objectID) => {
+        setArtworks(prevArtworks =>
+            prevArtworks.map(art => 
+                art.objectID === objectID ? { ...art, found: true } : art
+            )
+        );
         const updatedArtworks = artworks.map(art =>
             art.objectID === objectID ? { ...art, found: true } : art
         );
-        setArtworks(updatedArtworks);
-        localStorage.setItem('scavengerHunt', JSON.stringify(updatedArtworks));
+        localStorage.setItem('scavengerHunt', JSON.stringify(updatedArtworks)); // Update localStorage
         setAllFound(updatedArtworks.every(art => art.found));
     };
 
+    const handleSaveAsCollection = async () => {
+        setLoading(true);
+        const artworkIds = artworks.filter(art => art.found).map(art => art.objectID);
+        try {
+            await saveScavengerHuntAsCollection(user.id, artworkIds);
+            alert('Collection saved successfully!');
+            // Optionally reset the hunt or redirect the user
+        } catch (error) {
+            console.error('Failed to save collection:', error);
+            alert('Failed to save collection. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <div className='discover-container'>
-            <h1 className='header'>Scavenger Hunt</h1>
-            <p className='about'>Explore the Met. A selection of artworks will be provided to you. Seek out the item and use the information provided on the object's Title Card to confirm you've located the artwork.</p>
-            <div className="button-row">
-                <button onClick={handleGenerateHunt} disabled={loading} className="button-common generate-hunt-button">Generate Scavenger Hunt</button>
-                {allFound && (
-                    <button onClick={handleSaveAsCollection} className="button-common discover-collection-button">
-                        {buttonText}  
-                    </button>
-                )}
-            </div>
+        <div>
+            <h1>Scavenger Hunt</h1>
+            <p>Explore the Met. A selection of artworks will be provided to you. Seek out the item and use the information provided on the object's Title Card to confirm you've located the artwork.</p>
+            <button onClick={handleGenerateHunt} disabled={loading} className="generate-hunt-button">Generate Scavenger Hunt</button>
             {loading ? <p>Loading...</p> : error ? <p>{error}</p> : (
-                <div className="discover-list">
+                <div className="save-artwork-list">
                     {artworks.map(art => (
-                        <div key={art.objectID} className="discover-artwork-item">
+                        <div key={art.objectID} className="save-artwork-item">
                             <div className="save-artwork-image-container">
-                                <img src={art.primaryImageSmall} alt={art.title} className="discover-artwork-image" />
+                                <img src={art.primaryImageSmall} alt={art.title} className="save-artwork-image" />
                             </div>
-                            <div className="discover-artwork-info">
-                                <h3 className="discover-artwork-title">{art.title}</h3>
-                                <p className="discover-artwork-gallery">Gallery Number: {art.galleryNumber}</p>
+                            <div className="save-artwork-info">
+                                <h3 className="save-artwork-title">{art.title}</h3>
+                                <p className="save-artwork-gallery">Gallery Number: {art.galleryNumber}</p>
                                 <p>Artist: {art.artistDisplayName || 'Unknown'}</p>
                                 {!art.found && (
                                     <div className="question">
                                         <label htmlFor={`input-${art.objectID}`}>Enter the Artwork's ObjectID:</label>
                                         <input 
-                                            id={`input-${art.objectID}`}
+                                            id={`input-${art.objectID}`} 
                                             type="text" 
                                             onKeyDown={(e) => handleKeyDown(e, art.objectID)}
                                         />
@@ -134,6 +137,11 @@ function Discover() {
                         </div>
                     ))}
                 </div>
+            )}
+            {allFound && (
+                <button onClick={handleSaveAsCollection} className="save-collection-button">
+                    Save All as Collection
+                </button>
             )}
         </div>
     );

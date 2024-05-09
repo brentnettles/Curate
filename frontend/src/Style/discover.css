@@ -1,65 +1,113 @@
-/* Scavenger-specific artwork list layout */
-.scavenger-artwork-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
-}
-
-.scavenger-artwork-item:hover {
-    transform: scale(1.05);
-    border-color: #0056b3; /* Darker blue on hover */
-}
-
-.scavenger-artwork-info {
-    font-size: 0.75rem;
-    width: 80%;
-    text-align: center;
+/* Discover-specific styles */
+.discover-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 10px;
+    padding-top: 20px;
+    background-color: #f8f8f8;
 }
 
-.scavenger-artwork-image {
-    max-height: 18vh;
-    width: auto;
-    object-fit: contain;
-    cursor: pointer;
+.header  {
+    margin-top: 0;
+    color: #B10F2E; /* Adds a theme color to the header */
 }
-
-.scavenger-artwork-title {
-    font-size: 0.55rem;
+.about {
+    margin-top: 25px;
+    margin-bottom: 25px;
+    margin-left: 20vw;
+    margin-right: 20vw;
+    font-size: 1.5em;
     text-align: center;
-    width: 100%;
+    color: rgb(93, 93, 93); /* Adds a theme color to the header */
 }
 
-.scavenger-artwork-gallery {
-    font-size: 0.75rem;
-    color: #666;
-    text-align: center;
+
+.button-row {
+    display: flex;
+    width: 80%;
+    max-width: 960px;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
-.scavenger-found {
-    background-color: #B10F2E; /* Change the background when found */
-    color: #f8f8f8;
-}
-
-.scavenger-found .scavenger-artwork-title {
-    color: #f8f8f8;
-}
-
-.scavenger-generate-hunt-button {
-    display: block;
-    margin: 20px auto;
+.button-common {
     padding: 10px 20px;
     background-color: #B10F2E;
     color: white;
     border: none;
     cursor: pointer;
+    width: 49%; /* Adjusted width to keep buttons side by side */
 }
 
-.scavenger-generate-hunt-button:hover {
-    background-color: #003d82;
+.button-common:hover {
+    background-color: #85091f;
+}
+
+.discover-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center the items horizontally */
+    gap: 20px;
+    width: 80%;
+    max-width: 960px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.discover-artwork-item {
+    position: relative;
+    width: 220px; /* Consistent with Search item width */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 10px;
+    overflow: hidden;
+}
+
+.discover-artwork-image {
+    max-height: 200px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.discover-artwork-info {
+    width: 100%;
+    text-align: center;
+}
+
+.discover-artwork-title, .discover-artwork-gallery {
+    font-size: 1em;
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.question {
+    font-size: 1em;
+    padding: 5px;
+}
+
+.question input[type="text"], .question button {
+    width: auto; /* Ensure the input field and button take only the necessary width */ Comfortable padding around text inside input and button */
+    margin-top: 5px; /* Space between label and input field */
+}
+
+.question button {
+    position: bottom;
+    background-color: #B10F2E;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: background-color 0.3s;
+}
+
+.question button:hover {
+    background-color: #85091f; /* Darker shade on hover for better interaction feedback */
 }

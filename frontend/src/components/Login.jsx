@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext'; 
+import '../Style/Login.css';
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -21,21 +22,24 @@ function Login() {
     };
 
     return (
-        <div>
-            <h1>Login</h1>
-            <form onSubmit={handleLogin}>
-                <label>
-                    Username:
-                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-                </label>
-                <label>
-                    Password:
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </label>
-                <button type="submit">Login</button>
-            </form>
+        <div className="login-container">
+            <div className="login-form">
+                <h1>Login</h1>
+                <form onSubmit={handleLogin}>
+                    <label>
+                        Username:
+                        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+                    </label>
+                    <label>
+                        Password:
+                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    </label>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
         </div>
     );
+    
 }
 
 export default Login;

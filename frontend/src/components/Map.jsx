@@ -27,29 +27,29 @@ function Map_visual() {
     //         });
     // }, [highlightedGalleries]);
 
-    // useEffect(() => {
-    //     // Only fetch and set up the SVG once
-    //     fetch("/MetMap.svg")
-    //         .then(res => res.text())
-    //         .then(svg => {
-    //             svgRef.current.innerHTML = svg;
-    //             const svgElement = svgRef.current.querySelector('svg');
-    //             enhanceSVG(svgElement); // Apply zoom and interaction handlers
-    //         });
-    // }, []);
-
     useEffect(() => {
-        if (user) {
-            // Only fetch and set up the SVG if there's a logged-in user
-            fetch("/MetMap.svg")
-                .then(res => res.text())
-                .then(svg => {
-                    svgRef.current.innerHTML = svg;
-                    const svgElement = svgRef.current.querySelector('svg');
-                    enhanceSVG(svgElement);
-                });
-        }
-    }, [user]);
+        // Only fetch and set up the SVG once
+        fetch("/MetMap.svg")
+            .then(res => res.text())
+            .then(svg => {
+                svgRef.current.innerHTML = svg;
+                const svgElement = svgRef.current.querySelector('svg');
+                enhanceSVG(svgElement); // Apply zoom and interaction handlers
+            });
+    }, []);
+
+    // useEffect(() => {
+    //     if (user) {
+    //         // Only fetch and set up the SVG if there's a logged-in user
+    //         fetch("/MetMap.svg")
+    //             .then(res => res.text())
+    //             .then(svg => {
+    //                 svgRef.current.innerHTML = svg;
+    //                 const svgElement = svgRef.current.querySelector('svg');
+    //                 enhanceSVG(svgElement);
+    //             });
+    //     }
+    // }, [user]);
 
     // useEffect(() => {
     //     const fetchGalleries = async () => {

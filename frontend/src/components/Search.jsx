@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../Style/search.css';
 import departmentsData from '../departments.json'; 
 import { searchArtworks } from '../services/MetAPI';
+//function to load random artworks on load for CURATE db
+import { fetchRandomArtworks } from '../services/apiService';  
 
 function Search() {
     const [queryParams, setQueryParams] = useState({
@@ -16,6 +18,29 @@ function Search() {
     const [fetchLimit, setFetchLimit] = useState(10);
 
     const departments = departmentsData.departments;
+
+    useEffect(() => {
+        // Load random artworks on component mount
+        loadRandomArtworks();
+    }, []);
+
+    const loadRandomArtworks = async () => {
+        setLoading(true);
+        try {
+            const response = await fetchRandomArtworks(); // Calls the API to fetch artworks
+            if (response && Array.isArray(response.artworks)) {
+                console.log('Random artworks loaded:', response.artworks);
+                setResults(response.artworks);
+            } else {
+                throw new Error('Received data is not in expected format');
+            }
+        } catch (error) {
+            console.error('Failed to load random artworks:', error);
+            setResults([]); // Set results to an empty array on error
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchArtworks = async (params, limit) => {
         console.log('Fetching parameters:', params, 'Limit:', limit);

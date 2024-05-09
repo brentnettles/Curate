@@ -7,7 +7,7 @@
 .floorplan-container {
     display: flex;
     flex-direction: column;
-    position: fixed;
+    position: relative;
     top: 80px; 
     left: 0;
     right: 0;

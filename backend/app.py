@@ -98,37 +98,6 @@ def update_saved_artwork(object_id):
     return {'message': 'Artwork marked as inactive'}, 200
 # Collections 
 
-#Create collection and Add artwork to collection
-# @app.route('/api/collections', methods=['POST'])
-# def create_collection():
-#     json_data = request.get_json()
-#     user_id = json_data.get('user_id')
-#     name = json_data.get('name')
-#     artwork_objectID = json_data.get('artwork_objectID', None)
-
-#     user = User.query.get(user_id)
-#     if not user:
-#         return {'error': 'User not found'}, 404
-
-#     new_collection = Collection(name=name, user_id=user_id)
-#     db.session.add(new_collection)
-#     db.session.flush()  # Flush to assign an ID to new_collection without committing transaction
-
-#     if artwork_objectID:
-#         artwork = Artwork.query.filter_by(objectID=artwork_objectID).first()
-#         if not artwork:
-#             db.session.rollback()  # Roll back if the artwork doesn't exist
-#             return {'error': 'Artwork not found'}, 404
-#         new_artwork_in_collection = CollectionArtworks(
-#             collection_id=new_collection.id, 
-#             artwork_objectID=artwork.objectID, 
-#             is_active=True
-#         )
-#         db.session.add(new_artwork_in_collection)
-
-#     db.session.commit()
-
-#     return {'message': 'Collection created', 'collection': new_collection.to_dict()}, 201
 @app.route('/api/collections/<int:collection_id>/artworks')
 def get_artworks_by_collection(collection_id):
     collection = Collection.query.get(collection_id)
@@ -363,3 +332,21 @@ def save_scavenger_hunt():
     db.session.commit()
     return {'message': 'Scavenger hunt saved as a collection', 'collection_id': new_collection.id}, 201
 
+# Data for Search page load 
+@app.route('/api/random-artworks', methods=['GET'])
+def random_artworks():
+    number_of_artworks = request.args.get('count', default=16, type=int)  # Default is 16, can be overridden by query parameter
+
+    try:
+        # Fetch a specific number of unique artworks with visible primary images
+        artworks = Artwork.query \
+            .filter(Artwork.primaryImageSmall != None, Artwork.primaryImageSmall != '') \
+            .distinct(Artwork.galleryNumber) \
+            .order_by(func.random()) \
+            .limit(16) \
+            .all()
+
+        results = [artwork.to_dict(rules=('-collections', '-to_views')) for artwork in artworks]
+        return {'artworks': results}, 200
+    except Exception as e:
+        return {'error': str(e)}, 500

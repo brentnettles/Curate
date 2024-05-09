@@ -170,3 +170,14 @@ export const saveScavengerHuntAsCollection = async (userId, objectIds) => {
     };
     return fetchWithErrors(url, options);
 };
+
+export const fetchRandomArtworks = async (count = 16) => {
+    const url = `${BASE_URL}/random-artworks?count=${count}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+    return fetchWithErrors(url, options);
+};

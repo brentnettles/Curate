@@ -58,9 +58,10 @@ body {
 }
 
 .results {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Creates a responsive grid */
-    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Align items centrally if that fits your design */
+    gap: 20px; /* Optional if you prefer using gap with flexbox for spacing */
     width: 80%;
     max-width: 960px;
     padding: 20px;
@@ -69,24 +70,49 @@ body {
     margin-top: 20px;
 }
 
-.result-item {
+/* .result-item {
+    position: relative;
+    width: 350px; 
+    height: 350px; 
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 1px solid #eee;
-    /* border-radius: 5px; */
-    overflow: hidden;
-}
+    margin-right: 20px;
+    background: #ffffff43; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+} */
 
+.result-item {
+    position: relative;
+    width: 220px; /* Fixed width or you can make it flexible with min-width and max-width */
+    height: auto; /* Adjust based on content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 10px; /* This adds space between items */
+    background: #ffffff43;
+
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 10px;
+    overflow: hidden; /* Ensures content does not spill out */
+}
 .artwork-image {
-    width: auto;
-    height: 320px; /* Fixed height for uniformity */
-    /* object-fit: cover; */
+    max-height: 30vh; 
+    max-width: 100%; 
+    transition: transform 0.3s ease-in-out;
+    object-fit: contain; 
 }
 
 .result-item h3, .result-item p {
-    padding: 5px 10px;
+    font-size: 1em;
+    padding: 5px;
     text-align: center;
+    width: 100%; /* Ensures text does not exceed the container width */
+    overflow: hidden; /* Hides text that overflows */
+    text-overflow: ellipsis; /* Adds an ellipsis to text that overflows */
+    white-space: nowrap; /* Prevents text from wrapping */
 }
 
 .see-more-button {

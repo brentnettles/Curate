@@ -16,7 +16,7 @@
 .artwork-item {
   position: relative;
   width: 350px; 
-  height: 350px; 
+  height: 30vh; 
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,19 +44,6 @@
   object-fit: contain; 
 }
 
-.close-button {
-  position: fixed; 
-  top: 520px; 
-  /* right: center; 
-  */
-  align-items: center;
-  width: 30px;
-  height: 30px;
-  background: url('/src/buttons/close.png') no-repeat center center;
-  background-size: cover;
-  border: none;
-  cursor: pointer;
-}
 
 /* 
 .button-container {
