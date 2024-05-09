@@ -9,7 +9,7 @@ function Discover() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [allFound, setAllFound] = useState(false);
-    const [buttonText, setButtonText] = useState('Save All as Collection'); // New state for dynamic button text
+    const [buttonText, setButtonText] = useState('Save All as Collection');
 
     useEffect(() => {
         const savedHunt = localStorage.getItem('scavengerHunt');
@@ -20,13 +20,19 @@ function Discover() {
         }
     }, []);
 
+    useEffect(() => {
+        if (allFound) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });  // Smooth scroll to the top when all artworks are found
+        }
+    }, [allFound]); ; // Dependency on allFound to trigger scroll only when it changes to true
+
     const handleGenerateHunt = async () => {
         setLoading(true);
         try {
             const response = await fetchScavengerHunt();
             const data = response.artworks;
-            console.log("Fetched artworks data:", data);
             const initializedArtworks = data.map(art => ({ ...art, found: false }));
+            console.log("Fetched Artworks Data:", data);
             setArtworks(initializedArtworks);
             localStorage.setItem('scavengerHunt', JSON.stringify(initializedArtworks));
             setAllFound(false);
@@ -44,8 +50,7 @@ function Discover() {
             const foundArtworks = artworks.filter(art => art.found).map(art => art.objectID);
             try {
                 await saveScavengerHuntAsCollection(user.id, foundArtworks);
-                console.log("Collection saved successfully!");
-                setButtonText('NEW COLLECTION SAVED');  // Change button text upon successful save
+                setButtonText('NEW COLLECTION SAVED');
             } catch (error) {
                 console.error('Failed to save collection:', error);
                 setError('Failed to create collection!');
