@@ -6,8 +6,10 @@ import '../Style/ManageCollections.css';
 const ManageCollections = ({ artwork, onClose }) => {
     const { user, collections, handleGetCollections, saveArtworkContext } = useAuth();
     const [newCollectionName, setNewCollectionName] = useState('');
-    const [selectedCollectionId, setSelectedCollectionId] = useState('');
     const [addedCollectionIds, setAddedCollectionIds] = useState(new Set());
+    
+    // Troubleshooting state 
+    const [selectedCollectionId, setSelectedCollectionId] = useState('');
 
     const handleAddToCollection = async (collectionId) => {
         const collection = collections.find(c => c.id === parseInt(collectionId));
@@ -19,8 +21,10 @@ const ManageCollections = ({ artwork, onClose }) => {
         try {
             await addArtworkToCollection(collection.name, artwork.objectID, user.id);
             saveArtworkContext({ objectID: artwork.objectID, galleryNumber: artwork.galleryNumber });
-            setAddedCollectionIds(prev => new Set(prev.add(collectionId))); // Mark as added
-            handleGetCollections(user.id); // Refresh collections list
+            // Mark as added
+            setAddedCollectionIds(prev => new Set(prev.add(collectionId))); 
+            // Refresh collections list
+            handleGetCollections(user.id); 
         } catch (error) {
             console.error('Failed to add artwork to collection:', error);
         }
@@ -37,8 +41,8 @@ const ManageCollections = ({ artwork, onClose }) => {
             await addArtworkToCollection(newCollection.name, artwork.objectID, user.id);
             saveArtworkContext({ objectID: artwork.objectID, galleryNumber: artwork.galleryNumber });
             setNewCollectionName('');
-            handleGetCollections(user.id);  // Refresh collections list
-            onClose(); // Optionally close modal after operation
+            handleGetCollections(user.id);  
+            onClose(); 
         } catch (error) {
             console.error('Failed to create collection and add artwork:', error);
         }

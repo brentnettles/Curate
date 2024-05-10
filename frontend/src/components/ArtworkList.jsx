@@ -12,7 +12,7 @@ function ArtworkList({ galleryNumber }) {
     const [isVisible, setIsVisible] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const containerRef = useRef(null); // Create a ref for the component
+    const containerRef = useRef(null); 
 
     useEffect(() => {
         if (galleryNumber) {
@@ -50,7 +50,7 @@ function ArtworkList({ galleryNumber }) {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (containerRef.current && !containerRef.current.contains(event.target)) {
-                handleClose(); // Close the component if clicked outside
+                handleClose(); 
             }
         };
 
@@ -62,6 +62,7 @@ function ArtworkList({ galleryNumber }) {
         };
     }, [isVisible]);
 
+    //onClick handler to view artwork details
     const viewArtworkDetail = (artwork) => {
         navigate(`/artwork/${artwork.objectID}`, { state: { artwork } });
     };

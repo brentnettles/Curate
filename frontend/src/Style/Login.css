@@ -3,11 +3,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Full height of the viewport */
-    /* background-color: rgba(0, 0, 0, 0.5); Dark overlay */
+    height: 100vh; 
+
   }
   
-  /* Login form styling similar to the manage collections modal */
+
   .login-form {
     background-color: #fff;
     padding: 20px;
@@ -19,19 +19,19 @@
     align-items: center;
   }
   
-  /* Styling for form elements */
+
   .login-form label {
-    width: 100%; /* Full width of the form */
+    width: 100%; 
     margin-bottom: 10px;
   }
   
   .login-form input[type="text"], .login-form input[type="password"] {
-    width: 100%; /* Full width of the label */
+    width: 100%; 
     padding: 8px;
     margin-top: 5px;
     /* border: 2px solid #ccc; */
     border-radius: 4px;
-    box-sizing: border-box; /* Include padding and border in the element's width */
+    box-sizing: border-box; 
   }
   
   .login-form input[type="text"]:focus, .login-form input[type="password"]:focus {

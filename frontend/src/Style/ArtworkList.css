@@ -47,7 +47,7 @@
 }
 
 .artwork-item:hover .artwork-image {
-  transform: scale(1.05); /* Slight zoom on hover */
+  transform: scale(1.05); 
 }
 
 .artwork-item:hover {
@@ -61,50 +61,3 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-/* 
-.button-container {
-  position: absolute;
-  top: 10px; 
-  right: 10px; 
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
-}
-
-.button {
-  background-size: cover;
-  background-color: #f0f0f000;
-  width: 30px;
-  height: 30px;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  margin: 5px;
-}
-
-.save-button {
-  background-image: url('/src/buttons/pin.png');
-}
-
-.remove-button {
-  background-image: url('/src/buttons/down.png');
-}
-
-.inspect-button {
-  background-image: url('/src/buttons/search.png');
-}
-
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-image: url('/src/buttons/down.png');
-  background-size: cover;
-  width: 30px;
-  height: 30px;
-  border: none;
-  cursor: pointer;
-  z-index: 100;
-} */

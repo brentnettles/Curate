@@ -20,19 +20,24 @@ function Discover() {
         }
     }, []);
 
+    // Scroll to top when all artworks are found 
     useEffect(() => {
         if (allFound) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });  // Smooth scroll to the top when all artworks are found
+            window.scrollTo({ top: 0, behavior: 'smooth' });  
         }
-    }, [allFound]); ; // Dependency on allFound to trigger scroll only when it changes to true
+    }, [allFound]); ; 
 
+    // Fetch a new scavenger hunt data
     const handleGenerateHunt = async () => {
         setLoading(true);
         try {
             const response = await fetchScavengerHunt();
             const data = response.artworks;
             const initializedArtworks = data.map(art => ({ ...art, found: false }));
+            
+            // For demo and test - view ObjectID in console
             console.log("Fetched Artworks Data:", data);
+
             setArtworks(initializedArtworks);
             localStorage.setItem('scavengerHunt', JSON.stringify(initializedArtworks));
             setAllFound(false);
@@ -56,16 +61,11 @@ function Discover() {
                 setError('Failed to create collection!');
             }
         } else {
-            setError('User must be logged in to save a collection.');
+            setError('No user');
         }
     };
 
-    const handleKeyDown = (e, artworkObjectID) => {
-        if (e.key === 'Enter') {
-            handleSubmitGuess(e.target.value, artworkObjectID);
-        }
-    };
-
+    
     const handleSubmitGuess = async (userGuess, artworkObjectID) => {
         try {
             const response = await fetch('http://localhost:5555/api/verify-artwork', {
@@ -88,7 +88,8 @@ function Discover() {
             console.error('Error verifying artwork:', error);
         }
     };
-
+    
+    // Found / check input against ObjectID
     const markAsFound = (objectID) => {
         const updatedArtworks = artworks.map(art =>
             art.objectID === objectID ? { ...art, found: true } : art
@@ -97,6 +98,14 @@ function Discover() {
         localStorage.setItem('scavengerHunt', JSON.stringify(updatedArtworks));
         setAllFound(updatedArtworks.every(art => art.found));
     };
+    
+    //UI helper
+    const handleKeyDown = (e, artworkObjectID) => {
+        if (e.key === 'Enter') {
+            handleSubmitGuess(e.target.value, artworkObjectID);
+        }
+    };
+
 
     return (
         <div className='discover-container'>

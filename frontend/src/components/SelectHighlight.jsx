@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../Style/SelectHighlight.css'; // Make sure to import the CSS correctly
+import '../Style/SelectHighlight.css'; 
 
 function SelectionControls({ setHighlightMode, setSelectedGallery, collections }) {
     const [showCollections, setShowCollections] = useState(false);

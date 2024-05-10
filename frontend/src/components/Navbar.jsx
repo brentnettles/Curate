@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import logo from '../../public/CUlogo.png'; // Adjust the path as necessary
+import logo from '../../public/CUlogo.png'; 
 
 function Navbar() {
     const { user, logout } = useAuth();

@@ -5,6 +5,9 @@ import { searchArtworks } from '../services/MetAPI';
 //function to load random artworks on load for CURATE db
 import { fetchRandomArtworks } from '../services/apiService';  
 
+//* This Component uses the MET API directly / Not the CURATE (project) API
+
+
 function Search() {
     const [queryParams, setQueryParams] = useState({
         searchTerm: '',
@@ -19,10 +22,11 @@ function Search() {
 
     const departments = departmentsData.departments;
 
+    // Load random artworks on component mount
     useEffect(() => {
-        // Load random artworks on component mount
         loadRandomArtworks();
     }, []);
+
 
     const loadRandomArtworks = async () => {
         setLoading(true);
@@ -42,6 +46,7 @@ function Search() {
         }
     };
 
+    // test w/ limit
     const fetchArtworks = async (params, limit) => {
         console.log('Fetching parameters:', params, 'Limit:', limit);
         setLoading(true);

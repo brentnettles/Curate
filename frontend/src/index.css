@@ -8,9 +8,9 @@ body, h1, h2, h3, p, form, button, input {
   box-sizing: border-box;
 }
 
-/* Apply a basic font and background to the whole page */
+
 body {
-  font-family: 'Poppins', sans-serif; /* Ensuring Poppins is the global font */
+  font-family: 'Poppins', sans-serif; 
   background-color: #f4f4f4;
   height: 100vh;
   color: #333;
@@ -18,7 +18,7 @@ body {
   padding: 20px;
 }
 
-/* Remaining styles unchanged */
+
 .navbar {
   display: flex;
   align-items: center;

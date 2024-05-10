@@ -16,55 +16,23 @@ function Map_visual() {
     const [highlightedGalleries, setHighlightedGalleries] = useState(new Set());
 
    
-    // useEffect(() => {
-    //     fetch("/MetMap.svg")
-    //         .then(res => res.text())
-    //         .then(svg => {
-    //             svgRef.current.innerHTML = svg;
-    //             const svgElement = svgRef.current.querySelector('svg');
-    //             enhanceSVG(svgElement);
-    //             highlightSavedGalleries(svgElement);
-    //         });
-    // }, [highlightedGalleries]);
+    //*d3 map overview~ svg:1 layer is map, 2nd layer is galleries
+    //*each rectangle in the svg has an id = to the galleryNumber
+    //*select the id, append as text to the rectangle
+    //*reference the galleryNumber in the id of the svg for highlightSavedGalleries function
 
+    // Only fetch and set up the SVG once
+    // prevent repositioning of the map when the highlighted galleries change
     useEffect(() => {
-        // Only fetch and set up the SVG once
         fetch("/MetMap.svg")
             .then(res => res.text())
             .then(svg => {
                 svgRef.current.innerHTML = svg;
                 const svgElement = svgRef.current.querySelector('svg');
-                enhanceSVG(svgElement); // Apply zoom and interaction handlers
+                enhanceSVG(svgElement); 
             });
     }, []);
 
-    // useEffect(() => {
-    //     if (user) {
-    //         // Only fetch and set up the SVG if there's a logged-in user
-    //         fetch("/MetMap.svg")
-    //             .then(res => res.text())
-    //             .then(svg => {
-    //                 svgRef.current.innerHTML = svg;
-    //                 const svgElement = svgRef.current.querySelector('svg');
-    //                 enhanceSVG(svgElement);
-    //             });
-    //     }
-    // }, [user]);
-
-    // useEffect(() => {
-    //     const fetchGalleries = async () => {
-    //         try {
-    //             // Check if highlightMode is set to use collections
-    //             const collectionId = highlightMode === 'collection' ? selectedGallery : null;
-    //             const response = await getHighlightedGalleries(user.id, collectionId);
-    //             setHighlightedGalleries(new Set(response.highlighted_galleries));
-    //         } catch (error) {
-    //             console.error("Error fetching highlighted galleries:", error);
-    //         }
-    //     };
-    
-    //     fetchGalleries();
-    // }, [user.id, highlightMode, selectedGallery]);
     useEffect(() => {
         if (user) {
             const fetchGalleries = async () => {
@@ -81,16 +49,7 @@ function Map_visual() {
         }
     }, [user, highlightMode, selectedGallery]);
 
-    // const enhanceSVG = (svgElement) => {
-    //     const svg = d3.select(svgElement);
-    //     zoom.current.on('zoom', (event) => {
-    //         svg.select('#Layer_1').attr('transform', event.transform);
-    //         svg.select('#Floor_1_Galleries').attr('transform', event.transform);
-    //     });
-    //     svg.call(zoom.current);
-    //     svg.call(zoom.current.transform, d3.zoomIdentity);
-    //     setupInteractions(svg);
-    // };
+ 
 
     const enhanceSVG = (svgElement) => {
         const svg = d3.select(svgElement);
@@ -157,6 +116,7 @@ function Map_visual() {
         });
     };
 
+    //Recenter button
     const recenterSVG = (event) => {
         event.stopPropagation();
         d3.select(svgRef.current.querySelector('svg')).transition().duration(750).call(zoom.current.transform, d3.zoomIdentity);

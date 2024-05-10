@@ -59,7 +59,7 @@
 
 .discover-artwork-item {
     position: relative;
-    width: 25vw; /* Consistent with Search item width */
+    width: 25vw; 
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -67,8 +67,8 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     padding: 10px;
     overflow: hidden;
-    height: auto; /* Adjust height as necessary */
-    min-height: 300px; /* Minimum height to ensure design integrity */
+    height: auto; /
+    min-height: 300px; 
 }
 .discover-artwork-image {
     max-height: 200px;
@@ -96,8 +96,8 @@
 }
 
 .question input[type="text"], .question button {
-    width: auto; /* Ensure the input field and button take only the necessary width */ Comfortable padding around text inside input and button */
-    margin-top: 5px; /* Space between label and input field */
+    width: auto; 
+    margin-top: 5px; 
 }
 
 .question button {
@@ -111,5 +111,5 @@
 }
 
 .question button:hover {
-    background-color: #85091f; /* Darker shade on hover for better interaction feedback */
+    background-color: #85091f; 
 }

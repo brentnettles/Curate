@@ -13,7 +13,7 @@ function CollectionsPage() {
     const [selectedCollectionId, setSelectedCollectionId] = useState('all');
     const [artworksDetails, setArtworksDetails] = useState([]);
     const [inactiveArtworks, setInactiveArtworks] = useState([]);
-    const [isListVisible, setIsListVisible] = useState(false); // State to control the visibility of the list
+    const [isListVisible, setIsListVisible] = useState(false); 
 
     useEffect(() => {
         if (!user) {
@@ -55,10 +55,13 @@ function CollectionsPage() {
         updateArtworksDetails();
     }, [selectedCollectionId]);
 
+    //helper to refresh and reflect changes in the UI
     const handleUpdate = () => {
-        fetchData();  // Refresh data to reflect changes in the UI
+        fetchData();  
     };
 
+    //Like / remove button handler - 
+    //"isActive" moves artwork to Saved History UI
     const updateArtworkStatus = (artworkId, isActive) => {
         // Update fetchedArtworks to reflect the change
         const updatedArtworks = fetchedArtworks.map(artwork =>
@@ -77,6 +80,7 @@ function CollectionsPage() {
         }
     };
 
+    //UI helpers : 
     const toggleListVisibility = () => {
         setIsListVisible(!isListVisible); // Toggle the visibility state
     };
@@ -90,6 +94,7 @@ function CollectionsPage() {
     };
     
     
+    // Delete Collection button in manage collections
     const handleDeleteCollection = async (collectionId) => {
         try {
             await deleteCollection(collectionId, user.id);

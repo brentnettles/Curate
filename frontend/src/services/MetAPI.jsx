@@ -1,14 +1,6 @@
 const API_BASE_URL = 'https://collectionapi.metmuseum.org/public/collection/v1';
 
-/**
- * Function to fetch search results from the Met Museum API based on various filters.
- * @param {Object} params - The search parameters.
- * @param {string} params.searchTerm - The term to search for.
- * @param {boolean} params.isHighlight - Filter for highlights.
- * @param {boolean} params.isOnView - Filter for objects on view.
- * @param {string} params.departmentId - The department ID to filter by.
- * @param {number} fetchLimit - Limit for number of results to fetch.
- */
+
 async function searchArtworks({ searchTerm, isHighlight, isOnView, departmentId, searchType }, fetchLimit) {
     const url = new URL(`${API_BASE_URL}/search`);
     if (searchType === 'medium') {
@@ -33,10 +25,7 @@ async function searchArtworks({ searchTerm, isHighlight, isOnView, departmentId,
     }
 }
 
-/**
- * Function to fetch details for a list of artwork IDs.
- * @param {number[]} objectIDs - Array of object IDs.
- */
+
 async function fetchArtworkDetails(objectIDs) {
     const promises = objectIDs.map(id =>
         fetch(`${API_BASE_URL}/objects/${id}`)

@@ -1,3 +1,7 @@
+
+/// TESTING / STILL IN DEV 
+/// LANDING PAGE TO BE MERGED WITH LOGIN PAGE
+
 import React, { useState, useEffect } from 'react';
 import '../Style/Landing.css';
 
@@ -8,13 +12,12 @@ function Landing() {
 
   useEffect(() => {
     setTimeout(() => {
-      setStartAnimation(true);  // Start the animation after component mounts
-    }, 100); // Small delay to ensure the initial render completes
+      setStartAnimation(true);  
+    }, 100); 
 
     const timer = setTimeout(() => {
       setShowText(true);
-    }, colors.length * 300 + 200); // Time before text appears
-
+    }, colors.length * 300 + 200); 
     return () => clearTimeout(timer);
   }, []);
 
@@ -26,8 +29,8 @@ function Landing() {
           className="color-block"
           style={{
             backgroundColor: color,
-            transitionDelay: `${index * 300}ms`, // Delay each block
-            transform: startAnimation ? 'translateX(0)' : 'translateX(-100%)' // Trigger the slide in
+            transitionDelay: `${index * 300}ms`,
+            transform: startAnimation ? 'translateX(0)' : 'translateX(-100%)' 
           }}
         />
       ))}

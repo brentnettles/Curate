@@ -1,7 +1,7 @@
 import '../Style/ArtworkDetail.css';
 import React, { useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import backIcon from '../buttons/left.png'; 
+// import backIcon from '../buttons/left.png'; 
 
 function ArtworkDetail() {
   const { id } = useParams();

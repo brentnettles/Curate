@@ -122,10 +122,10 @@ export const getArtworksByCollectionId = async (collectionId) => {
     const url = `${BASE_URL}/collections/${collectionId}/artworks`;
     try {
         const response = await fetchWithErrors(url, { method: 'GET' });
-        return response;  // Assuming fetchWithErrors already handles JSON parsing
+        return response;  
     } catch (error) {
         console.error('Failed to fetch artworks for collection:', error);
-        throw error;  // Re-throw to allow the caller to handle it
+        throw error;  
     }
 };
 
@@ -171,6 +171,7 @@ export const saveScavengerHuntAsCollection = async (userId, objectIds) => {
     return fetchWithErrors(url, options);
 };
 
+//Used at Search Component on mount 
 export const fetchRandomArtworks = async (count = 16) => {
     const url = `${BASE_URL}/random-artworks?count=${count}`;
     const options = {
