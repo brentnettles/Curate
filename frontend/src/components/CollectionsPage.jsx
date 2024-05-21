@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getSavedArtworksByUserId, getCollectionsByUserId, getArtworksByCollectionId, deleteCollection } from '../services/apiService';
+import { getCollectionsByUserId, getArtworksByCollectionId, deleteCollection } from '../services/apiService';
 import ArtworkActions from './ArtworkActions';
 import '../Style/CollectionsPage.css';
 
 function CollectionsPage() {
-    const { user } = useAuth();
+    const { user, fetchSavedArtworks, savedArtworks } = useAuth();
     const navigate = useNavigate();
-    const [fetchedArtworks, setFetchedArtworks] = useState([]);
     const [collections, setCollections] = useState([]);
     const [selectedCollectionId, setSelectedCollectionId] = useState('all');
     const [artworksDetails, setArtworksDetails] = useState([]);
     const [inactiveArtworks, setInactiveArtworks] = useState([]);
-    const [isListVisible, setIsListVisible] = useState(false); 
+    const [isListVisible, setIsListVisible] = useState(false);
 
     useEffect(() => {
         if (!user) {
@@ -25,64 +24,59 @@ function CollectionsPage() {
 
     const fetchData = async () => {
         try {
-            const artworks = await getSavedArtworksByUserId(user.id);
+            console.log('Fetching collections and saved artworks...');
             const { collections } = await getCollectionsByUserId(user.id);
-            setFetchedArtworks(artworks);
-            setInactiveArtworks(artworks.filter(art => !art.is_active));
             setCollections(collections);
-            if (selectedCollectionId === 'all') {
-                setArtworksDetails(artworks.filter(art => art.is_active));
-            }
+            await fetchSavedArtworks();
+            console.log('Fetched collections:', collections);
+            console.log('Fetched saved artworks:', savedArtworks);
         } catch (error) {
             console.error("Failed to fetch data:", error);
         }
     };
 
+    useEffect(() => {
+        if (selectedCollectionId === 'all') {
+            setArtworksDetails(savedArtworks.filter(art => art.isActive));
+            setInactiveArtworks(savedArtworks.filter(art => !art.isActive));
+        } else {
+            updateArtworksDetails();
+        }
+    }, [selectedCollectionId, savedArtworks]);
+
     const updateArtworksDetails = async () => {
         if (selectedCollectionId !== 'all') {
             try {
                 const data = await getArtworksByCollectionId(selectedCollectionId);
-                setArtworksDetails(data.artworks);
+                const artworks = data.artworks
+                    .map(art => ({
+                        ...art,
+                        isActive: savedArtworks.some(savedArt => savedArt.objectID === art.objectID && savedArt.isActive)
+                    }))
+                    .filter(art => art.isActive); // Ensure only active artworks are displayed
+                setArtworksDetails(artworks);
+                console.log('Fetched artworks for collection:', artworks);
             } catch (error) {
                 console.error("Failed to fetch artworks for the collection:", error);
             }
-        } else {
-            setArtworksDetails(fetchedArtworks.filter(art => art.is_active));
         }
     };
 
-    useEffect(() => {
-        updateArtworksDetails();
-    }, [selectedCollectionId]);
-
-    //helper to refresh and reflect changes in the UI
     const handleUpdate = () => {
-        fetchData();  
+        fetchSavedArtworks();
     };
 
-    //Like / remove button handler - 
-    //"isActive" moves artwork to Saved History UI
     const updateArtworkStatus = (artworkId, isActive) => {
-        // Update fetchedArtworks to reflect the change
-        const updatedArtworks = fetchedArtworks.map(artwork =>
-            artwork.objectID === artworkId ? { ...artwork, is_active: isActive } : artwork
-        );
-        setFetchedArtworks(updatedArtworks);
-
-        // Filter inactive artworks again
-        setInactiveArtworks(updatedArtworks.filter(art => !art.is_active));
-
-        // Optionally, update artworksDetails if needed
-        if (selectedCollectionId !== 'all') {
-            setArtworksDetails(updatedArtworks.filter(art => art.is_active && selectedCollectionId === art.collectionId));
-        } else {
-            setArtworksDetails(updatedArtworks.filter(art => art.is_active));
-        }
+        setArtworksDetails(prev => prev.map(artwork =>
+            artwork.objectID === artworkId ? { ...artwork, isActive } : artwork
+        ));
+        setInactiveArtworks(prev => prev.map(artwork =>
+            artwork.objectID === artworkId ? { ...artwork, isActive: !isActive } : artwork
+        ));
     };
 
-    //UI helpers : 
     const toggleListVisibility = () => {
-        setIsListVisible(!isListVisible); // Toggle the visibility state
+        setIsListVisible(!isListVisible);
     };
 
     const viewArtworkDetail = (artwork) => {
@@ -92,14 +86,11 @@ function CollectionsPage() {
     const handleMouseLeave = () => {
         setIsListVisible(false);
     };
-    
-    
-    // Delete Collection button in manage collections
+
     const handleDeleteCollection = async (collectionId) => {
         try {
             await deleteCollection(collectionId, user.id);
             console.log("Collection deleted successfully");
-            // Refresh collections list after deletion
             const updatedCollections = collections.filter(collection => collection.id !== collectionId);
             setCollections(updatedCollections);
 
@@ -110,6 +101,13 @@ function CollectionsPage() {
         } catch (error) {
             console.error("Failed to delete collection:", error);
         }
+    };
+
+    const truncateTitle = (title, maxLength = 25) => {
+        if (title.length > maxLength) {
+            return title.slice(0, maxLength) + ' [...]';
+        }
+        return title;
     };
 
     return (
@@ -139,31 +137,34 @@ function CollectionsPage() {
                     <div key={artwork.objectID || index} className="save-artwork-item">
                         <img src={artwork.primaryImageSmall} alt={artwork.title} onClick={() => viewArtworkDetail(artwork)} className="save-artwork-image" />
                         <div className="save-artwork-info">
-                            <h3 className="save-artwork-title">{artwork.title}</h3>
-                            <p className="save-artwork-gallery">Gallery: {artwork.galleryNumber}</p>
-                            <ArtworkActions artwork={artwork} isActive={artwork.is_active} onUpdate={handleUpdate} onStatusChange={updateArtworkStatus} />
-                        </div>
+                        <h3 className="save-artwork-title">
+                            {truncateTitle(artwork.title)}
+                            <span className="full-title-tooltip">{artwork.title}</span>
+                        </h3>
+                        <p className="save-artwork-gallery">Gallery: {artwork.galleryNumber}</p>
+                        <ArtworkActions artwork={artwork} isActive={artwork.isActive} onUpdate={handleUpdate} onStatusChange={updateArtworkStatus} />
+                    </div>
                     </div>
                 ))}
             </div>
-
+    
             <div className="separator-history"></div>
             <h2 className='saved-header'>SAVED HISTORY</h2>
             <div className="separator-history"></div>
             <div className="history-list-container">
-            {[...inactiveArtworks].reverse().map((artwork, index) => (
-                <div key={artwork.objectID || index} className="history-artwork-item">
-                    <div className="history-artwork-image-container">
-                    <img
-                    src={artwork.primaryImageSmall}
-                    alt={artwork.title}
-                    onClick={() => viewArtworkDetail(artwork)}
-                    className="history-artwork-image"
-                />
+                {[...inactiveArtworks].reverse().map((artwork, index) => (
+                    <div key={artwork.objectID || index} className="history-artwork-item">
+                        <div className="history-artwork-image-container">
+                            <img
+                                src={artwork.primaryImageSmall}
+                                alt={artwork.title}
+                                onClick={() => viewArtworkDetail(artwork)}
+                                className="history-artwork-image"
+                            />
+                        </div>
                     </div>
-        </div>
-    ))}
-</div>
+                ))}
+            </div>
         </div>
     );
 }

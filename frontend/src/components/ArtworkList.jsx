@@ -6,13 +6,13 @@ import { useAuth } from '../contexts/AuthContext';
 import '../Style/ArtworkList.css';
 
 function ArtworkList({ galleryNumber }) {
-    const { savedArtworks } = useAuth();
+    const { savedArtworks, fetchSavedArtworks } = useAuth();
     const navigate = useNavigate();
     const [artworks, setArtworks] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const containerRef = useRef(null); 
+    const containerRef = useRef(null);
 
     useEffect(() => {
         if (galleryNumber) {
@@ -22,8 +22,11 @@ function ArtworkList({ galleryNumber }) {
 
             getArtworksByGalleryNumber(galleryNumber)
                 .then(data => {
+                    console.log("Fetched artworks:", data);  // Detailed log of fetched data
                     if (data.length > 0) {
-                        setArtworks(data.filter(artwork => artwork.primaryImageSmall !== ""));
+                        const filteredArtworks = data.filter(artwork => artwork.primaryImageSmall !== "");
+                        setArtworks(filteredArtworks);
+                        console.log("Filtered artworks:", filteredArtworks);  // Log filtered artworks
                     } else {
                         setError('No artworks to display.');
                         setIsVisible(false);
@@ -41,12 +44,10 @@ function ArtworkList({ galleryNumber }) {
         }
     }, [galleryNumber]);
 
-    // Function to close the component
     const handleClose = () => {
         setIsVisible(false);
     };
 
-    // Click outside handler / useEffect clutch 
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -62,9 +63,22 @@ function ArtworkList({ galleryNumber }) {
         };
     }, [isVisible]);
 
-    //onClick handler to view artwork details
     const viewArtworkDetail = (artwork) => {
         navigate(`/artwork/${artwork.objectID}`, { state: { artwork } });
+    };
+
+    // Function to check if artwork is saved
+    const isArtworkSaved = (artworkId) => {
+        // console.log('Checking if artwork is saved:', artworkId, savedArtworks);
+        return savedArtworks.some(art => art.objectID === artworkId && art.isActive);
+    };
+
+    // Function to update the state after save/remove action
+    const updateArtworkStatus = (artworkId, isActive) => {
+        setArtworks(prevArtworks => prevArtworks.map(art =>
+            art.objectID === artworkId ? { ...art, isActive } : art
+        ));
+        fetchSavedArtworks();  // Fetch the updated saved artworks list
     };
 
     if (!isVisible) {
@@ -82,12 +96,12 @@ function ArtworkList({ galleryNumber }) {
                 <p>{error}</p>
             ) : (
                 artworks.map(artwork => (
-                    <div key={artwork.objectID} className="artwork-item">
+                    <div key={`artwork-${artwork.objectID}`} className="artwork-item">
                         <div className="artwork-image-container" onClick={() => viewArtworkDetail(artwork)}>
                             <img src={artwork.primaryImageSmall} alt={artwork.title} className="artwork-image" />
                         </div>
                         <div className="artwork-details">
-                            <ArtworkActions artwork={artwork} isActive={savedArtworks[artwork.objectID]?.isActive} />
+                            <ArtworkActions artwork={artwork} onStatusChange={updateArtworkStatus} isActive={isArtworkSaved(artwork.objectID)} />
                         </div>
                     </div>
                 ))

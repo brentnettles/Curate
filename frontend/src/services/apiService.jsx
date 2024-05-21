@@ -66,19 +66,20 @@ export const addArtworkToCollection = async (collectionName, artworkId, userId) 
         },
         body: JSON.stringify({
             collectionName: collectionName,
-            artworkId: artworkId,  // Ensure the key matches the backend expectation
+            artworkId: artworkId,
             userId: userId
         })
     };
     try {
         const response = await fetch(url, options);
         if (!response.ok) {
-            throw new Error('Failed to add artwork to collection: ' + await response.text());
+            const errorText = await response.text();
+            throw new Error('Failed to add artwork to collection: ' + errorText);
         }
-        return await response.json(); // Ensure response is properly awaited
+        return await response.json();
     } catch (error) {
         console.error('API call failed:', error);
-        throw error;  // Re-throw to handle it in the component
+        throw error;
     }
 };
 

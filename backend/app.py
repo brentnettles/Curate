@@ -200,47 +200,55 @@ def mark_artwork_inactive_in_collection(collection_artwork_id):
     db.session.commit()
     return {'message': 'Artwork marked as inactive in collection'}, 200
 
-## + artwork to collection - if collection doesn't exist, create it
 @app.route('/api/collections/add', methods=['POST'])
 def add_artwork_to_collection():
-    json_data = request.get_json()
-    collection_name = json_data.get('collectionName')
-    artwork_id = json_data.get('artworkId')
-    user_id = json_data.get('userId')
+    try:
+        json_data = request.get_json()
+        collection_name = json_data.get('collectionName')
+        artwork_id = json_data.get('artworkId')
+        user_id = json_data.get('userId')
 
-    # Ensure user exists
-    user = User.query.get(user_id)
-    if not user:
-        return {'error': 'User not found'}, 404
+        print(f"Received data: collectionName={collection_name}, artworkId={artwork_id}, userId={user_id}")
 
-    # Ensure the artwork exists
-    artwork = Artwork.query.filter_by(objectID=artwork_id).first()
-    if not artwork:
-        return {'error': 'Artwork not found'}, 404
+        # Ensure user exists
+        user = User.query.get(user_id)
+        if not user:
+            return {'error': 'User not found'}, 404
 
-    # Check or create the collection
-    collection = Collection.query.filter_by(name=collection_name, user_id=user_id).first()
-    if not collection:
-        collection = Collection(name=collection_name, user_id=user_id)
-        db.session.add(collection)
-        db.session.flush()  # Get the new collection ID without committing
+        # Ensure the artwork exists
+        artwork = Artwork.query.filter_by(objectID=artwork_id).first()
+        if not artwork:
+            return {'error': 'Artwork not found'}, 404
 
-    # Link artwork to collection, create if necessary
-    collection_artwork = CollectionArtworks.query.filter_by(collection_id=collection.id, artwork_objectID=artwork_id).first()
-    if not collection_artwork:
-        collection_artwork = CollectionArtworks(collection_id=collection.id, artwork_objectID=artwork_id, is_active=True)
-        db.session.add(collection_artwork)
+        # Check or create the collection
+        collection = Collection.query.filter_by(name=collection_name, user_id=user_id).first()
+        if not collection:
+            collection = Collection(name=collection_name, user_id=user_id)
+            db.session.add(collection)
+            db.session.flush()  # Get the new collection ID without committing
 
-    # Check if the artwork is marked as saved (to_view), if not, save it
-    saved_artwork = ToView.query.filter_by(user_id=user_id, artwork_objectID=artwork_id).first()
-    if not saved_artwork:
-        saved_artwork = ToView(user_id=user_id, artwork_objectID=artwork_id, is_active=True)
-        db.session.add(saved_artwork)
+        print(f"Collection ID after flush: {collection.id}")
 
-    # Commit changes
-    db.session.commit()
+        # Link artwork to collection, create if necessary
+        collection_artwork = CollectionArtworks.query.filter_by(collection_id=collection.id, artwork_objectID=artwork_id).first()
+        if not collection_artwork:
+            collection_artwork = CollectionArtworks(collection_id=collection.id, artwork_objectID=artwork_id, is_active=True)
+            db.session.add(collection_artwork)
 
-    return {'message': 'Artwork added to collection and marked as saved', 'collection': collection.to_dict()}
+        # Check if the artwork is marked as saved (to_view), if not, save it
+        saved_artwork = ToView.query.filter_by(user_id=user_id, artwork_objectID=artwork_id).first()
+        if not saved_artwork:
+            saved_artwork = ToView(user_id=user_id, artwork_objectID=artwork_id, is_active=True)
+            db.session.add(saved_artwork)
+
+        # Commit changes
+        db.session.commit()
+
+        return {'message': 'Artwork added to collection and marked as saved', 'collection': collection.to_dict()}
+
+    except Exception as e:
+        db.session.rollback()
+        return {'error': str(e)}, 500
 
 
 

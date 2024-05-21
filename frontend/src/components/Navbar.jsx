@@ -9,12 +9,10 @@ function Navbar() {
 
     const handleLogout = async () => {
         console.log("Logging out...");
-        await logout();
+        await logout(navigate);
         console.log("Logged out, navigating to home...");
-        navigate('/');
     };
 
-    
     return (
         <div className="navbar">
             <div className="navbar-logo">

@@ -2,6 +2,8 @@
 
 **Curate** is a full-stack application developed as part of a three-week sprint for the Flatiron School's Full Stack Software Engineering program.
 
+### Site Demo Video: https://www.dropbox.com/scl/fi/vlclqlv793y8m8s672xnm/Curate_v1-Stite-Demo.mp4?rlkey=mqkn0cw5x4j6tpx6efkwy6pj2&dl=0
+
 ## To Run
 Navigate to the project directory and set up the environment:
 

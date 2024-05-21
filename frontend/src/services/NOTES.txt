@@ -1,4 +1,4 @@
-About to rework the API Service - Saving old code here :
+
 
 Database Overview : 
 
@@ -26,8 +26,3 @@ B10F2E
 570000
 280000
 DE7C5A
-
-
-Bugs: 
-
-When I'm filtering by collection, it is rendering All artworks associated with that collection and we need to only show the is_Active True artworks in that collection. 

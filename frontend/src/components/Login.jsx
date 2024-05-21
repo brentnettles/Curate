@@ -14,8 +14,7 @@ function Login() {
 
         // Hardcoding user authentication for development
         if (username === "Brento" && password === "123!") {
-            login({ username: "Brento", id: "3" });
-            navigate('/');
+            login({ username: "Brento", id: "3" }, navigate);
         } else {
             alert('Incorrect username or password');
         }
@@ -39,7 +38,6 @@ function Login() {
             </div>
         </div>
     );
-    
 }
 
 export default Login;

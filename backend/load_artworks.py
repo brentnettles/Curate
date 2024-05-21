@@ -36,7 +36,7 @@ def load_artworks(json_path='artworks.json'):
                     artistBeginDate=artwork_data.get('artistBeginDate', ''),
                     artistEndDate=artwork_data.get('artistEndDate', ''),
                     dimensions=artwork_data['dimensions'],
-                    galleryNumber=artwork_data.get('GalleryNumber', ''),  # Ensure this line is correct
+                    galleryNumber=artwork_data.get('GalleryNumber', ''), 
                     objectURL=artwork_data['objectURL']
                 )
                 db.session.add(artwork)

@@ -1,7 +1,6 @@
-// App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext'; // Make sure to import useAuth
 import Navbar from './components/Navbar';
 import Map from './components/Map';
 import ArtworkDetail from './components/ArtworkDetail';
@@ -13,7 +12,7 @@ import Discover from './components/Discover';
 // import Landing from './components/Landing'; 
 
 function ProtectedRoute({ children }) {
-    const { user } = useAuth();
+    const { user } = useAuth(); // useAuth imported and used here
     return user ? children : <Navigate to="/login" />;
 }
 
