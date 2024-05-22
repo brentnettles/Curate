@@ -51,6 +51,7 @@ function ArtworkList({ galleryNumber }) {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (containerRef.current && !containerRef.current.contains(event.target)) {
+                console.log('Clicked outside, closing modal');
                 handleClose(); 
             }
         };
@@ -67,18 +68,15 @@ function ArtworkList({ galleryNumber }) {
         navigate(`/artwork/${artwork.objectID}`, { state: { artwork } });
     };
 
-    // Function to check if artwork is saved
     const isArtworkSaved = (artworkId) => {
-        // console.log('Checking if artwork is saved:', artworkId, savedArtworks);
         return savedArtworks.some(art => art.objectID === artworkId && art.isActive);
     };
 
-    // Function to update the state after save/remove action
     const updateArtworkStatus = (artworkId, isActive) => {
         setArtworks(prevArtworks => prevArtworks.map(art =>
             art.objectID === artworkId ? { ...art, isActive } : art
         ));
-        fetchSavedArtworks();  // Fetch the updated saved artworks list
+        fetchSavedArtworks(); 
     };
 
     if (!isVisible) {

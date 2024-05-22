@@ -1,17 +1,9 @@
-
-
-
-
 .selection-controls {
     position: absolute; 
     top: 17%; 
     margin-left: 20px;
-    /* transform: translateX(-50%); Center align */
     width: 300px;
-    z-index: 1000; 
-
-
-
+    z-index: 1000;
 }
 
 .selection-controls button {
@@ -27,20 +19,21 @@
 
 .selection-controls button:hover {
     background-color: #b10f2d7d;
-    
 }
 
-.selection-controls ul {
+.selection-controls ul.collections-list {
     list-style-type: none; 
     padding: 0;
-    font-size: 1rem; 
+    font-size: 1rem;
+    max-height: 300px; /* Set max-height for scrollable list */
+    overflow-y: auto; /* Enable vertical scroll */
 }
 
 .selection-controls li {
     cursor: pointer;
-    padding: 10px;
+    padding: 8px; /* Decreased padding */
     background-color: #f0f0f0;
-    margin: 5px 0;
+    margin: 3px 0; /* Adjusted margin */
     transition: background-color 0.3s;
 }
 

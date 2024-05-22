@@ -5,6 +5,7 @@
     width: 100vw;
     align-items: center;
     padding-top: 20px;
+    padding-bottom: 100px;
     background-color: #f8f8f8;
 }
 
@@ -22,12 +23,12 @@
     color: rgb(93, 93, 93);/* Adds a theme color to the header */
 }
 
-
 .button-row {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 80%;
     max-width: 960px;
-    justify-content: space-between;
     margin-bottom: 20px;
 }
 
@@ -38,6 +39,7 @@
     border: none;
     cursor: pointer;
     width: 49%; /* Adjusted width to keep buttons side by side */
+    margin: 10px 0; /* Added margin to separate buttons */
 }
 
 .button-common:hover {
@@ -67,9 +69,14 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     padding: 10px;
     overflow: hidden;
-    height: auto; /
-    min-height: 300px; 
+    height: auto;
+    min-height: 200px; 
 }
+
+.discover-artwork-item.found {
+    background-color: #dff0d8; /* Light green background for found items */
+}
+
 .discover-artwork-image {
     max-height: 200px;
     max-width: 100%;
@@ -79,12 +86,14 @@
 .discover-artwork-info {
     width: 100%;
     text-align: center;
-    /* max-height: 40px; */
+    margin-top: auto; /* Push content to the bottom */
+    padding-top: 5px; /* Add space between image and text */
 }
 
 .discover-artwork-title, .discover-artwork-gallery {
     font-size: 1em;
-    padding: 5px;
+    padding: 2px; /* Reduced padding for less space between lines */
+    margin: 0; /* Removed margin */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -112,4 +121,10 @@
 
 .question button:hover {
     background-color: #85091f; 
+}
+
+.found-text {
+    font-size: 2em;
+    font-weight: bold;
+    color: #3c763d; /* Dark green text for found items */
 }

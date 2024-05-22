@@ -1,16 +1,12 @@
 const API_BASE_URL = 'https://collectionapi.metmuseum.org/public/collection/v1';
 
-
 async function searchArtworks({ searchTerm, isHighlight, isOnView, departmentId, searchType }, fetchLimit) {
     const url = new URL(`${API_BASE_URL}/search`);
-    if (searchType === 'medium') {
-        url.searchParams.append('medium', searchTerm);
-    } else {
-        url.searchParams.append('q', searchTerm);
-        if (isHighlight) url.searchParams.append('isHighlight', 'true');
-        if (isOnView) url.searchParams.append('isOnView', 'true');
-        if (departmentId) url.searchParams.append('departmentId', departmentId);
-    }
+    url.searchParams.append('q', searchTerm);
+
+    if (isHighlight) url.searchParams.append('isHighlight', 'true');
+    if (isOnView) url.searchParams.append('isOnView', 'true');
+    if (departmentId) url.searchParams.append('departmentId', departmentId);
 
     try {
         const response = await fetch(url.toString());
@@ -25,18 +21,17 @@ async function searchArtworks({ searchTerm, isHighlight, isOnView, departmentId,
     }
 }
 
-
 async function fetchArtworkDetails(objectIDs) {
     const promises = objectIDs.map(id =>
         fetch(`${API_BASE_URL}/objects/${id}`)
             .then(response => response.json())
             .then(data => {
-                if (data.isPublicDomain) return data; 
+                if (data.isPublicDomain) return data;
                 return null;
             })
             .catch(error => {
                 console.error(`Failed to fetch details for object ${id}:`, error);
-                return null; 
+                return null;
             })
     );
     const details = await Promise.all(promises);

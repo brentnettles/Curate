@@ -169,8 +169,10 @@ export const saveScavengerHuntAsCollection = async (userId, objectIds) => {
         },
         body: JSON.stringify({ user_id: userId, object_ids: objectIds })
     };
+    console.log("Saving Scavenger Hunt as Collection:", options);
     return fetchWithErrors(url, options);
 };
+
 
 //Used at Search Component on mount 
 export const fetchRandomArtworks = async (count = 16) => {

@@ -310,6 +310,7 @@ def get_highlighted_galleries():
     return {'highlighted_galleries': [g[0] for g in gallery_numbers]}, 200
 
 #Save Scavenger Hunt as a collection w/ todays date 
+# Save Scavenger Hunt as a collection w/ today's date 
 @app.route('/api/save-scavenger-hunt', methods=['POST'])
 def save_scavenger_hunt():
     json_data = request.get_json()
@@ -326,7 +327,7 @@ def save_scavenger_hunt():
     db.session.add(new_collection)
     db.session.flush()  # Get new collection ID
 
-    # Add artworks to the new collection
+    # Add artworks to the new collection and save to to_view table
     for object_id in object_ids:
         artwork = Artwork.query.filter_by(objectID=object_id).first()
         if artwork:
@@ -336,6 +337,14 @@ def save_scavenger_hunt():
                 is_active=True
             )
             db.session.add(new_artwork_in_collection)
+            
+            # Add to to_view table
+            new_to_view = ToView(
+                user_id=user_id,
+                artwork_objectID=artwork.objectID,
+                is_active=True
+            )
+            db.session.add(new_to_view)
 
     db.session.commit()
     return {'message': 'Scavenger hunt saved as a collection', 'collection_id': new_collection.id}, 201

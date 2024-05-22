@@ -46,11 +46,12 @@
     transition: transform 0.7s ease, box-shadow 0.7s ease; 
     overflow: hidden;
     justify-content: space-between;
-    cursor: pointer; 
+    cursor: pointer;
+    flex: 1 1 20%;
+    max-width: 20%;
 }
 .save-artwork-item {
-    width: 22vw;
-    height: 40vh;
+    height: auto;
 }
 
 /* .save-artwork-item:hover {
@@ -62,7 +63,6 @@
     height: 20vh;
 }
 
-/* Artwork Information Styles */
 /* Artwork Information Styles */
 .save-artwork-info {
     font-size: 0.75rem;
@@ -84,6 +84,7 @@
 .save-artwork-title {
     font-weight: bold;
     position: relative; /* Required to position tooltip correctly */
+    margin-top: 5px; /* Reduce space between image and title */
 }
 
 .save-artwork-title:hover .full-title-tooltip {
@@ -112,11 +113,14 @@
 
 /* Artwork Image Styles */
 .save-artwork-image {
-    max-height: 25vh;
-    width: auto;
+    max-width: 95%;
+    height: 300px;
     cursor: pointer;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 10px; /* Reduce space between image and title */
 }
-
 
 /* Action Button Layout */
 .artwork-actions {
@@ -125,10 +129,6 @@
     justify-content: center;
     padding: 5px 0;
 }
-
-/* .collection-selector {
-    background-image: url('/src/buttons/add.png');
-  } */
 
 /* Collection Selector Styles */
 .collection-selector {
@@ -139,6 +139,8 @@
     transition: max-height 0.7s ease, opacity 1.7s ease; 
     visibility: hidden; 
     z-index: 100; 
+    max-height: 400px; /* Added for max height */
+    overflow-y: auto; /* Added for overflow scroll */
 }
 
 .collection-selector.active {
@@ -230,7 +232,7 @@
 .history-artwork-image {
     max-height: 100%;
     max-width: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 .history-artwork-info {
     width: 100%;
@@ -242,15 +244,22 @@
     color: #494848;
 }
 
+
 .delete-collection-button {
     margin-left: 10px;
-    background-color: #b10f2e;
-    color: white;
+    background: none;
+    justify-content: right;
     border: none;
-    padding: 5px 10px;
+    padding: 0;
     cursor: pointer;
+    background-image: url('/src/buttons/close.png');
+    background-size: cover;
+    width: 20px;
+    height: 20px;
+    align-self: center; /* Center vertically */
+    filter: brightness(0) invert(1); /* Make the icon white */
 }
 
 .delete-collection-button:hover {
-    background-color: #ff1e1e;
+    background-color: transparent;
 }

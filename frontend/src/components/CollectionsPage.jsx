@@ -120,21 +120,19 @@ function CollectionsPage() {
                     All Collections
                 </li>
                 {[...collections].reverse().map((collection) => (
-                    <li key={collection.id}>
+                    <li key={`collection-${collection.id}`}>
                         <span onClick={() => setSelectedCollectionId(String(collection.id))}>
                             {collection.name}
                         </span>
-                        <button onClick={() => handleDeleteCollection(collection.id)} className="delete-collection-button">
-                            Delete
-                        </button>
+                        <button onClick={() => handleDeleteCollection(collection.id)} className="delete-collection-button"></button>
                     </li>
                 ))}
             </ul>
             <h1 className='selected-header'>{selectedCollectionId === 'all' ? 'ALL SAVED ARTWORKS' : collections.find(c => c.id === parseInt(selectedCollectionId))?.name || 'Filtered Artworks'}</h1>
             
             <div className="save-artwork-list">
-                {[...artworksDetails].reverse().map((artwork, index) => (
-                    <div key={artwork.objectID || index} className="save-artwork-item">
+                {[...artworksDetails].reverse().map((artwork) => (
+                    <div key={`artwork-${artwork.objectID}`} className="save-artwork-item">
                         <img src={artwork.primaryImageSmall} alt={artwork.title} onClick={() => viewArtworkDetail(artwork)} className="save-artwork-image" />
                         <div className="save-artwork-info">
                         <h3 className="save-artwork-title">
@@ -152,8 +150,8 @@ function CollectionsPage() {
             <h2 className='saved-header'>SAVED HISTORY</h2>
             <div className="separator-history"></div>
             <div className="history-list-container">
-                {[...inactiveArtworks].reverse().map((artwork, index) => (
-                    <div key={artwork.objectID || index} className="history-artwork-item">
+                {[...inactiveArtworks].reverse().map((artwork) => (
+                    <div key={`inactive-artwork-${artwork.objectID}`} className="history-artwork-item">
                         <div className="history-artwork-image-container">
                             <img
                                 src={artwork.primaryImageSmall}

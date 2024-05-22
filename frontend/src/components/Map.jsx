@@ -144,8 +144,8 @@ function Map_visual() {
                         top: '10px',
                         background: `url(${centerIcon}) no-repeat center center`,
                         backgroundSize: 'cover',
-                        width: '50px',
-                        height: '50px',
+                        width: '30px',
+                        height: '30px',
                         border: 'none',
                         cursor: 'pointer'
                     }}

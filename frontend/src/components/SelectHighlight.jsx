@@ -14,15 +14,20 @@ function SelectionControls({ setHighlightMode, setSelectedGallery, collections }
             setHighlightMode('collection');
             setSelectedGallery(collectionId);
         }
+        setShowCollections(false); // Close the modal after selection
+    };
+
+    const handleMouseLeave = () => {
+        setShowCollections(false);
     };
 
     return (
-        <div className="selection-controls">
+        <div className="selection-controls" onMouseLeave={handleMouseLeave}>
             <button onClick={toggleCollections}>
                 {showCollections ? "Show All Galleries" : "CURATED MAPS"}
             </button>
             {showCollections && (
-                <ul>
+                <ul className="collections-list">
                     <li>
                         <button onClick={() => handleCollectionSelect(null)} className="full-width">
                             All Saved Artworks

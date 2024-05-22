@@ -2,11 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../Style/search.css';
 import departmentsData from '../departments.json'; 
 import { searchArtworks } from '../services/MetAPI';
-//function to load random artworks on load for CURATE db
-import { fetchRandomArtworks } from '../services/apiService';  
-
-//* This Component uses the MET API directly / Not the CURATE (project) API
-
+import { fetchRandomArtworks } from '../services/apiService';
+import { useNavigate } from 'react-router-dom'; 
 
 function Search() {
     const [queryParams, setQueryParams] = useState({
@@ -21,12 +18,11 @@ function Search() {
     const [fetchLimit, setFetchLimit] = useState(10);
 
     const departments = departmentsData.departments;
+    const navigate = useNavigate();
 
-    // Load random artworks on component mount
     useEffect(() => {
         loadRandomArtworks();
     }, []);
-
 
     const loadRandomArtworks = async () => {
         setLoading(true);
@@ -46,14 +42,13 @@ function Search() {
         }
     };
 
-    // test w/ limit
-    const fetchArtworks = async (params, limit) => {
+    const fetchArtworks = async (params, limit, append = false) => {
         console.log('Fetching parameters:', params, 'Limit:', limit);
         setLoading(true);
         try {
             const newResults = await searchArtworks(params, limit);
             console.log('Fetched data:', newResults);
-            setResults(newResults);
+            setResults(prevResults => append ? [...prevResults, ...newResults] : newResults);
         } catch (error) {
             console.error('Error fetching artworks:', error);
             setResults([]);
@@ -71,18 +66,26 @@ function Search() {
         setQueryParams(prev => {
             const updatedParams = { ...prev, ...newParams };
             console.log('Updated query parameters:', updatedParams);
+            fetchArtworks(updatedParams, fetchLimit);
             return updatedParams;
         });
     };
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
+            event.preventDefault();
             fetchArtworks(queryParams, fetchLimit);
         }
     };
 
     const handleSeeMore = () => {
-        setFetchLimit(prev => prev + 10);
+        const newLimit = fetchLimit + 10;
+        setFetchLimit(newLimit);
+        fetchArtworks(queryParams, newLimit, true); // Fetch more results and append to the existing results
+    };
+
+    const handleImageClick = (artwork) => {
+        navigate(`/artwork/${artwork.objectID}`, { state: { artwork } });
     };
 
     return (
@@ -90,7 +93,7 @@ function Search() {
             <form onSubmit={handleSearch} className="search-form">
                 <select
                     value={queryParams.searchType}
-                    onChange={(e) => handleFilterChange({ searchType: e.target.value })}
+                    onChange={(e) => setQueryParams({ ...queryParams, searchType: e.target.value })}
                     className="search-type-select"
                 >
                     <option value="artistCulture">Search by Artist / Culture</option>
@@ -100,7 +103,7 @@ function Search() {
                     type="text"
                     placeholder={queryParams.searchType === 'medium' ? 'Enter Medium' : 'Search...'}
                     value={queryParams.searchTerm}
-                    onChange={(e) => handleFilterChange({ searchTerm: e.target.value })}
+                    onChange={(e) => setQueryParams({ ...queryParams, searchTerm: e.target.value })}
                     onKeyDown={handleKeyDown}
                     className="search-input"
                 />
@@ -140,9 +143,9 @@ function Search() {
                 <div className="results">
                     {results.map(item => (
                         <div key={item.objectID} className="result-item">
-                            <img src={item.primaryImageSmall} alt={item.title} className="artwork-image" />
+                            <img src={item.primaryImageSmall} alt={item.title} className="artwork-image" onClick={() => handleImageClick(item)} />
                             <h3 className='search-title'>{item.title}</h3>
-                            <p className='search-Gallery-num'>Gallery {item.GalleryNumber}</p>
+                            {item.GalleryNumber && <p className='search-Gallery-num'>Gallery {item.GalleryNumber}</p>}
                             <p className='search-ArtistName'>{item.artistDisplayName}</p>
                         </div>
                     ))}

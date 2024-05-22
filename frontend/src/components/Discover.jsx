@@ -25,7 +25,7 @@ function Discover() {
         if (allFound) {
             window.scrollTo({ top: 0, behavior: 'smooth' });  
         }
-    }, [allFound]); ; 
+    }, [allFound]);
 
     // Fetch a new scavenger hunt data
     const handleGenerateHunt = async () => {
@@ -35,8 +35,8 @@ function Discover() {
             const data = response.artworks;
             const initializedArtworks = data.map(art => ({ ...art, found: false }));
             
-            // For demo and test - view ObjectID in console
-            console.log("Fetched Artworks Data:", data);
+            // Cheat Code - view ObjectID in console
+            console.log("Cheat Code:", data.map(art => art.objectID));
 
             setArtworks(initializedArtworks);
             localStorage.setItem('scavengerHunt', JSON.stringify(initializedArtworks));
@@ -54,7 +54,9 @@ function Discover() {
         if (user && user.id) {
             const foundArtworks = artworks.filter(art => art.found).map(art => art.objectID);
             try {
-                await saveScavengerHuntAsCollection(user.id, foundArtworks);
+                console.log("Attempting to save collection:", { user_id: user.id, object_ids: foundArtworks });
+                const response = await saveScavengerHuntAsCollection(user.id, foundArtworks);
+                console.log("Save Collection Response:", response);
                 setButtonText('NEW COLLECTION SAVED');
             } catch (error) {
                 console.error('Failed to save collection:', error);
@@ -99,40 +101,53 @@ function Discover() {
         setAllFound(updatedArtworks.every(art => art.found));
     };
     
-    //UI helper
+    // UI helper
     const handleKeyDown = (e, artworkObjectID) => {
         if (e.key === 'Enter') {
             handleSubmitGuess(e.target.value, artworkObjectID);
         }
     };
 
+    // Truncate title function
+    const truncateTitle = (title, maxLength = 25) => {
+        if (title.length > maxLength) {
+            return title.slice(0, maxLength) + ' [...]';
+        }
+        return title;
+    };
 
     return (
         <div className='discover-container'>
             <h1 className='header'>Scavenger Hunt</h1>
             <p className='about'>Explore the Met. A selection of artworks will be provided to you. Seek out the item and use the information provided on the object's Title Card to confirm you've located the artwork.</p>
             <div className="button-row">
-                <button onClick={handleGenerateHunt} disabled={loading} className="button-common generate-hunt-button">Generate Scavenger Hunt</button>
                 {allFound && (
                     <button onClick={handleSaveAsCollection} className="button-common discover-collection-button">
                         {buttonText}  
                     </button>
                 )}
+                <button onClick={handleGenerateHunt} disabled={loading} className="button-common generate-hunt-button">Generate Scavenger Hunt</button>
             </div>
             {loading ? <p>Loading...</p> : error ? <p>{error}</p> : (
                 <div className="discover-list">
                     {artworks.map(art => (
-                        <div key={art.objectID} className="discover-artwork-item">
+                        <div key={art.objectID} className={`discover-artwork-item ${art.found ? 'found' : ''}`}>
                             <div className="save-artwork-image-container">
                                 <img src={art.primaryImageSmall} alt={art.title} className="discover-artwork-image" />
                             </div>
                             <div className="discover-artwork-info">
-                                <h3 className="discover-artwork-title">{art.title}</h3>
-                                <p className="discover-artwork-gallery">Gallery Number: {art.galleryNumber}</p>
-                                <p>Artist: {art.artistDisplayName || 'Unknown'}</p>
+                                {!art.found && (
+                                    <>
+                                        <h3 className="discover-artwork-title">{truncateTitle(art.title)}</h3>
+                                        <p className="discover-artwork-gallery">Gallery Number: {art.galleryNumber}</p>
+                                        <p>Artist: {art.artistDisplayName || 'Unknown'}</p>
+                                    </>
+                                )}
+                                {art.found && <span className="found-text">Found!</span>}
                                 {!art.found && (
                                     <div className="question">
                                         <label htmlFor={`input-${art.objectID}`}>Enter the Artwork's ObjectID:</label>
+                                        <br></br>
                                         <input 
                                             id={`input-${art.objectID}`}
                                             type="text" 
@@ -143,7 +158,6 @@ function Discover() {
                                         </button>
                                     </div>
                                 )}
-                                {art.found && <span>Found!</span>}
                             </div>
                         </div>
                     ))}
@@ -154,3 +168,5 @@ function Discover() {
 }
 
 export default Discover;
+
+
